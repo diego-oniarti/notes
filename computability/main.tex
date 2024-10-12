@@ -1,0 +1,438 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{algorithm2e}
+\RestyleAlgo{ruled}
+
+\usepackage{lipsum}
+\input{../common}
+
+\newcommand{\floor}[1]{\ensuremath{\lfloor #1 \rfloor}}
+
+\title{Appunti Computability}
+\author{Diego Oniarti}
+\date{Anno 2024-2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Macchina di Turing}
+Una macchina di Turing è rappresentata da:
+\begin{itemize}
+    \item $\Sigma=\{\sigma_0,\dots,\sigma_{m-1}\}$
+    \item $Q=\{q_0, \dots, q_{n-1}\}$
+    \item $q_o \in Q$ stato iniziale
+    \item $f:\Sigma\times Q \to \Sigma\times Q\times \{\leftarrow,\rightarrow\}$
+\end{itemize}
+La funzione di transizione può essere definita come una tabella
+
+\[
+    Q \left\{
+        \begin{array}{|c|c|c|c|}
+            \hline
+            & \sigma_0 &\cdots& \sigma_n \\
+            \hline
+            q_0 & & \\
+            \hline
+            \vdots & & \\
+            \hline
+            q_n & & \\
+            \hline
+        \end{array}
+    \right.
+\]
+Un altra rappresentazione per una macchina di Turing è quella della macchina a stati (come quelle viste in LFC). Gli stati corrispondono agli stati della macchina di Turnig, mentre le transizioni contengono il carattere letto, quello da scrivere, e la transizione.
+
+\begin{callout}{NB}
+    Come definiamo la funzione di transizione non è importante. Per la definizione di una macchina di Turnig basta che esista una funzione di transizione del tipo $f:\Sigma\times Q \to \Sigma\times Q\times \{\leftarrow,\rightarrow\}$
+
+    Non è necessario che la funzione di transizione sia totale.
+\end{callout}
+
+\paragraph{Esempio}
+Questa è la funzione di transizione per una macchina di Turing che inizia con un numero binario sul nastro e ci aggiunge $1$.
+\[
+    \begin{array}{c|c|c|c}
+        & \textvisiblespace & 0 & 1 \\
+        \hline
+        LSB & \textvisiblespace,carry,\leftarrow & 0,LSB,\rightarrow & 1,LSB,\rightarrow \\
+        carry & 1,MSB,\leftarrow& 1,MSB,\leftarrow& 0,carry,\leftarrow\\
+        MSB & \textvisiblespace,halt,\rightarrow & 0,MSB,\leftarrow & 1,MSB,\leftarrow
+    \end{array}
+\]
+
+\paragraph{Esempio}
+Ideiamo una macchina di Turing che inizia con un numero sul nastro. La macchina deve:
+\begin{itemize}
+    \item creare una copia del numero letto
+    \item scrivere questa copia a destra del numero dato
+    \item lasciare il numero intoccato
+    \item lasciare un \textvisiblespace\ tra i due numeri
+\end{itemize}
+
+Una soluzione valida sarebbe questa, dove l'alfabeto è $\Sigma=\{\text\textvisiblespace,0,1,\hat 0, \hat 1\}$ e la funzione di transizione è:
+\[
+    \begin{array}{c|c|c|c|c|c}
+        & \textvisiblespace & 0 & 1 & \hat 0 & \hat 1 \\
+        \hline
+        next & \textvisiblespace,halt,\rightarrow & \hat 0,first0,\rightarrow &\hat 1,first1,\rightarrow & & \\
+        first1 & \textvisiblespace,scom1,\rightarrow & 0,first1,\rightarrow & 1,scom1,\rightarrow & & \\
+        scom1 & 1,left,\leftarrow & 0,scom1,\rightarrow & 1,scom1,\rightarrow & & \\
+        first0 & \textvisiblespace,scom0,\rightarrow & 0,first0,\rightarrow & 1,scom0,\rightarrow & & \\
+        scom0 & 0,left,\leftarrow & 0,scom0,\rightarrow & 1,scom0,\rightarrow & & \\
+        left & \textvisiblespace,left,\leftarrow & 0,left,\leftarrow & 1,left,\leftarrow & 0,next,\rightarrow & 1,next,\rightarrow \\
+
+    \end{array}
+\]
+
+\section {Multi-Tape Turing Machine}\label{sec: multitape}
+Per convenzione immaginiamo una macchina con un tape di input, uno di output, e gli altri sono per utilizza arbitrario. \\
+Ogni tape ha un puntatore suo, e può decidere di muoverlo o lasciarlo intoccato.
+La funzione di transizione prende questa forma
+\large\[
+    f: \Sigma^t\times Q \to \Sigma^t\times Q \times \{\leftarrow, \downarrow, \rightarrow\}^t
+\]
+\normalsize
+dove l'apice $t$ (numero di tape) indica che l'elemento è ripetuto $t$ volte all'interno di una tupla. \\
+La funzione quindi prende l'input di tutti i tape e lo stato corrente. Questo decide cosa scrivere in ogni tape, lo stato a cui muoversi, e la direzione in cui muovere ogni tape.
+
+\paragraph{Multi-Tape vs Single Tape}
+Una macchina di Turing con più tape può svolgere le stesse computazioni di una macchina a tape singolo. È solo più veloce a farlo.
+
+\section{Turing vs Universal Machines}
+Una differenza che rimane tra la macchina di Turing descritta e un computer come lo vediamo oggi è la seguente. Una macchina di Turing è hard coded per svolgere un singolo compito.
+
+Possiamo quindi formalizzare una macchina di Turing $U$ che sia universale? si. \\
+L'input di $U$ deve essere un encoding di una macchina $m$.
+
+Prendiamo per esempio la macchina di Turing che aggiunge $1$ ad un numero (vista in precedenza).
+\[
+    \begin{array}{c|c|c|c}
+        & \textvisiblespace & 0 & 1 \\
+        \hline
+        0 & \textvisiblespace,1,\leftarrow & 0,0,\rightarrow & 1,0,\rightarrow \\
+        1 & 1,H & 1, H & 0,1,\leftarrow
+    \end{array}
+\]
+Possiamo definire un'albeto che ci permetta di descrivere questa tabella sotto forma di stringa.
+\begin{align*}
+    \Sigma &= \{\text{\textvisiblespace},1,0,',',;\} \\
+    \text{tabella}&=\text{\textvisiblespace},1,0;0,0,1;1,0,1;1,,;1,,;0,1,0
+\end{align*}
+Prendiamo cone conenzione che ogni cella sia definita da 3 simboli separati da virgole. Un simbolo mancante è interpretato come l'\textit{Halting State}.
+
+La macchina universale $U$ è composta da:
+\begin{itemize}
+    \item Un tape $\lfloor m\rfloor$ che rappresenta la macchina $m$
+    \item Un tape $s$ che rappresenta lo stato di $m$
+    \item Uno o più tape usati per l'esecuzione di $m$
+\end{itemize}
+\begin{callout}{nb}
+    Come detto in Sec.\ref{sec: multitape}, questo piò essere svolto anche con una macchina a tape singolo.
+\end{callout}
+L'esecuzione di $m$ utilizzanto $U$ richiede più \textit{step} dell'esecuzione di $m$. Ma il numero di step di $U$ scala linearmente con quello di $m$.
+
+\begin{align*}
+    t(m,s) &\leq 2|s|+1 \\
+    t(U,\lfloor m \rfloor s) &\leq k t(m,s) \\
+\end{align*}
+dove $t(a,b)$ è il tempo di esecuzione della macchina $a$ sull'input $b$.
+
+\subsection{Random-access Machine}
+Un computer moderno può essere devinito come una "\textit{random access machine}" in quanto accede agli indirizzi di memoria in tempo costante, a differenza della macchina di Turing che deve scorrere il tape.\\
+Questa è l'unica differenza tra i due tipi di macchine. Quella di Turing è "lenta".
+
+Ogni altro aspetto di una CPU odierna può essere creato analogamente in una macchina di Turing (Pc, registri, memoria, etc..).
+
+\subsection*{Nota sull'alfabeto}
+Abbiamo usato un alfabeto $\Sigma$ di 5 caratteri per descrivere la Turing machine, ma potremmo rappresentare ogni simbolo con un numero binario a tre cifre. Questo ci permette di descrivere un programma come una stringa binaria.
+
+\section{Uncomputabe machines}
+Possiamo rapprsentare ogni possibile macchina di Turing e ogni può output in una tabella
+\[
+    TM\left\{\overbrace{\begin{array}{c|c c c c c}
+            & \epsilon & 0 & 1 & 00 & \cdots \\
+            \hline
+        \epsilon & \\
+        0   &  \\
+        1 & \\
+        \vdots & 
+
+    \end{array}}^{\Sigma^*}\right.
+\]
+\begin{align*}
+    & UC: \Sigma^*\mapsto\{0,1\} \\
+    & UC(\alpha) = \begin{cases}
+        0 & m_\alpha(\alpha)=1 \\
+        1 & \text{altrimenti}
+    \end{cases} \\
+    & m_\alpha \text{ macchina descritta dalla stringa } \alpha
+\end{align*}
+Ora possiamo usare l'argomento della diagonale per creare una macchina UC che non sia computabile.
+
+\paragraph{Thesis}
+\[
+    \forall m\in TM \exists s \in \{0,1\}^*:\ m(s)\neq UC(s)
+\] 
+
+\begin{callout}{}
+    Sapevamo già che esistessero problemi non calcolabili. Questa è sono un'altra prova.
+    \begin{align*}
+        UC\in\{f:\Sigma^*\to\{0,1\}\} &\quad \text{uncountable} \\
+        \{TM\} &\quad \text{countable}
+    \end{align*}
+\end{callout}
+
+\begin{callout}{Congettura di Goldbach}
+    Ogni numero maggiore di due può essere espresso come la somma di due numeri primi.
+\end{callout}
+
+\subsection{Halting Problem}
+Esiste una macchina $H(\floor{M},\epsilon)$ che so comporti così?
+$$
+H(\floor{M},\epsilon) = \begin{cases}
+    1 & M(\epsilon)\ \text{halts} \\
+    0 & M(\epsilon)\ \text{does not halt} 
+\end{cases}
+$$
+
+No. Se esistesse esisterebbe anche la macchina $H'$ con quiesto comportamento.
+$$
+H'(\floor{M},\epsilon) = \begin{cases}
+    0 & H(\floor{M},\epsilon)==1 \\
+    \infty & H(\floor{M},\epsilon)==0
+\end{cases}
+$$
+Il comportamento di $H(H'(\floor{M},\epsilon))$ non può poi essere definito.
+
+\begin{warning}{NB}
+    Questa non è la dimostrazione usata dal prof. Per quella chiedi in giro.
+\end{warning}
+
+\subsubsection{rambling}
+Halt non è ricorsiva. Halt è ricorsivamente enumerabile? Si. Basta usare il metodo "parallelo" diagonale visto in precedenza. (avanzare tutti i casi di uno step alla volta)
+faccio un backup
+
+\section{Recap}
+\subsection{Insiemi}
+Abbiamo due modi di definire un subset ti tutte le stringhe.
+\begin{align*}
+    s &\subseteq \Sigma^* \\
+    f:\Sigma^*&\to\{0,1\} \\
+\end{align*}
+
+\subsection{recursive}
+Un set è \textit{recursive} se e solo se
+\begin{align*}
+    s\in R \iff \exists m\ TM\ s.t. \forall x\in\Sigma^*\ m(x)=\begin{cases}0&x\not\in s \\ 1 & x\in s\end{cases}
+\end{align*}
+
+\subsection{ricursively enumerable}
+Ci sono tre modi di definire $RE$.
+\begin{itemize}
+    \item Un set è ricorsivamente enumerabile se:
+        \begin{align*}
+            s\in RE \iff \exists m\ TM\ s.t. \forall x\in\Sigma^*\ m(x)=\begin{cases}1&x\in s \\ \text{anything else} & x\not\in s\end{cases}
+        \end{align*}
+        \textit{Anything Else} include anche il non haltare mai.
+
+    \item
+        \begin{align*}
+            \forall x\in\Sigma^* m(x)=\begin{cases}1&x\in s \\ \infty & x\not\in s\end{cases}
+        \end{align*}
+
+    \item $m$ scrive su un tape tutti e soli gli elementi di $s$.
+\end{itemize}
+Possiamo dimostrare che le 3 definizioni sono equivalenti.
+\begin{itemize}
+    \item $2\implies 1$: Triviale. $\infty\in\text{Anything Else}$
+    \item $1\implies 2$: Assumendo di avere una macchina $m_1$, possiamo costruire una macchina $m_2$.
+        \begin{align*}
+            m_2(x) = \begin{cases}
+                1 & m_1(x) = 1 \\
+                \infty & otherwise
+            \end{cases}
+        \end{align*}
+        Questa tecnica di prendere una macchina e modificarla per crearne un'altra è chiamata \textbf{riduzione}.
+    \item $2\implies 3$: Assumiamo di avere $m_2$.
+        \begin{align*}
+            & queue \leftarrow empty \\
+            & \forall x \in \Sigma^*: \\
+            & \quad queue.push\ (x, \text{init configuration of }m_2(x)) \\
+            & \quad \forall (y,\text{configuration of }m_2(y)) \in q: \\
+            & \quad\quad if\ \text{configuration is halted}: \\
+            & \quad\quad\quad \text{output }y \\
+            & \quad\quad\quad \text{remove from queue} (y,config) \\
+            & \quad\quad else: \\
+            & \quad\quad\quad \text{advance configuration by one step} \\
+        \end{align*}
+        \begin{callout}{Diagonale}
+            Questo è a tutti gli effetti un ennesimo utilizza del metodo diagonale.
+        \end{callout}
+\end{itemize}
+
+\subsection{coRE}
+Un set è Co recursively enumerable (coRE) se il suo complementare è ricorsivamente enumerabile.
+
+\begin{align*}
+    s\in RE && m(x) = \begin{cases}
+        1 & x\in S \\
+        \text{anything else} & x\not\in S
+    \end{cases} 
+    \\
+        s\in coRE && m(x) = \begin{cases}
+        0 & x\not\in S \\
+        \text{anything else} & x\in S
+    \end{cases}
+    \\
+        s\in coRE && \overline{m(x)} = \begin{cases}
+        0 & x\not\in S \\
+        \infty & x\in S
+    \end{cases}
+\end{align*}
+
+\begin{callout}{Set}
+    Dato il powerset di $\Sigma^*$ (tutte le stringhe), $RE$ e $coRE$ sono due sottoinsiemi di $P(\Sigma^*)$. $R$ (linguaggi ricorsivi) \textbf{è} l'intersezione di $RE$ e $coRE$.
+\end{callout}
+
+\section{Ordering}
+Sia dato un linguaggio $L\subseteq \Sigma^*$ e un ordinamento $<$. Assumiamo che $L$ sia ricorsivamente enumerabile ma non ricorsivo $L\in RE\setminus R$.
+Essendo $L$ in $RE$, esiste una macchina $m$ che produce tutti gli elementi di $L$. Possiamo provare che non esiste una macchina che li produce in ordine.
+
+\section{boh}
+\begin{align*}
+    HALT &= \{(t,s): m_t(s)\neq\infty\} \in RE\setminus R \\
+    HALT_\epsilon &= \{t: m_t(\epsilon)\neq\infty\} \not\in R
+\end{align*}
+
+Ipotiziamo per assurdo che $H_\epsilon$ sia ricorsiva.
+\begin{align*}
+    H_\epsilon: \Sigma^*&\to\{0,1\} \\
+    t &\mapsto \begin{cases}
+        1 & m_t(s)\text{ halts} \\
+        0 & \text{otherwise} \\
+    \end{cases}
+\end{align*}
+\begin{warning}{AO}
+    mi sono distratto e non ho seguito. Però la prova funziona per riduzione e contraddizione. Crea una macchina $H$ che scrive un input e chiama $H_\epsilon$ mi pare
+\end{warning}
+
+\section{Busy beaver "game"}
+\begin{align*}
+    |\Sigma| &= n \\
+    |Q| &= m \\
+    halt &\not\in Q
+\end{align*}
+Il numero di macchine possibili con questi parametri è $2n^2m(m+1)$. Si può vedere questo costruendo la tabella che definisce le transizioni della macchina.
+
+Chiamiamo $\Sigma(m)$ Il numero massimo di 1 che una macchina con $m$ stati può mettere sul tape.  \\
+Poi chiamiamo $S(m)$ il numero massimo di step che una macchina con $m$ esegue prima di haltare. \\
+Per entrambi consideriamo solo macchine che ricevono $\epsilon$ come input e hantano.
+
+$S(m)$ non è computabile.
+
+\section{2024-10-07}
+\begin{gather*}
+    (L,<)\subseteq (\Sigma^*,>) \\
+    L\in RE \setminus R \\
+    m_L
+\end{gather*}
+
+\section{Proprietà di una TM}
+Una \textit{Proprietà} di una Turing machine è una qualsiasi funzione binaria (decision function) sulla macchina.
+\begin{align*}
+    HALT_\epsilon: TM \mapsto \{0,1\}
+\end{align*}
+Un esempio è Halt. Altri sono:
+\begin{enumerate}
+    \item $m$ has 10 states (Computable)
+    \item $m$ decides prime numbers (Specification)
+    \item $m$ recognizes haltime TMs (Semantica)
+    \item $m$ deecides halting TMs (Computable perché è sempre \textit{False}. Triviale)
+\end{enumerate}
+
+\begin{callout}{Riconoscere vs Decidere}
+    Una macchina di Turing \textit{Decide} qualcosa se conferma qualcosa ("risponde si"). Ma non ha un comportamento stabilito in caso contrario \\
+    Una macchina \textit{Riconosce} qualcoss se risponde "si" o "no" in maniera definitiva
+\end{callout}
+Quindi una proprietà "P" \textbf{decide} un set di Turing Machines.
+\begin{align*}
+    P:TM\mapsto\{0,1\}
+\end{align*}
+
+\paragraph{Triviale}
+Una proprietà $P$ è \textit{triviale} se $P=\emptyset$ o $P=TM$
+
+\paragraph{Specification}
+Boh °¬°
+
+\paragraph{Semantic}
+Ogni macchina di Turing può essere vista come
+\begin{align*}
+    m(s) = \begin{cases}
+        1 \\
+        \text{anything else} \\
+        \infty
+    \end{cases}
+\end{align*}
+Quindi possiamo dire che ogni macchina di Turing riconosce un linguaggio $L(m) = \{s\in\Sigma^*: m(s)=1\}$
+
+Una proprietà è \textit{Semantica} se.
+\begin{align*}
+    \forall m_1,m_2\in TM. L(m_1)=L(m_2) \implies P(m_1)=P(m_2)
+\end{align*}
+Se le due macchine compiono lo stesso lavoro (riconoscono lo stesso linguaggio): O entrambe hanno la proprietà, o nessuna delle due la ha.
+
+\begin{align*}
+    P(m) = "\text{All strings recognized by $m$ have an even length}"
+\end{align*}
+La macchina che riconosce solo la stringa vuota ($\epsilon$) ha questa proprietà. Questo perché tutte le stringhe che vengono riconosciute da questa macchina (solo 1) hanno lunghezza $0$, che è pari.
+
+\subsection{Teorema di Rice}
+Se una proprietà è sia \textit{semantica} che \textit{non triviale} allora è \textbf{undecidable}
+
+\paragraph{Prova per assurdo}
+Sia $P$ semantica e non triviale. Deve esserci almeno una macchina $m_p$ per cui la proprietà sia vera (altrimenti sarebbe triviale)
+\begin{equation*}
+    m_p\in TM\ s.t.\ P(m_p)=1
+\end{equation*}
+Without loss of generality: $L(m)=\emptyset\implies P(m)=0$ Le machcine che riconoscono l'insieme vuoto non hanno la proprietà $P$.
+
+Supponiamo per assurdo che $P$ sia decidibile. Quindi
+\begin{equation*}
+    \exists \mathcal{P} \in TM\ s.t.\ \forall m: \mathcal{P}(m)=P(m)
+\end{equation*}
+Esiste una macchina $\mathcal{P}$ che decide la proprietà $P$.
+
+Abbiamo poi la macchina $HALT:\ TM\times\Sigma^*\mapsto \{0,1\}$ che decide se una certa macchina halta con un certo input.
+
+Prendiamo poi una macchina qualsiasi $n\in TM$. Ovviamente possiamo ottenere $\mathcal P(\floor{n})$.
+La macchina prende un input $t$ e:
+\begin{algorithm}
+    \caption{n}
+    save $t$ on a separate tape\;
+    Put $s$ on the input tape\;
+    run $m(s)$\;
+    restore original input $t$\;
+    run $m_p(t)$
+\end{algorithm}
+
+\begin{align*}
+    P(m_{ms}) = \begin{cases}
+        0 & m(s)=\infty \\
+        m_p(t) & m(s)\neq\infty
+    \end{cases}
+\end{align*}
+
+\begin{align*}
+    m(s)=\infty &\implies L(n_{ms})=\emptyset \\
+    m(s)\neq\infty &\implies L(n_{ms})=L(m_p)\implies P(n_{ms}=P(m_p) = 1
+\end{align*}
+Quindi questa macchina risolverebbe l'halting problen. Questo è ovviamente assurdo e prova la tesi.
+
+\end{document}
+
+

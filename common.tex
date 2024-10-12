@@ -1,0 +1,18 @@
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{callout}[2][]{breakable,sharp corners, skin=enhancedmiddle jigsaw,parbox=false,
+boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,
+after title={.\ }, coltitle=purple,colback=purple!10,colframe=purple, title={#2},
+fonttitle=\bfseries,#1}
+
+\newtcolorbox{warning}[2][]{breakable,sharp corners, skin=enhancedmiddle jigsaw,parbox=false,
+boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,
+after title={!\ }, coltitle=red,colback=red!10,colframe=red, title={#2},
+fonttitle=\bfseries,#1}
+
+\newtcolorbox{esempio}[2][]{breakable,sharp corners, skin=enhancedmiddle jigsaw,parbox=false,
+boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,
+after title={:\ }, coltitle=blue,colback=blue!10,colframe=blue, title={#2},
+fonttitle=\bfseries,#1}
+

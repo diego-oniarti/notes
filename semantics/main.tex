@@ -1,0 +1,720 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\usepackage[inference]{semantic}
+\usepackage{amsmath} \allowdisplaybreaks % lets align equations break over pages.
+\usepackage{hyperref}
+\usepackage[amsmath,hyperref,amsthm]{ntheorem}
+\usepackage{thmtools}
+\usepackage[capitalize]{cleveref}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor} % the best way to colour text
+\usepackage[colorinlistoftodos]{todonotes} 
+\usepackage{tikz} \usetikzlibrary{positioning,shadows,arrows,calc,backgrounds,fit,shapes,snakes,shapes.multipart,decorations.pathreplacing,shapes.misc,patterns}
+\usepackage{xspace}
+\usepackage{scalerel}
+\usepackage{bm} %bold math. a mess to use.
+\usepackage{bussproofs} % for logic-style proofs
+\usepackage{xfrac}
+
+\hypersetup{ pdfpagemode=UseOutlines, colorlinks=true, linkcolor=red, citecolor=blue }
+
+\input{../cmds}
+\input{../common}
+
+\newcommand{\na}[0]{\ensuremath {\overset{N}{\rightarrow}}}
+\newcommand{\rl}[3]{\inference{#1}{#2}\text{ #3}}
+\newcommand{\bop}[0]{\ensuremath\oplus}
+\newcommand{\appl}[2]{\ensuremath(#1)\ #2}
+%\newcommand{\st}[3][]{\ensuremath\infer{#3}{#2}\text{#1}}
+\newcommand{\st}[3][]{\ensuremath \displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}
+\newcommand{\N}{\ensuremath \mathbb N}
+\usepackage{pdflscape}
+
+\newcommand{\IF}[0]{\ensuremath {\text{ if }}}
+\newcommand{\THEN}[0]{\ensuremath {\text{ then }}}
+\newcommand{\ELSE}[0]{\ensuremath {\text{ else }}}
+\newcommand{\AND}[0]{\ensuremath {\text{ and }}}
+
+\title{Appunti Semantics}
+\author{Diego Oniarti}
+\date{Anno 2024-2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Lambda Calculus}
+Modello formale per il calcolo funzionale. \\
+Il "While Language"(?) è più o meno la stessa cosa ma per la programmazione procedurale, che non faremo.
+
+\subsection{Sintassi}
+Sintassi per l'Untyped Lambda Calculus (ULC):
+
+\begin{align*}
+t :=  & n\in \mathbb{N} \\
+      & | t \oplus t \\
+	  & | \lambda x. t \\
+	  & | x\in X \\
+	  & | t\ t \\
+\end{align*}
+
+dove:
+\begin{itemize}
+    \item \textit{t} è una metabariabile
+    \item \textit{:=} è "RNF" (?)
+    \item $\oplus$ è +, -, e $\times$
+    \item $\lambda$ indica una funzione, in questo caso con parametro $x$ e body $t$.
+    \item Tutto è associativo a sinistra
+\end{itemize}
+
+Questo vuol dire che un termine nel nostro linguaggio è un numero naturale o una somma di termini.
+
+\begin{callout}{nb}
+    Possiamo fare delle semplificazioni come usare $n$ per rappresentare i numeri reali invece che preoccuparci della rappresentazione binaria.
+\end{callout}
+
+\begin{esempio}{example}
+    $(\lambda x.x+1)\ 3$
+    Questo rappresenta una funzione "successivo" e invoca la funzione sul numero $3$.
+\end{esempio}
+
+\section{SOS - Structural Operational Semantics}
+\begin{align*}
+t ::=& n \\
+    |& t \oplus t \\
+    |& \lambda x.t \\
+    |& x\in X \\
+    |& t\ t
+\end{align*}
+
+\begin{align*}
+    \overbrace{\Omega}^\text{progrm state} :: =& t \\
+                                               |&fail \\
+\end{align*}
+
+We can divide terms in \textbf{redexes} and \textbf{values}.
+\paragraph{Redexes}
+\begin{itemize}
+    \item $n\oplus n$
+    \item $(\lambda x.t)\ v$
+\end{itemize}
+
+\paragraph{Values}
+\begin{align*}
+    v ::&= n \\
+        &| \lambda x.t
+\end{align*}
+
+Redexes change the state of the program according to some rules:
+\paragraph{rules}
+\begin{align*} 
+    &\frac{[n\oplus n'] = n''}{n\oplus n'\to n''} &&\text{sos-bop} \\
+    &\frac{}{(\lambda x.t) v\to t[\frac v x]}\ &&\text{sos-beta} \\
+    &\frac{t\to t''}{t\oplus t' \to t''\oplus t'} &&\text{sos-bop-1} \\
+    &\frac{t\to t'}{n\oplus t \to n\oplus t'} &&\text{sos-bop-2} \\
+    &\frac{t\to t''}{t\ t' \to t''\ t'}\ &&\text{sos-app-1} \\
+    &\frac{t'\to t''}{(\lambda x.t) t'\to (\lambda x.t)\ t''}\ &&\text{sos-app-2} \\
+\end{align*}
+
+\paragraph{substitution}
+\begin{align*}
+    n[v/x] &= n \\
+    x[v/x] &= v \\
+    y[v/x] &= y \\
+    \\
+    (t\oplus t')[v/x] &= t[v/x]\oplus t'[v/x] \\
+    (t\ t')[v/x]  &= t[v/x]\ t'[v/x] \\
+    (\lambda y.t)[v/x] &= \lambda y.t[v/x] \\
+\end{align*}
+
+Ogni regola modifica lo stato del programma, quindi possiamo dire abbiano la forma $\Omega \to \Omega$. 
+Un programma corretto risolve a un \textit{valore} dopo una serie di "\textit{steps}".
+
+\paragraph{Errori}
+Programmi come "$5\ 4$" o "$0 + (\lambda x.x)$" sono ben formati dal punto di vista della grammatica indicata. Portano però a delle redex a cui non di può applicare alcuna regola. \\
+Aggiungiamo quindi uno stato "\textit{fail}" a $\Omega$ e delle regole per propagare questo fail.
+
+\paragraph{Fails}
+\begin{align*}
+    \frac{}{(\lambda x.t)\oplus t\to fail}\ &\text{sos-f-L} \\
+    \frac{}{n\ t\to fail}\ &\text{sos-f-n} \\
+    \frac{}{n\ \oplus \lambda x.t\to fail}\ &\text{sos-f-L2} \\
+    \\
+    \frac{t\to t'' \  t''\to fail}{t\oplus t' \to fail}\ &\text{sos-bop-f1} \\
+    \frac{t\to t'\ t'\to fail}{n\oplus t \to fail}\ &\text{sos-bop-f2} \\
+    \frac{t\to t'' \ t''\to fail}{t\ t' \to fail}\ &\text{sos-app-f1} \\
+    \frac{t'\to t''\ t''\to fail}{(\lambda x.t)\ t'\to fail}\ &\text{sos-app-f2} \\
+\end{align*}
+
+\section{SOS - Call By Name}
+We don't apply a function to values but to symbols. The symbols are then lazily evaluated when they're used.
+\[
+    \Omega\na\Omega
+\]
+Let's see which rules change under these new assumption:
+$$\begin{array}{c l}
+    \frac{}{n\oplus n' \overset{N}{\rightarrow} n"}\ &\text{sos-bop N} \\
+    \frac{}{(\lambda x.t)\ t'\na t[\frac {t'} x]}\   &\text{sos-beta N} \\
+    \text{untouched}                                 &\text{sos-app1N } \\
+    \text{untouched}                                 &\text{sos-bop1N } \\
+    \text{untouched}                                 &\text{sos-bop2N } \\
+\end{array}$$
+
+\section{Big Step}
+Una semantica \textit{big step} ha un judgement del tipo:
+\[
+    t\Downarrow v
+\]
+Questo vuol dire che le inverence rules non fatto più pattern matching su $\Omega\to\Omega$ ma su $t\Downarrow v$ (il termine $t$ riduce a un valore $v$). \\
+rules:
+\begin{align*}
+    \frac{}{v\Downarrow v}\ &\text{ val} \\
+    \frac{t\Downarrow n\ t'\Downarrow n'\ n\oplus n'=n"}{t\oplus t' \Downarrow n"}\ &\text{bs-bop} \\
+    \frac{t\Downarrow \lambda x.t"\ t'\Downarrow v\ t"[v/x]\Downarrow v'}{t\ t'\Downarrow v'}\ &\text{bs-app} \\
+\end{align*}
+
+\subsection{Equivalenza con SS}
+Big Step e Small Step sono equivalenti. Questo vuol dire che ogni termine che riduce a un valore in big step, converge allo stesso valore in small step. 
+Questo è utile per alcune dimostrazioni, in quanto possiamo usare la struttura ad albero di BS nelle dimostrazioni per SS.
+
+\section{Contextual Operation Semantics}
+\subsection{COS, SS, CBV}
+Chiamiamo $E$ l'\textit{evaluation context}, così definito.
+\begin{align*}
+E ::= &[] \\
+|& E\ t \\
+|& (\lambda x.t)E \\
+|& E \oplus t \\
+|& n \bop E 
+\end{align*}
+
+Abbiamo poi 2 judgements
+\begin{align*}
+    \Omega &\cred \Omega & \text{main reduction} \\
+    \Omega &\credp \Omega & \text{primitive reduction}
+\end{align*}
+
+\begin{gather*}
+    \rl{t\credp t'}{E[t]\cred E[t']}{ctx} \\
+    \rl{}{n\bop n' \credp n"}{c-bop} \\
+    \rl{}{(\lam{x}{t})v \credp t[v/x]}{c-beta}
+\end{gather*}
+
+\begin{callout}{esercizio}
+(((\lam{x}{\lam{y}{\lam{z}{z\ x-y\ x}}})5)(\lam v v))(\lam w {2*w})
+\end{callout}
+
+\begin{callout}{wow}
+SOS e COS risolvono un'espressione con lo stesso numero di passaggi
+\end{callout}
+
+\section{Teorema di equivalenza SOS e COS}
+$\forall t,t'.t\to t' \iff t\cred t'$ \\
+Per ogni coppia di termini $t$ e $t'$, $t$ fa uno step SOS a $t'$ se e solo se $t$ fa anche uno step COS a $t'$.
+Per dimostrare l'$iff$ dimostriamo prima il $\implies$ e poi l'$\impliedby$.
+
+\paragraph{lem.1} $\forall t,t'.t\to t' \implies t\cred t'$
+\paragraph{lem.2} $\forall t,t'.t\to t' \impliedby t\cred t'$
+
+\subsection{Prova per induzione del lemma 1}
+Usiamo i termini come struttura induttiva. Se vediamo i termini come il loro Abstract Syntax Tree, possiamo partire da termini la cui altezza è zero e costruirne altri più complessi per induzione. \\
+L'altra struttura induttiva che possiamo usare è la derivazione SOS. Anche essa è un albero, quindi lo stresso ragionamento vale.
+
+Iniziamo quindi con i casi base. In questo caso abbiamo solo \textit{bop} e \textit{beta}.
+\begin{itemize}
+    \item BOP 
+        \begin{align*}
+            \quad & t = n\bop n'\quad t'=n" \\
+            \text{TS:}  \quad & n\bop n' \cred n" \\
+            \quad & \text{by ctx with } E = [] \\
+            \text {TS:} \quad & n\bop n'\credp n" \\
+            \quad & \text{by c-bop}
+        \end{align*}
+    \item BETA
+        \begin{align*}
+            \quad & t = (\lam{x}{t"})v\quad t'=t"[v/x] \\
+            \text{TS:}  \quad & (\lam{x}{t"})v \cred t"[v/x] \\
+            \quad & \text{by ctx with } E = [] \\
+            \text {TS:} \quad & (\lam{x}{t"})v \credp t"[v/x] \\
+            \quad & \text{by c-beta}
+        \end{align*}
+\end{itemize}
+Dimostriamo ora il passo induttivo per la prova del della 1: \\
+In questo caso avremmo 4 casi induttivi da dimostrare (bop1, bop2, app1, app2) ma ne facciamo uno (app1) solo per brevità.
+\[
+    \text{TH:} \quad \forall t_h,t_h'\ if\ t_h\to t_h'\ then\ t_h\cred t_h' \\
+\]
+\begin{itemize}
+    \item app1: $t=t_1\ t_2 \quad t'=t_1'\ t_2$
+        \begin{align*}
+            \text{TH:}\quad  & t_1\ t_2 \cred t_1'\ t_2 \\
+            \text{HP1:}\quad & t_1\ t_2 \to t_1'\ t_2 \\
+            \text{HP2:}\quad & t_1 \to t_1' \\
+                             & \text{by IH with HP2 wh } t_1\cred t_1' \quad \text{HT1} \\
+                             & \text{by inversion on HT1 wh }
+                             \begin{cases} 
+                                 t_1 \equiv E[t_0]   &  \text{HE1} \\
+                                 t_1'\equiv E[t_0']  & \text{HE1'} \\
+                                 t_0 \credp t_0'     & \text{HPR} \\
+                             \end{cases} \\
+                             & \text{by HE1, HE1' TS } E[t_0]\ t_2\cred E[t_0']\ t_2 \quad^{(*)}\\
+                             & \text{by ctx} \\
+                             & \text{with } E'=E\ t_2\text{ and HPR} \\
+                             & E[t_0]\ t_2 \equiv E'[t_0] \cred E'[t_0'] \quad^{(*)}
+        \end{align*}
+\end{itemize}
+
+\subsection{Prova per definizione del lemma 2}
+\[
+    \forall t,t'.\ t\cred t' \implies t\to t'
+\] 
+\subparagraph{lemma a} $\forall t,t'.\ t\to t' \implies E[t]\to E[t']$
+
+\subparagraph{lemma b} $\forall t,t'.\ t\credp t' \implies t\to t'$
+
+\begin{align*}
+    \text {by inversion on HP} \quad& t\equiv E[t_0]  & HE0 \\
+                         \quad& t'\equiv E[t_0']  & HE0' \\
+                         \quad& t_0\credp t_0'  & HPR \\
+    \text{by LB with HPR w.h.}\quad& t_0\to t_0' & HR \\
+    \text{by HE0,HE0' T.S.} \quad& E[t_0] \to E[t_0']  \\
+    \text{by LA with HR} \quad& \text{the thesis holds}
+\end{align*}
+
+\subparagraph{Proof Lemma B} Proof by case study on $\credp$
+\subparagraph{Proof Lemma A} Proof by induction on $E$
+\begin{itemize}
+    \item Base
+        \begin{align*}
+            E = [] \\
+            TS t\to t' & \text{by HP} 
+        \end{align*}
+    \item Induzione. 
+        \begin{itemize}
+            \item IH: $t\to t' \implies E'[t]\to E'[t']$
+            \item $E = E'[t"]$
+            \item by IH with HP.$E'$ w.h. $E'[t]\to E'[t']$
+            \item TS $(E'\ t")[t] \to ()$
+        \end{itemize}
+\end{itemize}
+
+\section{Simply Typed Lambda Calculus}
+I programmi descritti dal STLC sono un subset di tutti i programmi descritti dal ULC. \\
+STLC non descrive però l'insieme di \textbf{tutti} i programmi che non falliscono. I \textit{type system} fanno una over-approssimazione, rifiutando alcuni programmi che potrebbero ridurre a un valore. \\
+In fine, un programma STLC può ancora divergere (finire in un loop infinito).
+\begin{esempio}{Progranna ULC non STLC che non fallisce}
+    $$(\lambda x.0)(\lambda y.3+\lambda z.z)$$
+    Il programma, assumendo call by name, riduce correttamente a $0$. Questo è un comportamento che si può apprezzare a run time, ma non a compile time (dove vive il \textit{type system}).
+\end{esempio}
+
+\paragraph{Tipi}
+\begin{align*}
+    \tau :=&N \\
+           &\tau\to\tau
+\end{align*}
+
+\paragraph{Judgment}
+\begin{align*}
+    vedi\ foto
+\end{align*}
+
+\paragraph{recap}
+\subparagraph{temini}
+\begin{align*}
+    t := &n \\
+         &t\bop t \\
+         &\lam{x:\tau}{t} \\
+         &x \\
+         &t\ t \\
+\end{align*}
+
+\subparagraph{v}
+\begin{align*}
+    v := &n \\
+         &\lam{x:\tau}{t} \\
+\end{align*}
+
+\subparagraph{tipi}
+\begin{align*}
+    \tau :=&N \\
+           &\tau\to\tau
+\end{align*}
+
+\subparagraph{typing environment}
+\begin{align*}
+    \Gamma := &\emptyset \\
+              &\Gamma,x:\tau
+\end{align*}
+
+\section{Expanding The STLC}
+\subsection{Aggiungere tuple}
+\begin{align*}
+    t := &\dots \\
+    |&<t,t> \\
+    |&t.1 \\
+    |&t.2 \\
+    \\
+    \tau:= &\dots \\
+    |&\tau\times\tau \\
+    \\
+    v:=&\dots \\
+    |&<v,v> \\
+    \\
+    E := &\dots \\
+    |&<E,t> \\
+    |&<v,E> \\
+    |&E.1 \\
+    |&E.2 \\
+    \\
+    \frac{}{<v_1,v_2>.1\credp v_1}p1 & \frac{}{<v_1,v_2>.2\credp v_2}p2
+\end{align*}
+
+\subsection{Aggiungere inums}
+\begin{align*}
+    t := &\dots \\
+    |&inl\ t \\
+    |&inr\ t \\
+    |&case\ t\ of\ inl\ x\mapsto t | inr\ x\mapsto t \\
+    \\
+    \tau:= &\dots \\
+    |&\tau_1 \cup+ \tau_2 \\
+    \\
+    v:=&\dots \\
+    |&inl\ v \\
+    |&inr\ v \\
+\end{align*}
+\begin{align*}
+    E := &\dots \\
+    |&inl\ E \\
+    |&inr\ E \\
+    |&case\ t\ of\ inl\ x\mapsto t| inr\ x\mapsto t \\
+    \\
+     & \frac{}{case\ inl\ v\ of\ inl\ x_1\mapsto t_1| inr\ x_2\mapsto t_2\credp t_1[v/x_1]}inL \\
+     & \frac{}{case\ inr\ v\ of\ inl\ x_1\mapsto t_1| inr\ x_2\mapsto t_2\credp t_2[v/x_2]}inR
+\end{align*}
+
+\subsection{Booleani}
+Ci sono due modi in cui potremmo aggiungere booleani nel linguaggio.
+\begin{itemize}
+    \item true: $\lambda x.\lambda y. x$
+    \item false: $\lambda x.\lambda y. y$
+    \item $if\ t\ then\ t_1\ else\ t_2$ $t\ t_1\ t_2$
+\end{itemize}
+Questo fa evaluation sia di $t_1$ che $t_2$. Possiamo risolvere così:
+\begin{itemize}
+    \item true: $\lambda x.\lambda y. x\ 0$
+    \item false: $\lambda x.\lambda y. y\ 0$
+    \item $if\ t\ then\ t_1\ else\ t_2$ $t\ (\lambda \_.t_1)\ (\lambda\_.t_2)$
+\end{itemize}
+Oppure così:
+\begin{itemize}
+    \item true: $\lambda x.\lambda y. x$
+    \item false: $\lambda x.\lambda y. y$
+    \item $if\ t\ then\ t_1\ else\ t_2$ $(t\ (\lambda \_.t_1)\ (\lambda\_.t_2))0$
+\end{itemize}
+
+\begin{landscape}
+    \begin{align*}
+        \st[lam]{
+            \emptyset: \lam{x:\N\to \N\to \N}{\lam{y:\N\to \N}{\lam{a:\N}{\lam{b:\N}{x\ (y\ a)\ (y\ b)}}}}:(\N\to\N\to\N)\to((\N\to\N)\to(\N\to(\N\to\N)))
+        }{
+            \st[lam]{
+                x:\N\to\N\to\N\vdash \lam{y:\N\to \N}{\lam{a:\N}{\lam{b:\N}{x\ (y\ a)\ (y\ b)}}} : (\N\to\N)\to(\N\to(\N\to\N))
+            }{
+                \st[lam]{
+                    \substack{x:\N\to\N\to\N,\hfill\\y:\N\to\N\hfill}\vdash \lam{a:\N}{\lam{b:\N}{x\ (y\ a)\ (y\ b)}}:\N\to(\N\to\N)
+                }{
+                    \st[lam] {
+                        \substack{x:\N\to\N\to\N,\hfill\\y:\N\to\N,\hfill\\a:\N\hfill}\vdash \lam{b:\N}{x\ (y\ a)\ (y\ b)}:\N\to\N
+                    }{
+                        \st[app] {
+                            \Gamma \left\{\substack{x:\N\to\N\to\N,\hfill\\y:\N\to\N,\hfill\\a:\N,\hfill\\b:\N\hfill}\right.\vdash x\ (y\ a)\ (y\ b):\N
+                        }{
+                            \st[app]{
+                                \Gamma\vdash x\ (y\ a): \N\to\N
+                            }{
+                                \st[val]{
+                                    \Gamma\vdash x:\N\to\N\to\N
+                                }{
+                                    \Gamma(x)=\N\to\N\to\N
+                                }
+                                \quad
+                                \st[app]{
+                                    \Gamma\vdash y\ a:\N
+                                }{
+                                    \st[var]{
+                                        \Gamma\vdash y:\N\to\N
+                                    }{
+                                        \Gamma(y)=\N\to\N
+                                    }
+                                    \quad
+                                    \st[var]{
+                                        \Gamma\vdash a:\N
+                                    }{
+                                        \Gamma(a)=\N
+                                    }
+                                }
+                            }
+                            \quad
+                            \st[app]{
+                                \Gamma\vdash y\ b:\N
+                            }{
+                                \st[var]{
+                                    \Gamma\vdash y:\N\to\N
+                                }{
+                                    \Gamma(y)=\N\to\N
+                                }
+                                \quad
+                                \st[var]{
+                                    \Gamma\vdash b:\N
+                                }{
+                                    \Gamma(b)=\N
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    \end{align*}
+    \begin{align*}
+        \st[app]{
+            \emptyset\vdash(\lam{x:\N}{2*x})\ 5:\N
+        }{
+            \st[lam]{
+                \emptyset\vdash \lam{x:\N}{2*x}:\N\to\N
+            }{
+                \st[num]{
+                    x:\N\vdash 2*x:\N
+                }{}
+            }
+            \quad
+            \st[num]{
+                \emptyset\vdash 5: \N
+            }{}
+        }
+    \end{align*}
+\end{landscape}
+
+\section{If Then Else}
+Assumiamo questo encoding per \textit{true} e \textit{false}:
+\begin{align*}
+    True &= inl0 & Bool = \N\uplus\N \\
+    False &= inr 1 \\
+\end{align*}
+\begin{align*}
+    if\ t\ then\ t' = 
+\end{align*}
+
+\section{Properties of STLC}
+\subsection{Type soundness}
+\begin{align*}
+   & if\ \emptyset\vdash t:\tau\ and\ t\cred^* t'\ then\ either \\
+   & \vdash t.VAL \\
+   & or \\
+   & \exists t".t'\cred t"
+\end{align*}
+Se abbiamo un termine \textit{well typed}, prima o poi riduce a un valore o a un termine che può ancora ridurre.
+
+\begin{callout}{star-step}
+    \begin{align*}
+        \st{t\cred^* t}{}\quad\st{t\cred^* t'}{t\cred t"\quad t"\cred^* t'}
+    \end{align*}
+\end{callout}
+
+\subsubsection{Progress}
+\begin{align*}
+    & if\ \emptyset\vdash t.\tau\ then\ either \\
+    & \vdash t.VAL\ or \\
+    & \exists t'.t\cred t'
+\end{align*}
+
+\subsubsection{Preservation}
+\begin{align*}
+    if\ \emptyset\vdash t.\tau\ and\ t\cred t'\ then\ \emptyset\vdash t'.\tau
+\end{align*}
+
+\subparagraph{Lem: Canonicity}
+\begin{align*}
+    & if\ \Gamma\vdash v.N & then\quad & v=n &\\
+    & if\ \Gamma\vdash v.\tau\to\tau' & then\quad & v=\lam{x:\tau}{t'} &\\
+    & if\ \Gamma\vdash v.\tau\times\tau' & then\quad & v=<v_1,v_2> &\\
+    & if\ \Gamma\vdash v.\tau\uplus\tau' & then\quad & v=...
+\end{align*}
+
+\subsection{Normalization}
+\begin{align*}
+    if\ \emptyset\vdash t.\tau\ then \ \exists v. t\cred^* v
+\end{align*}
+
+\subsection{proofs}
+\subsubsection{Proof of Progress}
+\begin{align*}
+    & if\ \emptyset\vdash t.\tau\ then\ either \\
+    & \vdash t.VAL\ or \\
+    & \exists t'.t\cred t'
+\end{align*}
+Proof by induction on the typing derivation.
+\subparagraph{Base} 
+\begin{itemize}
+    \item t.VAR
+        \begin{align*}
+            \st[contradiziona]{\emptyset\vdash x.\tau}{\emptyset(x)=\tau}
+        \end{align*}
+    \item t.NAT
+        \begin{align*}
+            \st{\emptyset\vdash n.\N}{}
+        \end{align*}
+        TS either $\vdash n.VAL$ or $\exists \tau'. n\cred t'$
+\end{itemize}
+
+\subparagraph{Induction}
+\begin{itemize}
+    \item T-lam
+        \begin{align*}
+            \st{\emptyset\vdash \lam{x:\tau}{t'}:\tau\to\tau'}{}
+        \end{align*}
+        TS either $\underline{\vdash \lam{x:\tau}{t}.VAL}$ or $\exists ...$
+    \item T-app
+        \begin{align*}
+            \st{\emptyset\vdash t'\ t":\tau}{\emptyset\vdash t':\tau'\to\tau \quad \emptyset\vdash t":\tau'}
+        \end{align*}
+\end{itemize}
+
+\subsubsection{Proof of Preservation}
+Assumendo $t\equiv E[t_0]$, abbiamo il judgment $\vdash E:\tau\to\tau$
+\begin{align*}
+    & \st[et-hole]{\vdash[\cdot]:\tau\to\tau}{} \\
+    & \st[et-app]{\vdash E\ t:\tau\to\tau'}{\vdash E:\tau\to(\tau"\to\tau')\quad \emptyset\vdash t:\tau"} \\
+    & \st[et-lam]{\vdash (\lam{x:\tau}{t}) E:\tau"\to\tau'}{\emptyset\vdash (\lam{x:\tau}{t}):\tau\to\tau'\quad\vdash E:\tau"\to\tau} \\
+    & \st[et-bopp]{\vdash E\bop t:\tau\to\N}{\vdash E:\tau\to\N\quad\emptyset\vdash t:\N} \\
+    & \st[et-bopp]{\vdash n\bop E:\tau\to\N}{\emptyset\vdash n:\N\quad\vdash E:\tau\to\N} \\
+\end{align*}
+
+\paragraph{Primitive Preservation} $if\ \emptyset\vdash t:\tau\ and\ t\credp t'\ then\ \emptyset\vdash t'.\tau$
+\subparagraph{proof} Casa analisys on $\credp$
+
+\paragraph{Decomposition} $if\ \emptyset\vdash E[t]:\tau\ then\ \exists\tau'.\vdash E:\tau'\to\tau\ and\ \emptyset\vdash t:\tau'$
+\subparagraph{Proof} induction on $E$
+
+\paragraph{Composition} $if\ \vdash E: \tau\to\tau'\ and\ \emptyset\vdash t:\tau\ then\ \emptyset\vdash E[t]:\tau'$
+\subparagraph{Proof} by induction on $\vdash E:\tau\to\tau'$
+
+\begin{align*}
+    \text{by inversion on HP} & t\equiv E[t_0] & HT0 \\
+                              & t'\equiv E[t_0'] & HT1 \\
+                              & t_0\credp t_0' & HTP \\
+    \text{by HT0 to HP1 with }& \emptyset\vdash E[t_0]:\tau & HP1N \\
+    \text{by HT1 to TH. TS}   & \emptyset\vdash E[t_0']:\tau \\
+    \text{by decomposition with HP1N w.h.} & \vdash E:\tau'\to\tau & HE \\
+                                           & \emptyset\vdash t_0:\tau'&HTT0 \\
+    \text{by prim. pres with HTT0 and HTP w.h} & \emptyset\vdash t_0':\tau' & HTT1 \\
+    \text{by compos with HE and HTT1 W.h.} & \emptyset\vdash E[t_0']:\tau & HF \\
+    \text{by HF the thesis holds}
+\end{align*}
+
+\subsubsection{Proof of Normalization}
+\begin{align*}
+    if \emptyset\vdash t:\tau\ then\ \exists v.t\cred^* v
+\end{align*}
+\paragraph{Proof} by induction on T.D of $t$ \\
+\begin{itemize}
+    \item base 
+    \item induction \begin{itemize}
+            \item $t=t_1\ t_2\quad \st{\emptyset\vdash t_1\ t_2:\tau}{\emptyset\vdash t_1:\tau'\to\tau\quad\emptyset\vdash t_2:\tau'}$
+        \end{itemize}
+\end{itemize}
+Questo non possiamo provarlo con gli strumenti che abbiamo fin ora. Serve quindi introdurre le relazioni logiche.
+
+\section{Logical Relationships (and semantic typing)}
+\begin{align*}
+    V\left[\tau\right] & \text{Quali valori constituiscono un tipo} \\
+    E\left[\tau\right] & \text{Quali termini constituiscono un tipo}\\
+    G\left[\Gamma\right] & \text{Sostituzione} \\
+    \gamma ::=&\emptyset \\
+    |&\gamma[v/x] 
+\end{align*}
+
+\paragraph{Def SemTy (semantic typing)}: \begin{align*}
+    \Gamma \vDash t:\tau \hat{=} \forall \gamma\in G[\tau].t\gamma\in E[\tau] 
+\end{align*}
+
+\paragraph{Semantic soundness}
+\begin{align*}
+    if\ \Gamma\vdash t:\tau\ then\ \Gamma \vDash t:\tau
+\end{align*}
+Se un programma è well typed in sintactic typing, lo è anche in semantic typing.
+
+\subparagraph{AAAH}
+\begin{align*}
+    V[\N] &= \{n\} \\
+    or \\
+    V[\N] &= \{v|v\equiv n\} \\
+    V[\tau'\to\tau] &= \{v|v\equiv \lam{x:\tau'}{t}\ and\ \forall v'\ if\ v'\in V[\tau']\ then\ t[v'/x] \in E[\tau]\} \\
+    E[\tau]&=\{t|\exists v.t\cred^* v\ and\ v\in V[\tau] \} \\
+    V[\tau\times\tau'] &= \{v|v\equiv <v_1,v_2>\ and\ t \in V[\tau]\ and\ t'\in V[\tau']\} \\
+    V[\tau\uplus\tau'] &= \{v|v\equiv v.inl v_1\ and\ v_1\in V[\tau]\} \cup \{v|v\equiv v.inr v_2\ and\ v_2\in V[\tau']\}
+\end{align*}
+
+\section{Proof of Normalization}
+\begin{align*}
+    proof\ by\ SS\ w.h\ & \emptyset \vDash t.\tau \\
+    ...
+\end{align*}
+
+
+first projection
+$t=t_1$
+\begin{align*}
+    \Gamma\vDash \tau\times\tau'\ and\ 
+\end{align*}
+
+\section{lemma: vals in terms}
+\begin{align*}
+    \forall t\ if\ t\in V[\tau]\ then\ t\in E[\tau] 
+\end{align*}
+
+\section{Compatibility lemmas}
+\subsection{Application}
+\begin{align*}
+    if \Gamma\vDash t_1:\tau\to\tau'\ and\ \Gamma\vDash t_2:\tau\ then\ \Gamma\vDash t_1\ t_2:\tau'
+\end{align*}
+\paragraph{proof}
+\begin{align*}
+    & by\ def\ s.t\ take\ \gamma\in G[\Gamma]\ t.s\ (t_1\ t_2)\gamma\in E[\tau'] \\
+    & by\ def\ s.t\ with\ HP1\ wh\ t_1\gamma\in E[\tau\to\tau'] \\
+    & by\ def\ E\ \exists v_1.(t_1\gamma)\cred^* v_1\ and\ v_1\in V[\tau\to\tau'] \\
+    & \dots by\ def\ V\ v_1\equiv \lam{x:\tau}{t_1'}\ and\ \forall v_1'\IF v_1'\in V[\tau]\THEN t_1'[v_1'/x]\in E[\tau'] \\
+    & by\ def\ s.t\ with\ HP2\ wh\ t_2\gamma\in E[\tau]\ by\ def\ E\ \exists v_2. (t_2\gamma)\cred^*v_2 \AND v_2\in V[\tau] \\
+    & (t_1\ t_2)\gamma = (t_1\gamma)(t_2\gamma) \\
+    % & by\ HR1,HR2\ wh\ (t_1\ t_2)\gamma\cred^* v_1(t_2\gamma)\cred^*v_1\ v_2\equiv (\lam{x:\tau}{t\ t_1)v_2\cred t_1[v_2/x] 
+\end{align*}
+
+\section{Introduction and Destruction}
+Le regole del linguaggio semantico possono essere divise in \textit{introduzioni} e \textit{eliminazioni}
+
+\begin{align*}
+    & \st[introduzione]{\Gamma\vDash \tau{x:\tau}{t}:\underline{\tau\to\tau'}}{\Gamma,x:\tau\vDash t:\tau'} \\
+    \\
+    & \st[distruzione]{\Gamma\vDash t_1\ t_2:\tau_1}{\Gamma\vDash t_1:\underline{\tau\to\tau_1}\quad \Gamma\vDash t_2:\tau}
+\end{align*}
+
+\subsection{logica}
+\begin{align*}
+    \st[$\implies$E]{B}{A\quad A\implies B} \\
+    \st[$\implies$I]{A\implies B}{\displaystyle\overset{\displaystyle\overset{[A]}{\vdots}}{B}} \\
+    \st[$\wedge$ I]{A\wedge B}{A\quad B} \\
+    \st[AE1]{A}{A\wedge B} \\
+    \st[AE2]{B}{A\wedge B} \\
+\end{align*}
+
+\end{document}
+
