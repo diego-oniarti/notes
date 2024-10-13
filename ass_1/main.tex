@@ -1,19 +1,132 @@
 \documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\input{../common}
+
+\newcommand{\na}[0]{\ensuremath {\overset{N}{\rightarrow}}}
+\newcommand{\rl}[3]{\inference{#1}{#2}\text{ #3}}
+\newcommand{\bop}[0]{\ensuremath\oplus}
+\newcommand{\appl}[2]{\ensuremath(#1)\ #2}
+\newcommand{\st}[3][]{\ensuremath{\displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}}
+\newcommand{\N}{\ensuremath \mathbb N}
+\newcommand{\lam}[2]{\ensuremath{\lambda#1.#2}}
+\usepackage{pdflscape}
+
 \title{Assignment \#1}
 \author{Diego Oniarti}
-
-\usepackage{amsmath} % Remove the 'semantic' package if it's not needed
-\usepackage{semantic}
-
 \begin{document}
 
 \maketitle
 
-\section{ciao}
-ciao
-\begin{align*}
-    1 &= 2 \\
-    2 &= 3
-\end{align*}
+\section{Big step - call by name}
+Write the operational semantics rules for a big-step, call-by-name reduction for ULC. Write the semantically correct ones only, but write them all
+
+\[\begin{array}{cl}
+    \st{v\Downarrow v}{} & \text{val}\\
+    \\
+    \st{t \bop t' \Downarrow n}{t\Downarrow n' \quad t'\Downarrow n" \quad n'\bop n" = n} & \text{bs-bop} \\
+    \\
+    \st{t\ t'\Downarrow v}{t\Downarrow \lam{x}{t"} \quad t'\Downarrow v' \quad t"[v'/x]\Downarrow v}  & \text{bs-app}
+\end{array}\] 
+
+\section{Equivalence of SOS and COS}
+
+\section{Distinguish terms}
+% ( (t -> t') -> (n -> n -> t) -> t' ) -> n
+% (t -> t') -> (n -> n -> t) -> t'
+\begin{multline*}
+    t\overset{def}=\lam{d:(\N\to\tau\to\tau')\to(\N\to\N\to\tau)\to\tau'\\}{d\ (\lam{m:\N}{\lam{b:\tau}{b}})\ (\lam{i:\N}{\lam{n:\N}{i}})}
+\end{multline*}
+\begin{multline*}
+    t\overset{def}=\lam{d:(\N\to\tau\to\tau')\to(\N\to\N\to\tau)\\\to\tau'}{d\ (\lam{m:\N}{\lam{b:\tau}{b}})\ (\lam{i:\N}{\lam{n:\N}{i*n_1+(1-i)*n_2}})}
+\end{multline*}
+
+\section{Typing derivation}
+\begin{equation*}
+    \st[app]{
+        \Gamma\left\{f:\N\to\N\right. \vdash f\ ((\lam{x}{x+2})\ 4): \N
+    }{
+        \st[var]{
+            \Gamma \vdash f:\N\to\N
+        }{
+            f:\N\to\N \in \Gamma
+        }
+        \quad
+        \st[app]{
+            \Gamma\vdash (\lam{x}{x+2})\ 4: \N
+        }{
+            \st[lam]{
+                \Gamma\vdash \lam{x}{x+2}:\N\to\N
+            }{
+                \st[op]{
+                    \Gamma'\left\{\substack{f:\N\to\N\hfill,\\x:\N\hfill}\right.\vdash x+2:\N
+                }{
+                    \st[var]{
+                        \Gamma'\vdash x:\N
+                    }{
+                        x:\N\in\Gamma'
+                    }
+                    \quad
+                    \st[nat]{
+                        \Gamma'\vdash 2:\N
+                    }{
+                    }
+                }
+            }
+            \quad
+            \st[nat]{
+                \Gamma\vdash 4:\N
+            }{}
+        }
+    }
+\end{equation*}
+
+\begin{equation*}
+    \st[app]{
+        \Gamma\left\{f:\N\to\N\right. \vdash ((\lam{x}{\lam{y}{x\ y}})\ f)\ 3:\N
+    }{
+        \st[app]{
+            \Gamma\vdash (\lam{x}{\lam{y}{x\ y}})\ f: \N\to\N
+        }{
+            \st[lam]{
+                \Gamma\vdash \lam{x}{\lam{y}{x\ y}}: (\N\to\N)\to\N\to\N
+            }{
+                \st[lam]{
+                    \substack{\Gamma,\hfill\\x:\N\to\N}\vdash \lam{y}{x\ y}:\N\to\N
+                }{
+                    \st[app]{
+                        \Gamma' \left\{ \substack{\Gamma,\hfill\\x:\N\to\N,\\y:\N\hfill} \right. \vdash x\ y:\N
+                    }{
+                        \st[var]{
+                            \Gamma'\vdash x:\N\to\N
+                        }{
+                            x:\N\to\N\in\Gamma'
+                        }
+                        \quad
+                        \st[var]{
+                            \Gamma'\vdash y:\N
+                        }{
+                            y:\N\in\Gamma'
+                        }
+                    }
+                }
+            }
+            \quad
+            \st[var]{
+                \Gamma\vdash f:\N\to\N
+            }{
+                f:\N\to\N\in\Gamma
+            }
+        }
+        \quad
+        \st[nat]{
+            \Gamma\vdash 3:\N
+        }{
+        }
+    }
+\end{equation*}
 
 \end{document}
