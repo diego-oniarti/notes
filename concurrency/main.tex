@@ -1,5 +1,13 @@
 \documentclass{article}
 
+\newcommand{\na}[0]{\ensuremath {\overset{N}{\rightarrow}}}
+\newcommand{\rl}[3]{\inference{#1}{#2}\text{ #3}}
+\newcommand{\bop}[0]{\ensuremath\oplus}
+\newcommand{\appl}[2]{\ensuremath(#1)\ #2}
+\newcommand{\st}[3][]{\ensuremath{\displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}}
+\newcommand{\N}{\ensuremath \mathbb N}
+\newcommand{\lam}[2]{\ensuremath{\lambda#1.#2}}
+\usepackage{pdflscape}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \input{../common}
@@ -332,6 +340,98 @@ Ora dei fatti:
 \end{enumerate}
 
 \section{Tight bound: n bite for n threads}
+
+\section{Hoare Logic}
+La \textit{Hoare Logic} era inizialmente utilizzata per ragionare sulla correttezza di programmi sequenziali. È un tipo di analisi sintattica (quindi statica).
+
+\begin{itemize}
+    \item At the basis of all deductive verification techniques \\
+        Anche PVS usato dall'NSA si basa sulla Hoare Logic
+    \item Used to specify properties of squential imperative programs by means of triples
+        \begin{align*}
+            \{p\} S \{q\}
+        \end{align*}
+        where 
+        \begin {itemize}
+            \item $S$ is a statement of the language
+            \item $p$ is the \textit{pre-condition}, an assertion about a relevant property which the state holds before $S$ is exectuted
+            \item $q$ is a \textit{post-condition}, an assertion that holds after $S$
+        \end{itemize}
+        In altre parole
+        \begin{itemize}
+            \item if $S$ starts execution in a state satisfying $p$
+            \item and if the execution of $S$ terminates
+            \item Then the state reached after the execution of $S$ satisfyes $q$
+        \end{itemize}
+\end{itemize}
+
+\subsection{Language of assertions}
+Assertions are formulas in a propositional loguc
+\begin{align*}
+    A ::=& A\ and\ A \\
+         |& A\ or\ A \\
+         |& true \\
+         |& false \\
+         & ... \\
+    S ::= & skip\ |x:=E | S;S| if B then S else S | while (B) S
+\end{align*}
+
+Evert state sarisfies $true$ and no state sarisfies $false$. Henche fpr every $p$ and for every $S$
+\begin{align*}
+    \{p\} S \{true\}
+\end{align*}
+is a valid triple. and $\{false\} S \{p\}$ is a valid triple.
+
+\begin{esempio}{es}
+    \[\begin{array}{cl}
+        \{x=5\}x:=x+1\{x=6\} & \text{è valido} \\
+        \{x=5\ and\ y=2\}x:=x+1\{x=6\ and\ y=3\} & \text{non è valido} \\
+        \{x=5\ and\ y=2\}x:=x+1\{x=6\ or\ y=3\} & \text{è valido} \\
+    \end{array}\]
+\end{esempio}
+
+\subsection{Proof System}
+A proof system is defines so that: if the proof system accepts $\{p\}S\{q\}$, $\{p\}S\{q\}$ is valid.
+\subsubsection{Proof outline}
+Un modo più compatto di scrivere derivazioni nel proof system per non avere alberi enormi.
+
+\begin{esempio}{es}
+\[\begin{array}{c}
+    \{x+1\} \\
+    \{x+1=y+1\} \\
+    x:=x+1 \\
+    \{x=y+1\} \\
+    y:=y+1 \\
+    \{x=y\}
+\end{array}\] 
+\end{esempio}
+
+\begin{esempio}{es}
+    \begin{align*}
+        \{x=5\ &and\ y=2\} \\
+        \{x&=5\} \\
+        \{x+1&=6\} \\
+        x&:=x+1 \\
+        \{x&=6\} \\
+        \{x=6\ &or\ y=3\}
+    \end{align*}
+\end{esempio}
+
+\begin{esempio}{es}
+    \[\begin{array}{c}
+        \{x=3\} \\
+        \{x>2\} \\
+        \{x+1>3\} \\
+        x:=x+1; \\
+        \{x>3\} \\
+        \{x+2>5\} \\
+        x:=x+2; \\
+        \{x>5\}
+    \end{array}\] 
+\end{esempio}
+
+
+
 
 
 \end{document}
