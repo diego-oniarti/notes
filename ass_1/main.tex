@@ -13,6 +13,10 @@
 \newcommand{\st}[3][]{\ensuremath{\displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}}
 \newcommand{\N}{\ensuremath \mathbb N}
 \newcommand{\lam}[2]{\ensuremath{\lambda#1.#2}}
+\newcommand{\inl}[0]{\ensuremath{\ inL\ }}
+\newcommand{\inr}[0]{\ensuremath{\ inR\ }}
+\newcommand{\case}[3]{\ensuremath{\text{case}\ #1\ \text{of}\ \left|\begin{aligned}#2\\#3\end{aligned}\right.}}
+\newcommand{\Da}[0]{\ensuremath{\Downarrow}}
 \usepackage{pdflscape}
 
 \title{Assignment \#1}
@@ -29,7 +33,21 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
     \\
     \st{t \bop t' \Downarrow n}{t\Downarrow n' \quad t'\Downarrow n" \quad n'\bop n" = n} & \text{bs-bop} \\
     \\
-    \st{t\ t'\Downarrow v}{t\Downarrow \lam{x}{t"} \quad t'\Downarrow v' \quad t"[v'/x]\Downarrow v}  & \text{bs-app}
+    \st{t\ t'\Downarrow v}{t\Downarrow \lam{x}{t"} \quad t'\Downarrow v' \quad t"[v'/x]\Downarrow v}  & \text{bs-app} \\
+    \\
+    \st{\langle t_1, t_2 \rangle \Downarrow \langle v_1,v_2 \rangle}{t_1\Downarrow v_1\quad t_2\Downarrow v_2} & \text{pair} \\
+    \\
+    \st{t.1\Downarrow v}{t\Downarrow \langle v,v' \rangle} & \text{first-projection} \\
+    \\
+    \st{t.2\Downarrow v}{t\Downarrow \langle v',v \rangle} & \text{first-projection} \\
+    \\
+    \st{inL\ t\Downarrow inL\ v}{t\Downarrow v} & \text{inLeft} \\
+    \\
+    \st{inR\ t\Downarrow inR\ v}{t\Downarrow v} & \text{inRight} \\
+    \\
+    \st{\case{t}{\inl v_1\mapsto t_1}{\inr v_2\mapsto t_2}\Downarrow v}{t\Da \inl v' \quad t_1[v'/v_1]\Da v} & \text{pattern matching L}
+    \\ \\
+    \st{\case{t}{\inl v_1\mapsto t_1}{\inr v_2\mapsto t_2}\Downarrow v}{t\Da \inr v' \quad t_2[v'/v_2]\Da v} & \text{pattern matching R}
 \end{array}\] 
 
 \section{Equivalence of SOS and COS}
