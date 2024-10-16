@@ -33,7 +33,7 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
     \\
     \st{t \bop t' \Downarrow n}{t\Downarrow n' \quad t'\Downarrow n" \quad n'\bop n" = n} & \text{bs-bop} \\
     \\
-    \st{t\ t'\Downarrow v}{t\Downarrow \lam{x}{t"} \quad t'\Downarrow v' \quad t"[v'/x]\Downarrow v}  & \text{bs-app} \\
+    \st{t\ t'\Downarrow v}{t\Downarrow \lam{x}{t"} \quad t"[t'/x]\Downarrow v}  & \text{bs-app} \\
     \\
     \st{\langle t_1, t_2 \rangle \Downarrow \langle v_1,v_2 \rangle}{t_1\Downarrow v_1\quad t_2\Downarrow v_2} & \text{pair} \\
     \\
@@ -45,9 +45,9 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
     \\
     \st{inR\ t\Downarrow inR\ v}{t\Downarrow v} & \text{inRight} \\
     \\
-    \st{\case{t}{\inl v_1\mapsto t_1}{\inr v_2\mapsto t_2}\Downarrow v}{t\Da \inl v' \quad t_1[v'/v_1]\Da v} & \text{pattern matching L}
+    \st{\case{t}{\inl x_1\mapsto t_1}{\inr x_2\mapsto t_2}\Downarrow v}{t\Da \inl v' \quad t_1[v'/x_1]\Da v} & \text{pattern matching L}
     \\ \\
-    \st{\case{t}{\inl v_1\mapsto t_1}{\inr v_2\mapsto t_2}\Downarrow v}{t\Da \inr v' \quad t_2[v'/v_2]\Da v} & \text{pattern matching R}
+    \st{\case{t}{\inl x_1\mapsto t_1}{\inr x_2\mapsto t_2}\Downarrow v}{t\Da \inr v' \quad t_2[v'/x_2]\Da v} & \text{pattern matching R}
 \end{array}\] 
 
 \section{Equivalence of SOS and COS}
@@ -56,11 +56,69 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 % ( (t -> t') -> (n -> n -> t) -> t' ) -> n
 % (t -> t') -> (n -> n -> t) -> t'
 \begin{multline*}
-    t\overset{def}=\lam{d:(\N\to\tau\to\tau')\to(\N\to\N\to\tau)\to\tau'\\}{d\ (\lam{m:\N}{\lam{b:\tau}{b}})\ (\lam{i:\N}{\lam{n:\N}{i}})}
+    % t\overset{def}=\lam{d:(\N\to\tau\to\tau')\to(\N\to\N\to\tau)\to\tau'\\}{d\ (\lam{m:\N}{\lam{b:\tau}{b}})\ (\lam{i:\N}{\lam{n:\N}{i}})}
+    t\overset{def}=\lam{d:(\N\to\N\to\N)\to(\N\to\N\to\N)\to\N\\}{d\ (\lam{a:\N}{\lam{b:\N}{b}})\ (\lam{i:\N}{\lam{j:\N}{i}})}
 \end{multline*}
-\begin{multline*}
-    t\overset{def}=\lam{d:(\N\to\tau\to\tau')\to(\N\to\N\to\tau)\\\to\tau'}{d\ (\lam{m:\N}{\lam{b:\tau}{b}})\ (\lam{i:\N}{\lam{n:\N}{i*n_1+(1-i)*n_2}})}
-\end{multline*}
+
+\paragraph{Reduction 1}
+\begin{align*}
+    &\begin{array}{l @{\to} c l}
+        (\lam{d}{d\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i})})\ (\lam{x}\lam{y}{x\ 0\ (y\ 0\ 0)}) & \beta & E=[] \\
+        (\lam{x}\lam{y}{x\ 0\ (y\ 0\ 0)})\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i}) & \frac{\beta}{app1} & E=[](\lam{i}\lam{j}{i}) \\
+        (\lam{y}{(\lam{a}\lam{b}{b})\ 0\ (y\ 0\ 0)})\ (\lam{i}\lam{j}{i}) & \beta & E=[] \\
+        (\lam{a}\lam{b}{b})\ 0\ ((\lam{i}\lam{j}{i})\ 0\ 0)\  & \frac\beta{app1} & E=[]((\lam{i}\lam{j}{i})\ 0\ 0) \\
+        (\lam{b}{b})\ ((\lam{i}\lam{j}{i})\ 0\ 0)\  & \substack{\beta\\\hline\\app1\\\hline\\app2} & E=(\lam b b)\ ([]\ 0) \\
+        (\lam{b}{b})\ ((\lam{j}{0})\ 0)\  & \substack{\beta\\\hline\\\hline\\app2} & E=(\lam b b)\ [] \\
+        (\lam{b}{b})\ 0 & \beta & E= [] \\
+    \end{array}\\
+    &\quad 0
+\end{align*}
+
+\paragraph{Reduction 2}
+\begin{align*}
+    &\begin{array}{l @{\to} c l}
+        (\lam{d}{d\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i})})\ (\lam{x}\lam{y}{x\ 0\ (y\ 1\ 0)}) & \beta & E=[] \\
+        (\lam{x}\lam{y}{x\ 0\ (y\ 1\ 0)})\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i}) & \frac{\beta}{app1} & E=[](\lam{i}\lam{j}{i}) \\
+        (\lam{y}{(\lam{a}\lam{b}{b})\ 0\ (y\ 1\ 0)})\ (\lam{i}\lam{j}{i}) & \beta & E=[] \\
+        (\lam{a}\lam{b}{b})\ 0\ ((\lam{i}\lam{j}{i})\ 1\ 0)\  & \frac\beta{app1} & E=[]((\lam{i}\lam{j}{i})\ 0\ 0) \\
+        (\lam{b}{b})\ ((\lam{i}\lam{j}{i})\ 1\ 0)\  & \substack{\beta\\\hline\\app1\\\hline\\app2} & E=(\lam b b)\ ([]\ 0) \\
+        (\lam{b}{b})\ ((\lam{j}{1})\ 0)\  & \substack{\beta\\\hline\\\hline\\app2} & E=(\lam b b)\ [] \\
+        (\lam{b}{b})\ 1 & \beta & E= [] \\
+    \end{array}\\
+    &\quad 1
+\end{align*}
+
+% \begin{multline*}
+%     t\overset{def}=\lam{d:(\N\to\tau\to\tau')\to(\N\to\N\to\tau)\\\to\tau'}{d\ (\lam{m:\N}{\lam{b:\tau}{b}})\ (\lam{i:\N}{\lam{n:\N}{i*n_1+(1-i)*n_2}})}
+% \end{multline*}
+
+\section{Safe untypable term}
+\paragraph{typing derivation}
+\begin{align*}
+    \st[app]{
+        \emptyset\vdash (\lam{x}{x\ x})\ (\lam{y}{y\ y}): \tau'
+    }{
+        \st[lam]{
+            \emptyset\vdash\lam{x}{x\ x}:\tau\to\tau'
+        }{
+            \st[Err] {
+                x:\tau\vdash x\ x: \tau'
+            }{???}
+        }
+        \quad 
+        \emptyset\vdash\lam{y}{y\ y}:\tau
+    }
+\end{align*}
+
+\paragraph{COS-SM-CBV}
+\begin{align*}
+    \begin{array}{l@{\to}cl}
+        (\lam{x}{x\ x})\ (\lam{y}{y\ y}) & \beta & E=[] \\
+        (\lam{y}{y\ y})\ (\lam{y}{y\ y}) & \beta & E=[] \\
+        (\lam{y}{y\ y})\ (\lam{y}{y\ y}) & \beta & E=[] \\
+        ...
+    \end{array}
+\end{align*}
 
 \section{Typing derivation}
 \begin{equation*}

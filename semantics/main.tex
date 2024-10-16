@@ -715,5 +715,59 @@ Le regole del linguaggio semantico possono essere divise in \textit{introduzioni
     \st[AE2]{B}{A\wedge B} \\
 \end{align*}
 
+\section{System F}
+\begin{align*}
+    t :=& ... \\
+    |& \Lambda\alpha.t \\
+    |& t[\tau] \\
+    \\
+    \tau :=& ... \\
+    |& \forall \alpha.\tau \\
+    |& \alpha \\
+    \\
+    v :=& ... \\
+    |& \Lambda\alpha.t \\
+    \\
+    E :=& ... \\
+    |& E[\tau] \\
+    \\
+    \Delta :=& \emptyset \\
+    |& \Delta,\alpha \\
+    \\
+    \Gamma :=& \emptyset \\
+    |& \Gamma,x:\tau
+\end{align*}
+
+\begin{align*}
+    \st[$big\beta$]{(\Lambda\alpha t)[\tau] \credp t[\tau/\alpha]}{}
+\end{align*}
+
+Nuovo typing judgment:
+\begin{align*}
+    \Delta,\Gamma\vdash t:\tau
+\end{align*}
+
+Syntactic type checking:
+\begin{align*}
+    \st{\Delta,\Gamma\vdash \Delta\alpha t:\forall\alpha.\tau}{\Delta}
+\end{align*}
+
+\begin{gather*}
+    \st{\Delta\vdash\N}{} \\
+    \st{\Delta\vdash\tau\to\tau'}{\Delta\vdash\tau\quad \Delta\vdash\tau'} \\
+    ...
+\end{gather*}
+
+% \paragraph{esempio}
+% \begin{multiline*}
+%     \Lambda\alpha\Lambda\beta\Lambda\gamma:\lambda f:\alpha\to\beta\to\gamma.\lambda \\x:\beta.\lambda :\alpha. fyx: \forall\alpha\forall\beta\forall\gamma.(\alpha\to\beta\to\gamma)\to\beta\to\gamma\to\gamma
+% \end{multiline*}
+\subsection{Existential Types}
+
+Un record con almeno due label is_on e is_off. 
+Definire il tipo Switch e un termine di questo tipo
+
+jjk:
+
 \end{document}
 
