@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{semantic}
 
 \input{../common}
 
@@ -204,5 +205,22 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
         }
     }
 \end{equation*}
+
+\section{Encoding}
+\paragraph{Sequencing}
+\begin{align*}
+    t ::= \cdots|t;t' \\
+    t;t' \leadsto^p (\lam{x}{t})t'
+\end{align*}
+
+\paragraph{Let-in}
+\begin{align*}
+    t ::= \cdots | let\ x=t\ in\ t' \\
+    \st[let-in]{
+        let\ x=t\ in\ t' \leadsto 
+    }{
+    }
+\end{align*}
+
 
 \end{document}
