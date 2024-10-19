@@ -63,28 +63,28 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 
 \paragraph{Reduction 1}
 \begin{align*}
-    &\begin{array}{l @{\to} c l}
-        (\lam{d}{d\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i})})\ (\lam{x}\lam{y}{x\ 0\ (y\ 0\ 0)}) & \beta & E=[] \\
-        (\lam{x}\lam{y}{x\ 0\ (y\ 0\ 0)})\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i}) & \frac{\beta}{app1} & E=[](\lam{i}\lam{j}{i}) \\
-        (\lam{y}{(\lam{a}\lam{b}{b})\ 0\ (y\ 0\ 0)})\ (\lam{i}\lam{j}{i}) & \beta & E=[] \\
-        (\lam{a}\lam{b}{b})\ 0\ ((\lam{i}\lam{j}{i})\ 0\ 0)\  & \frac\beta{app1} & E=[]((\lam{i}\lam{j}{i})\ 0\ 0) \\
-        (\lam{b}{b})\ ((\lam{i}\lam{j}{i})\ 0\ 0)\  & \substack{\beta\\\hline\\app1\\\hline\\app2} & E=(\lam b b)\ ([]\ 0) \\
-        (\lam{b}{b})\ ((\lam{j}{0})\ 0)\  & \substack{\beta\\\hline\\\hline\\app2} & E=(\lam b b)\ [] \\
-        (\lam{b}{b})\ 0 & \beta & E= [] \\
+    &\begin{array}{l @{\leadsto} c l}
+        (\lam{d}{d\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i})})\ (\lam{x}\lam{y}{x\ 0\ (y\ 0\ 0)}) \\
+        (\lam{x}\lam{y}{x\ 0\ (y\ 0\ 0)})\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i}) \\
+        (\lam{y}{(\lam{a}\lam{b}{b})\ 0\ (y\ 0\ 0)})\ (\lam{i}\lam{j}{i}) \\
+        (\lam{a}\lam{b}{b})\ 0\ ((\lam{i}\lam{j}{i})\ 0\ 0)\  \\
+        (\lam{b}{b})\ ((\lam{i}\lam{j}{i})\ 0\ 0)\  \\
+        (\lam{b}{b})\ ((\lam{j}{0})\ 0)\  \\
+        (\lam{b}{b})\ 0 \\
     \end{array}\\
     &\quad 0
 \end{align*}
 
 \paragraph{Reduction 2}
 \begin{align*}
-    &\begin{array}{l @{\to} c l}
-        (\lam{d}{d\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i})})\ (\lam{x}\lam{y}{x\ 0\ (y\ 1\ 0)}) & \beta & E=[] \\
-        (\lam{x}\lam{y}{x\ 0\ (y\ 1\ 0)})\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i}) & \frac{\beta}{app1} & E=[](\lam{i}\lam{j}{i}) \\
-        (\lam{y}{(\lam{a}\lam{b}{b})\ 0\ (y\ 1\ 0)})\ (\lam{i}\lam{j}{i}) & \beta & E=[] \\
-        (\lam{a}\lam{b}{b})\ 0\ ((\lam{i}\lam{j}{i})\ 1\ 0)\  & \frac\beta{app1} & E=[]((\lam{i}\lam{j}{i})\ 0\ 0) \\
-        (\lam{b}{b})\ ((\lam{i}\lam{j}{i})\ 1\ 0)\  & \substack{\beta\\\hline\\app1\\\hline\\app2} & E=(\lam b b)\ ([]\ 0) \\
-        (\lam{b}{b})\ ((\lam{j}{1})\ 0)\  & \substack{\beta\\\hline\\\hline\\app2} & E=(\lam b b)\ [] \\
-        (\lam{b}{b})\ 1 & \beta & E= [] \\
+    &\begin{array}{l @{\leadsto} c l}
+        (\lam{d}{d\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i})})\ (\lam{x}\lam{y}{x\ 0\ (y\ 1\ 0)}) \\
+        (\lam{x}\lam{y}{x\ 0\ (y\ 1\ 0)})\ (\lam{a}\lam{b}{b})\ (\lam{i}\lam{j}{i}) \\
+        (\lam{y}{(\lam{a}\lam{b}{b})\ 0\ (y\ 1\ 0)})\ (\lam{i}\lam{j}{i}) \\
+        (\lam{a}\lam{b}{b})\ 0\ ((\lam{i}\lam{j}{i})\ 1\ 0)\  \\
+        (\lam{b}{b})\ ((\lam{i}\lam{j}{i})\ 1\ 0)\  \\
+        (\lam{b}{b})\ ((\lam{j}{1})\ 0)\  \\
+        (\lam{b}{b})\ 1 \\
     \end{array}\\
     &\quad 1
 \end{align*}
@@ -94,31 +94,28 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 % \end{multline*}
 
 \section{Safe untypable term}
+\begin{equation*}
+    (\lam{x:\N\to\N}{x})\ 1
+\end{equation*}
+
 \paragraph{typing derivation}
 \begin{align*}
     \st[app]{
-        \emptyset\vdash (\lam{x}{x\ x})\ (\lam{y}{y\ y}): \tau'
+        \emptyset\vdash (\lam{x:\N\to\N}{x})\ 1: 
     }{
-        \st[lam]{
-            \emptyset\vdash\lam{x}{x\ x}:\tau\to\tau'
-        }{
-            \st[Err] {
-                x:\tau\vdash x\ x: \tau'
-            }{???}
-        }
-        \quad 
-        \emptyset\vdash\lam{y}{y\ y}:\tau
+        \st[]{
+            \emptyset\vdash\lam{x:\N\to\N}{x}:(\N\to\N)\to\tau
+        }{}
+        \quad
+        \st[nat]{
+            \emptyset\vdash 1:\N
+        }{}
     }
 \end{align*}
 
 \paragraph{COS-SM-CBV}
 \begin{align*}
-    \begin{array}{l@{\to}cl}
-        (\lam{x}{x\ x})\ (\lam{y}{y\ y}) & \beta & E=[] \\
-        (\lam{y}{y\ y})\ (\lam{y}{y\ y}) & \beta & E=[] \\
-        (\lam{y}{y\ y})\ (\lam{y}{y\ y}) & \beta & E=[] \\
-        ...
-    \end{array}
+    (\lam{x\N\to\N}{x})\ 1 \leadsto 1
 \end{align*}
 
 \section{Typing derivation}
