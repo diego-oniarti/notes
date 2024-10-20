@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{semantic}
+\usepackage{cancel}
 
 \input{../common}
 
@@ -100,12 +101,18 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 
 \paragraph{typing derivation}
 \begin{align*}
-    \st[app]{
+    \st[$\cancel{app}$]{
         \emptyset\vdash (\lam{x:\N\to\N}{x})\ 1: 
     }{
-        \st[]{
-            \emptyset\vdash\lam{x:\N\to\N}{x}:(\N\to\N)\to\tau
-        }{}
+        \st[lam]{
+            \emptyset\vdash\lam{x:\N\to\N}{x}:(\N\to\N)\to(\N\to\N)
+        }{
+            \st[var]{
+                x:\N\to\N\vdash x:\N\to\N
+            }{
+                x:\N\to\N\in\Gamma
+            }
+        }
         \quad
         \st[nat]{
             \emptyset\vdash 1:\N
@@ -115,7 +122,7 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 
 \paragraph{COS-SM-CBV}
 \begin{align*}
-    (\lam{x\N\to\N}{x})\ 1 \leadsto 1
+    (\lam{x:\N\to\N}{x})\ 1 \leadsto 1
 \end{align*}
 
 \section{Typing derivation}
@@ -205,19 +212,38 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 
 \section{Encoding}
 \paragraph{Sequencing}
-\begin{align*}
-    t ::= \cdots|t;t' \\
-    t;t' \leadsto^p (\lam{x}{t})t'
-\end{align*}
+\begin{gather*}
+    t ::= \cdots | t;t' \\
+    (\lam{x}{t'})\ t
+\end{gather*}
+(Assuming $x$ is a free variable not used in x)
 
 \paragraph{Let-in}
-\begin{align*}
+\begin{gather*}
     t ::= \cdots | let\ x=t\ in\ t' \\
-    \st[let-in]{
-        let\ x=t\ in\ t' \leadsto 
-    }{
-    }
-\end{align*}
+    (\lam{x}{t'})\ t
+\end{gather*}
 
+\paragraph{Arrays of Length 4}
+\begin{gather*}
+    t ::= \cdots | [t,t,t,t] \\
+    v ::= \cdots | [v,v,v,v] \\
+    [a,b,c,d] \equiv <<a,b>,<c,d>>
+\end{gather*}
+
+\paragraph{Array field access}
+\begin{gather*}
+    t ::= \cdots | t.i\ (i\in0..3) \\
+    t.0 \equiv t.0.0 \\
+    t.1 \equiv t.0.1 \\
+    t.2 \equiv t.1.0 \\
+    t.3 \equiv t.1.1
+\end{gather*}
+
+\paragraph{Array update}
+\begin{gather*}
+    t ::= \cdots | t.i=t\ (i\in0..3) \\
+    t.0=t' \equiv <<t',t.0.1>,<t.1.0,t.1.1>> \\
+\end{gather*}
 
 \end{document}
