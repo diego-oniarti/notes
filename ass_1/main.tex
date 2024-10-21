@@ -216,7 +216,7 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
     t ::= \cdots | t;t' \\
     (\lam{x}{t'})\ t
 \end{gather*}
-(Assuming $x$ is a free variable not used in x)
+(Assuming $x$ is a free variable not used in $t'$)
 
 \paragraph{Let-in}
 \begin{gather*}
@@ -228,22 +228,26 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 \begin{gather*}
     t ::= \cdots | [t,t,t,t] \\
     v ::= \cdots | [v,v,v,v] \\
-    [a,b,c,d] \equiv <<a,b>,<c,d>>
+    % [t_1,t_2,t_3,t_4] \equiv \lam{a}\lam{b}\lam{c}\lam{d}\lam{z}{z\ a\ b\ c\ d}
+    [t_1,t_2,t_3,t_4] \equiv \lam{a}{a\ t_1\ t_2\ t_3\ t_4}
 \end{gather*}
 
 \paragraph{Array field access}
 \begin{gather*}
     t ::= \cdots | t.i\ (i\in0..3) \\
-    t.0 \equiv t.0.0 \\
-    t.1 \equiv t.0.1 \\
-    t.2 \equiv t.1.0 \\
-    t.3 \equiv t.1.1
+    t.0 \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{a}) \\
+    t.1 \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{b}) \\
+    t.2 \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{c}) \\
+    t.3 \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{d}) \\
 \end{gather*}
 
 \paragraph{Array update}
 \begin{gather*}
     t ::= \cdots | t.i=t\ (i\in0..3) \\
-    t.0=t' \equiv <<t',t.0.1>,<t.1.0,t.1.1>> \\
+    t.0=t' \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{\lam{z}{z\ t'\ b\ c\ d}}) \\
+    t.1=t' \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{\lam{z}{z\ a\ t'\ c\ d}}) \\
+    t.2=t' \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{\lam{z}{z\ a\ b\ t'\ d}}) \\
+    t.3=t' \equiv t\ (\lam{a}\lam{b}\lam{c}\lam{d}{\lam{z}{z\ a\ b\ c\ t'}})
 \end{gather*}
 
 \end{document}

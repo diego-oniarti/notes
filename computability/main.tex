@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{algorithm2e}
+\usepackage[symbol]{footmisc}
+
 \RestyleAlgo{ruled}
 
 \usepackage{lipsum}
@@ -433,8 +435,129 @@ La macchina prende un input $t$ e:
 \end{align*}
 Quindi questa macchina risolverebbe l'halting problem. Questo è ovviamente assurdo e prova la tesi.
 
+\section{Random String}
+Qual'è la definizione di una stringa random? Potremmo dire che una stringa è casuale se ogni simbolo ha la stessa probabilità di apparire in ogni posizione. Ma data una determinata stringa, è possibile determinare se sia stata generata tramite un processo casuale o con intento?
+
+Per esempio $S_0=000000$ non sembra casuale, ma potrebbe esserlo. $S_1=01101001010010$ invece sembra più "casuale" ma potrebbe essere generato secondo una regola precisa.
+
+$S_0$ è facilmente comprimibile. Possiamo dire "è composta da 9 $0$" (\textit{Run-length encoding}). Arrivano quindi in considerazione i concetti di entropia e quantità di informazione.
+
+Diciamo quindi che una stringa è \textit{casuale} quando non può essere compressa (o non può essere compressa molto). Questo è ovviamente soggetto a eccezioni, come il caso che si tiri 100 volte testa con una moneta. \\
+Questa definizione però si basa pesantemente sulla definizione di un "algoritmo di compressione".
+
+\begin{callout}{}
+    Useremo intercambiabilmente il termine \textit{incomprimibile} e \textit{casuale}. \\
+    Assumeremo anche di trattare solo algoritmo lossless.
+\end{callout}
+
+\subsection{Compression Algorthim}
+Un algoritmo di compressione prende una stringa $s$ e genera una descrizione di $s$ più corta di $s$ stesso.
+Questo implica ovviamente l'esistenza di un processo di \textit{decompressione} simmetrico a quello di comressione.
+
+\begin{align*}
+    & S\in\Sigma^* \\
+    & |s| = l \\
+    & \exists t \in \Sigma^*\ s.t\ |t|<l \\
+    & \exists \underbrace{m}_{unzip}. m(\underbrace{t}_{zipped}) = \underbrace{s}_{original}
+\end{align*}
+Ci stiamo affidando a una macchina di decompressione $m$, ma cosa sappiamo riguardo all'efficenza di $m$?
+
+\subsection{Kolmogorov}
+Consideriamo la dimensione non solo di $t$ ma anche della macchina $m$ che decomprime $t$. Questo equivale a avere un "self expanding executable file".
+
+\begin{callout}{}
+    Immagina di scaricare un file compresso in un formato sconosciuto e di dover anche scaricare un programma per la decompressione del suddetto file. \\ La dimensione del programma di estrazione dovrebbe essre inclusa nella dimensione totale del download.
+\end{callout}
+
+Per definire la dimensione di $m$ fixiamo una macchina universale $U$.
+
+\begin{align*}
+    & S\in\Sigma^* \\
+    & |s| = l \\
+    & \underbrace{(m,t)}_{description\ of\ s}\ s.t\ U(m,t)=s
+\end{align*}
+
+\paragraph{Ottimalità} ovviamente a noi interessa la coppia $(m,t)$ più piccola possibile (quella "ottimale") che riproduca $s$ alla fine. \\
+Un caso triviale sarebbe la macchina che copia un input e l'input originale. Questo ovviamente non è ottimale.
+
+\subsection{"Most strings are uncompressable"}
+\begin{gather*}
+    \Sigma=\{0,1\} \\
+    S = \Sigma^{100} \\
+    |S| = |\Sigma^{100}| = 2^{100}
+\end{gather*}
+Quante stringhe $s\in\Sigma^{100}$ sono comprimibili almeno del $10\%$? ($C(s)=t\quad |t|\leq 90$)
+
+Perché esista un algoritmo di compressione deve esistere alche un algoritmo di decompressione. 
+
+\begin{gather*}
+    t\in\bigcup_{i=0}^{90}\Sigma^i = T \\
+    |T| = \left|\bigcup_{i=0}^{90}\Sigma^i\right| = \sum_{i=0}^{90} 2^i = 2^{91}-1 \\
+    \frac{|T|}{|S|} = \frac{1}{512}
+\end{gather*}
+
+Quindi una stringa su $512$ di tutte quelle di lunghezza $100$ o meno è comprimibile di almeno il $10\%$. Questo a prescindere dall'algoritmo di compressione.
+
+Quindi "most strings are random".
+
+Fortunatamente, le stringhe che ci interessano di solito non sono random, quindi sono comprimibili.
+
+\subsection{Kolmogorov complexity}
+\begin{gather*}
+    D_{s,u} = \{(m,t)\in\Sigma^*\ s.t\ U(m,t)=s\} \\
+    K_U(s) = \min_{(m,t)\in D_{s,u}}(|m|+|t|)
+\end{gather*}
+Chiamiamo la \textit{Complessità di Kolmogorov} di una stringa $s$ (con rispetto a una macchina universale $U$) la lunghezza minima di $m,t$ tali che $U(m,t)=s$. \\
+Questa definizione di \textit{complessità} ovviamente dipende dalla macchina universale $U$. Se volessimo prendere anche $U$ in considerazione?
+
+Supponiamo di avere due macchine universali $U$ e $V$. Possiamo prendere una descrizione in $U$ e usarla in $V$ aggiungendo dell'overhead.
+\begin{gather*}
+    V(u, (m,t)) = U(m,t) = s
+\end{gather*}
+Una caratteristica particolare è che l'overhead è sempre lo stesso indipendentemente da $m$ e $t$. È sempre la stessa $u$.
+
+\begin{gather*}
+    \forall U,V\in UTM \exists C_{U,V} = |u_v|\footnotemark\\
+    K_V(s) \leq K_U(s) + C_{U,V} \\
+    K_V = O(K_U) 
+\end{gather*}
+Le due rappresentazioni sono asintoticamente equivalenti. 
+\footnotetext{rappresentation of $u$ in $v$} 
+
+\subsection{La Kolmogorov Complexity È Unconmputable}
+Prendiamo una macchina universale $U$. $K_U$ \textbf{non} è computable.
+
+Prendiamo la frase \center
+\textit{"The smallest number that cannot be defined with less than thirteen words"}
+\flushleft
+Questa frase è un paradosso, perché se trovassimo questo numero la frase gli si applicherebbe (ed essendo una frase di 12 parole lo renderebbe definibile con meno di 13 parole).
+
+Ora dobbiamo trovare una maniera formale di dimostrare la con computabilità della complessità di Kolmogorov utilizzando questo paradosso.
+\begin{itemize}
+    \item number $to$ string
+    \item defined $to$ Kologorov complexity
+    \item words $to$ symbold
+\end{itemize}
+
+\begin{gather*}
+    K_U(s) \text{The minimum \# of symbols that define $s$ (wrt $U$)}
+\end{gather*}
+
+\paragraph{Prova per assurdo}
+Supopniamo di avere una macchina $m_{K,U} \in TM$ tale che $\forall s\in\Sigma^* m_{K,U}(s) = K_U(s)$
+\begin{algorithm}
+    \caption{$m$}
+    \ForAll{$s\in\Sigma^*$}{
+        \If{$K_U(s)>|\floor{m_{k,u}}|+1000000\footnotemark[1]$}{
+            output $s$ and $HALT$\;
+        }
+    }
+\end{algorithm}
+\footnotetext{Costante di overhead per l'esecuzione dell'algoritmo stesso}
+
+\begin{gather*}
+    |\floor{m}| \leq |\floor{m_{ku}}| + 1000000
+\end{gather*}
 
 
 \end{document}
-
-

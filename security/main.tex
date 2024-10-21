@@ -13,7 +13,7 @@
 \maketitle
 \tableofcontents
 
-\section{Heap vs Stak}
+\section{Heap vs Stack}
 Ciò che allochi sulla heap non viene deallocato quando la funzione finisce. Quello che viene allocato dalla stack viene distrutto a fine lezione. Questo lo ha detto anche Roveri nel primo semestre di triennio.
 
 \section{Classification and groups of bugs / errors}
@@ -21,7 +21,7 @@ There are many ways of dividing errors into taxonomies. The major ones consist i
 \begin{itemize}
     \item \textbf{severity:} how much of an impact the bug can have on the system
     \item \textbf{priority:} how quickly the issue should be resolved, based on the business impact and the prihect imeline.
-    \item \textbf{nature:} it refers to technical charateristics of the byg/error (es: functional or security, design or code specific, etc..)
+    \item \textbf{nature:} it refers to technical characteristics of the bug/error (es: functional or security, design or code specific, etc..)
 \end{itemize}
 Some of these chriteria are objective and measurable while some other are more subective and require some informed evaluation.
 
@@ -145,7 +145,10 @@ Un test case descrive una procedura che mette alla prova il sistema
 \subsection{Test cases - static}
 ???
 
+\section{Tainted Variable}
+Una variabile è detta \textit{"tainted"} quando non è checkata. Quando il vaore di una tainted variable è checkato, diventa \textit{untainted}. \\
 
+L'analisi di queste variabili nel codice è detta \textit{"taint analysis"}, è può essere di tipo statico o dinamico.
 
 \end{document}
 
