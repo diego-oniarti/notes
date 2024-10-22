@@ -53,6 +53,26 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 \end{array}\] 
 
 \section{Equivalence of SOS and COS}
+\subsection{if $t\to t'$ then $t\leadsto t'$}
+Proof by induction on $\to$. \\
+Inductive hypothesis: $\forall t_h,t_h'. if\ t_h\to t_h'\ then\ t_h\leadsto t_h'$
+\subsubsection{App-2}
+$t = (\lam{x}{t_1})\ t_2$ \\
+$t'= (\lam{x}{t_1})\ t_2'$
+\begin{align*}
+    \begin{array}{rlr}
+        HP1 & (\lam{x}{t_1})\ t_2 \to (\lam{x}{t_1})\ t_2' \\
+        HP2 & t_2 \to t_2' \\
+        TH  & (\lam{x}{t_1})\ t_2 \leadsto (\lam{x}{t_1})\ t_2' \\
+        by\ IH\ with\ HP2\ w.h & t_2\leadsto t_2' & HT1 \\
+        by\ inversion\ on\ HT1\ w.h & t_2 \equiv E[t_0] & HEI \\
+                                    & t_2'\equiv E[t_0']  & HEI' \\
+                                    & t_0 \leadsto^p t_0' & HPR \\
+        by\ HEI,\ HEI'\ t.s         & (\lam{x}{t_1})\ E[t_0] \leadsto (\lam{x}{t_1})\ E[t_0'] \\
+        by\ ctx\ with\ E' = (\lam{x}{t_1})\ E\ \\
+        and\ HPR & (\lam{x}{t_1})\ E[t_0] \equiv E'[t_0]\leadsto E'[t_0']
+    \end{array}
+\end{align*}
 
 \section{Distinguish terms}
 % ( (t -> t') -> (n -> n -> t) -> t' ) -> n
@@ -96,33 +116,45 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 
 \section{Safe untypable term}
 \begin{equation*}
-    (\lam{x:\N\to\N}{x})\ 1
+    (\lam{x}{35*12})\ (\lam{x}{1\ x})
 \end{equation*}
 
 \paragraph{typing derivation}
 \begin{align*}
-    \st[$\cancel{app}$]{
-        \emptyset\vdash (\lam{x:\N\to\N}{x})\ 1: 
+    \st[app]{
+        \emptyset\vdash (\lam{x}{35*12})\ (\lam{y}{1\ y}): 
     }{
         \st[lam]{
-            \emptyset\vdash\lam{x:\N\to\N}{x}:(\N\to\N)\to(\N\to\N)
+            \emptyset\vdash \lam{x}{35*12}:\tau\to\N
         }{
-            \st[var]{
-                x:\N\to\N\vdash x:\N\to\N
+            \st[bop]{
+                x:\tau\vdash 35*12:\N
             }{
-                x:\N\to\N\in\Gamma
+                \st[nat]{
+                    x:\N\vdash 35:\N
+                }{}
+                \quad
+                \st[nat]{
+                    x:\N\vdash 35:\N
+                }{}
             }
         }
         \quad
-        \st[nat]{
-            \emptyset\vdash 1:\N
-        }{}
+        \st[lam]{
+            \emptyset\vdash \lam{y}{1\ y}: \tau'\to\tau
+        }{
+            \st[none]{
+                y:\tau'\vdash 1\ y: \tau
+            }{}
+        }
     }
 \end{align*}
 
 \paragraph{COS-SM-CBV}
 \begin{align*}
-    (\lam{x:\N\to\N}{x})\ 1 \leadsto 1
+    & (\lam{x}{35*12})\ (\lam{x}{1\ x}) \leadsto \\
+    & 35*12 \leadsto \\
+    & 420
 \end{align*}
 
 \section{Typing derivation}
@@ -214,21 +246,20 @@ Write the operational semantics rules for a big-step, call-by-name reduction for
 \paragraph{Sequencing}
 \begin{gather*}
     t ::= \cdots | t;t' \\
-    (\lam{x}{t'})\ t
+    t;t' \equiv (\lam{x}{t'})\ t
 \end{gather*}
 (Assuming $x$ is a free variable not used in $t'$)
 
 \paragraph{Let-in}
 \begin{gather*}
     t ::= \cdots | let\ x=t\ in\ t' \\
-    (\lam{x}{t'})\ t
+    let\ x=t\ in\ t' \equiv (\lam{x}{t'})\ t
 \end{gather*}
 
 \paragraph{Arrays of Length 4}
 \begin{gather*}
     t ::= \cdots | [t,t,t,t] \\
     v ::= \cdots | [v,v,v,v] \\
-    % [t_1,t_2,t_3,t_4] \equiv \lam{a}\lam{b}\lam{c}\lam{d}\lam{z}{z\ a\ b\ c\ d}
     [t_1,t_2,t_3,t_4] \equiv \lam{a}{a\ t_1\ t_2\ t_3\ t_4}
 \end{gather*}
 
