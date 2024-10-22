@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage{algorithm2e}
 \usepackage[symbol]{footmisc}
+\usepackage{cancel}
 
 \RestyleAlgo{ruled}
 
@@ -558,6 +559,34 @@ Supponiamo di avere una macchina $m_{K,U} \in TM$ tale che $\forall s\in\Sigma^*
 \begin{gather*}
     |\floor{m}| \leq |\floor{m_{ku}}| + 1000000
 \end{gather*}
+
+\section{Reduction}
+Supponiamo di avere due linguaggi $L_1, L_2 \subseteq \Sigma^*$, e una funzione $f:\Sigma^*\to \Sigma^*$. \\
+Supponiamo poi che la funzione $f$ mappi elementi di $L_1$ in $L_2$ ($x\in L_1 \iff f(x)\in L_2$).\\
+Se sappiamo che $L_2$ è ricorsiva, possiamo dire nulla su $L_1$? Si, sappiamo che $L_1$ è recursive, in quanto possiamo costruire $m_1(x)=m_2(f(x))$.
+
+Chiamiamo una funzione $f$ una \textit{"riduzione"} se si comporta un questo modo ($x\in L_1 \iff f(x)\in L_2$). E \textit{"Turing riduzione"} se $f$ è computabile con una macchina di Turing. \\
+Due linguaggi sono \textit{"riducibili"} o \textit{"Turing riducibili"} se esiste una $f$ da un linguaggio all'altro.
+
+\subsection{Proprietà}
+Se $L_1$ può essere ridotto a $L_2$:
+\begin{itemize}
+    \item $L_2\ \text{recursive}\implies L_1\ \text{recursive}$
+    \item $L_1\cancel{\text{recursive}} \implies\ L_2\ \cancel{\text{recursive}}$
+    \item $L_2\ RE \implies L_1\ RE$
+\end{itemize}
+
+\section{Unione di $RE\setminus R$}
+Supponiamo di avere due linguaggi $L_1,L_2\in RE\setminus R$. \\
+Sappiamo $L_{12}=L_1\cup L_2 \in RE$. Basta runnare $m_1$ e $m_2$ assieme e se una delle due halta haltimo $m_{12}$.\\
+Ma possiamo dire se $L_12$ in $RE$ o in $RE\setminus R$? No. Non possiamo imporre alcun constrain sul fatto che sia \textit{recursive}.
+
+\begin{callout}{Proof}
+    Questo è provato definendo $E$ l'insieme di tutte le stringhe rappresentanti TM con un numero pari di stati. Poi definiamo $O$ l'insieme di tutte le macchine con numero dispari di stati.
+
+    Ora $L_1=E\cup HALT_\epsilon$ e $L_2=O\cup HALT_\epsilon$.
+\end{callout}
+
 
 
 \end{document}
