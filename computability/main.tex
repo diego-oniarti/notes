@@ -46,10 +46,10 @@ La funzione di transizione può essere definita come una tabella
         \end{array}
     \right.
 \]
-Un altra rappresentazione per una macchina di Turing è quella della macchina a stati (come quelle viste in LFC). Gli stati corrispondono agli stati della macchina di Turnig, mentre le transizioni contengono il carattere letto, quello da scrivere, e la transizione.
+Un altra rappresentazione per una macchina di Turing è quella della macchina a stati (come quelle viste in LFC). Gli stati corrispondono agli stati della macchina di Turing, mentre le transizioni contengono il carattere letto, quello da scrivere, e la transizione.
 
 \begin{callout}{NB}
-    Come definiamo la funzione di transizione non è importante. Per la definizione di una macchina di Turnig basta che esista una funzione di transizione del tipo $f:\Sigma\times Q \to \Sigma\times Q\times \{\leftarrow,\rightarrow\}$
+    Come definiamo la funzione di transizione non è importante. Per la definizione di una macchina di Turing basta che esista una funzione di transizione del tipo $f:\Sigma\times Q \to \Sigma\times Q\times \{\leftarrow,\rightarrow\}$
 
     Non è necessario che la funzione di transizione sia totale.
 \end{callout}
@@ -107,7 +107,7 @@ Una macchina di Turing con più tape può svolgere le stesse computazioni di una
 \section{Turing vs Universal Machines}
 Una differenza che rimane tra la macchina di Turing descritta e un computer come lo vediamo oggi è la seguente. Una macchina di Turing è hard coded per svolgere un singolo compito.
 
-Possiamo quindi formalizzare una macchina di Turing $U$ che sia universale? si. \\
+Possiamo quindi formalizzare una macchina di Turing $U$ che sia universale? sì. \\
 L'input di $U$ deve essere un encoding di una macchina $m$.
 
 Prendiamo per esempio la macchina di Turing che aggiunge $1$ ad un numero (vista in precedenza).
@@ -119,12 +119,12 @@ Prendiamo per esempio la macchina di Turing che aggiunge $1$ ad un numero (vista
         1 & 1,H & 1, H & 0,1,\leftarrow
     \end{array}
 \]
-Possiamo definire un'albeto che ci permetta di descrivere questa tabella sotto forma di stringa.
+Possiamo definire un'alfabeto che ci permetta di descrivere questa tabella sotto forma di stringa.
 \begin{align*}
     \Sigma &= \{\text{\textvisiblespace},1,0,',',;\} \\
     \text{tabella}&=\text{\textvisiblespace},1,0;0,0,1;1,0,1;1,,;1,,;0,1,0
 \end{align*}
-Prendiamo cone conenzione che ogni cella sia definita da 3 simboli separati da virgole. Un simbolo mancante è interpretato come l'\textit{Halting State}.
+Prendiamo cone convenzione che ogni cella sia definita da 3 simboli separati da virgole. Un simbolo mancante è interpretato come l'\textit{Halting State}.
 
 La macchina universale $U$ è composta da:
 \begin{itemize}
@@ -133,9 +133,9 @@ La macchina universale $U$ è composta da:
     \item Uno o più tape usati per l'esecuzione di $m$
 \end{itemize}
 \begin{callout}{nb}
-    Come detto in Sec.\ref{sec: multitape}, questo piò essere svolto anche con una macchina a tape singolo.
+    Come detto in Sec.\ref{sec: multitape}, questo può essere svolto anche con una macchina a tape singolo.
 \end{callout}
-L'esecuzione di $m$ utilizzanto $U$ richiede più \textit{step} dell'esecuzione di $m$. Ma il numero di step di $U$ scala linearmente con quello di $m$.
+L'esecuzione di $m$ utilizzando $U$ richiede più \textit{step} dell'esecuzione di $m$. Ma il numero di step di $U$ scala linearmente con quello di $m$.
 
 \begin{align*}
     t(m,s) &\leq 2|s|+1 \\
@@ -144,7 +144,7 @@ L'esecuzione di $m$ utilizzanto $U$ richiede più \textit{step} dell'esecuzione 
 dove $t(a,b)$ è il tempo di esecuzione della macchina $a$ sull'input $b$.
 
 \subsection{Random-access Machine}
-Un computer moderno può essere devinito come una "\textit{random access machine}" in quanto accede agli indirizzi di memoria in tempo costante, a differenza della macchina di Turing che deve scorrere il tape.\\
+Un computer moderno può essere definito come una "\textit{random access machine}" in quanto accede agli indirizzi di memoria in tempo costante, a differenza della macchina di Turing che deve scorrere il tape.\\
 Questa è l'unica differenza tra i due tipi di macchine. Quella di Turing è "lenta".
 
 Ogni altro aspetto di una CPU odierna può essere creato analogamente in una macchina di Turing (Pc, registri, memoria, etc..).
@@ -152,8 +152,8 @@ Ogni altro aspetto di una CPU odierna può essere creato analogamente in una mac
 \subsection*{Nota sull'alfabeto}
 Abbiamo usato un alfabeto $\Sigma$ di 5 caratteri per descrivere la Turing machine, ma potremmo rappresentare ogni simbolo con un numero binario a tre cifre. Questo ci permette di descrivere un programma come una stringa binaria.
 
-\section{Uncomputabe machines}
-Possiamo rapprsentare ogni possibile macchina di Turing e ogni può output in una tabella
+\section{Uncomputable machines}
+Possiamo rappresentare ogni possibile macchina di Turing e ogni può output in una tabella
 \[
     TM\left\{\overbrace{\begin{array}{c|c c c c c}
             & \epsilon & 0 & 1 & 00 & \cdots \\
@@ -173,7 +173,7 @@ Possiamo rapprsentare ogni possibile macchina di Turing e ogni può output in un
     \end{cases} \\
     & m_\alpha \text{ macchina descritta dalla stringa } \alpha
 \end{align*}
-Ora possiamo usare l'argomento della diagonale per creare una macchina UC che non sia computabile.
+Ora possiamo usare l'argomento della diagonale per creare una macchina $UC$ che non sia computabile.
 
 \paragraph{Thesis}
 \[
@@ -201,7 +201,7 @@ H(\floor{M},\epsilon) = \begin{cases}
 \end{cases}
 $$
 
-No. Se esistesse esisterebbe anche la macchina $H'$ con quiesto comportamento.
+No. Se esistesse esisterebbe anche la macchina $H'$ con questo comportamento.
 $$
 H'(\floor{M},\epsilon) = \begin{cases}
     0 & H(\floor{M},\epsilon)==1 \\
@@ -232,7 +232,7 @@ Un set è \textit{recursive} se e solo se
     s\in R \iff \exists m\ TM\ s.t. \forall x\in\Sigma^*\ m(x)=\begin{cases}0&x\not\in s \\ 1 & x\in s\end{cases}
 \end{align*}
 
-\subsection{ricursively enumerable}
+\subsection{Recursively Enumerable}
 Ci sono tre modi di definire $RE$.
 \begin{itemize}
     \item Un set è ricorsivamente enumerabile se:
@@ -310,7 +310,7 @@ Essendo $L$ in $RE$, esiste una macchina $m$ che produce tutti gli elementi di $
     HALT_\epsilon &= \{t: m_t(\epsilon)\neq\infty\} \not\in R
 \end{align*}
 
-Ipotiziamo per assurdo che $H_\epsilon$ sia ricorsiva.
+Ipotizziamo per assurdo che $H_\epsilon$ sia ricorsiva.
 \begin{align*}
     H_\epsilon: \Sigma^*&\to\{0,1\} \\
     t &\mapsto \begin{cases}
@@ -332,7 +332,7 @@ Il numero di macchine possibili con questi parametri è $2n^2m(m+1)$. Si può ve
 
 Chiamiamo $\Sigma(m)$ Il numero massimo di 1 che una macchina con $m$ stati può mettere sul tape.  \\
 Poi chiamiamo $S(m)$ il numero massimo di step che una macchina con $m$ esegue prima di haltare. \\
-Per entrambi consideriamo solo macchine che ricevono $\epsilon$ come input e hantano.
+Per entrambi consideriamo solo macchine che ricevono $\epsilon$ come input e haltano.
 
 $S(m)$ non è computabile.
 
@@ -352,8 +352,8 @@ Un esempio è Halt. Altri sono:
 \begin{enumerate}
     \item $m$ has 10 states (Computable)
     \item $m$ decides prime numbers (Specification)
-    \item $m$ recognizes haltime TMs (Semantica)
-    \item $m$ deecides halting TMs (Computable perché è sempre \textit{False}. Triviale)
+    \item $m$ recognizes halting TMs (Semantica)
+    \item $m$ decides halting TMs (Computable perché è sempre \textit{False}. Triviale)
 \end{enumerate}
 
 \begin{callout}{Riconoscere vs Decidere}
@@ -401,7 +401,7 @@ Sia $P$ semantica e non triviale. Deve esserci almeno una macchina $m_p$ per cui
 \begin{equation*}
     m_p\in TM\ s.t.\ P(m_p)=1
 \end{equation*}
-Without loss of generality: $L(m)=\emptyset\implies P(m)=0$ Le machcine che riconoscono l'insieme vuoto non hanno la proprietà $P$.
+Without loss of generality: $L(m)=\emptyset\implies P(m)=0$ Le macchine che riconoscono l'insieme vuoto non hanno la proprietà $P$.
 
 Supponiamo per assurdo che $P$ sia decidibile. Quindi
 \begin{equation*}
@@ -450,9 +450,9 @@ Questa definizione però si basa pesantemente sulla definizione di un "algoritmo
     Assumeremo anche di trattare solo algoritmo lossless.
 \end{callout}
 
-\subsection{Compression Algorthim}
+\subsection{Compression Algorithm}
 Un algoritmo di compressione prende una stringa $s$ e genera una descrizione di $s$ più corta di $s$ stesso.
-Questo implica ovviamente l'esistenza di un processo di \textit{decompressione} simmetrico a quello di comressione.
+Questo implica ovviamente l'esistenza di un processo di \textit{decompressione} simmetrico a quello di compressione.
 
 \begin{align*}
     & S\in\Sigma^* \\
@@ -466,7 +466,7 @@ Ci stiamo affidando a una macchina di decompressione $m$, ma cosa sappiamo rigua
 Consideriamo la dimensione non solo di $t$ ma anche della macchina $m$ che decomprime $t$. Questo equivale a avere un "self expanding executable file".
 
 \begin{callout}{}
-    Immagina di scaricare un file compresso in un formato sconosciuto e di dover anche scaricare un programma per la decompressione del suddetto file. \\ La dimensione del programma di estrazione dovrebbe essre inclusa nella dimensione totale del download.
+    Immagina di scaricare un file compresso in un formato sconosciuto e di dover anche scaricare un programma per la decompressione del suddetto file. \\ La dimensione del programma di estrazione dovrebbe essere inclusa nella dimensione totale del download.
 \end{callout}
 
 Per definire la dimensione di $m$ fixiamo una macchina universale $U$.
@@ -480,7 +480,7 @@ Per definire la dimensione di $m$ fixiamo una macchina universale $U$.
 \paragraph{Ottimalità} ovviamente a noi interessa la coppia $(m,t)$ più piccola possibile (quella "ottimale") che riproduca $s$ alla fine. \\
 Un caso triviale sarebbe la macchina che copia un input e l'input originale. Questo ovviamente non è ottimale.
 
-\subsection{"Most strings are uncompressable"}
+\subsection{"Most strings are incompressible"}
 \begin{gather*}
     \Sigma=\{0,1\} \\
     S = \Sigma^{100} \\
@@ -522,9 +522,9 @@ Una caratteristica particolare è che l'overhead è sempre lo stesso indipendent
     K_V = O(K_U) 
 \end{gather*}
 Le due rappresentazioni sono asintoticamente equivalenti. 
-\footnotetext{rappresentation of $u$ in $v$} 
+\footnotetext{representation of $u$ in $v$} 
 
-\subsection{La Kolmogorov Complexity È Unconmputable}
+\subsection{La Kolmogorov Complexity È Uncomputable}
 Prendiamo una macchina universale $U$. $K_U$ \textbf{non} è computable.
 
 Prendiamo la frase \center
@@ -535,8 +535,8 @@ Questa frase è un paradosso, perché se trovassimo questo numero la frase gli s
 Ora dobbiamo trovare una maniera formale di dimostrare la con computabilità della complessità di Kolmogorov utilizzando questo paradosso.
 \begin{itemize}
     \item number $to$ string
-    \item defined $to$ Kologorov complexity
-    \item words $to$ symbold
+    \item defined $to$ Kolmogorov complexity
+    \item words $to$ symbols
 \end{itemize}
 
 \begin{gather*}
@@ -544,7 +544,7 @@ Ora dobbiamo trovare una maniera formale di dimostrare la con computabilità del
 \end{gather*}
 
 \paragraph{Prova per assurdo}
-Supopniamo di avere una macchina $m_{K,U} \in TM$ tale che $\forall s\in\Sigma^* m_{K,U}(s) = K_U(s)$
+Supponiamo di avere una macchina $m_{K,U} \in TM$ tale che $\forall s\in\Sigma^* m_{K,U}(s) = K_U(s)$
 \begin{algorithm}
     \caption{$m$}
     \ForAll{$s\in\Sigma^*$}{
