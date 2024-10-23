@@ -22,7 +22,7 @@
 \usepackage{pdflscape}
 
 \title{Assignment \#1}
-\author{Diego Oniarti - 226937}
+\author{Diego Oniarti - 257835}
 \date{}
 \begin{document}
 
@@ -182,6 +182,11 @@ Inductive hypothesis: $if\ t\to t'\ then\ E'[t] \to E'[t']$
     &\quad 1
 \end{align*}
 
+If you want the two reductions to result in generic $n_1$ and $n_2$ values you can apply $t_d$ to the result of the above mentioned reductions.
+\begin{equation*}
+    t_d \overset{def}{=} \lam{i}{(i*n_2)+((1-i)*n_1)}
+\end{equation*}
+
 % \begin{multline*}
 %     t\overset{def}=\lam{d:(\N\to\tau\to\tau')\to(\N\to\N\to\tau)\\\to\tau'}{d\ (\lam{m:\N}{\lam{b:\tau}{b}})\ (\lam{i:\N}{\lam{n:\N}{i*n_1+(1-i)*n_2}})}
 % \end{multline*}
@@ -338,7 +343,7 @@ Inductive hypothesis: $if\ t\to t'\ then\ E'[t] \to E'[t']$
 \paragraph{reductions}
 \begin{align*}
     \begin{array}{r l @{\leadsto}l}
-        let\ x=(\lam{a}\lam{b}{a*b})\ in\ x\ 11\ 13 \equiv & (\lam{x}{x\ 11\ 13})\ (\lam{a}\lam{b}{a*b}) \\
+        let\ x=(\lam{a}\lam{b}{a*b})\ in\ (x\ 11\ 13) \equiv & (\lam{x}{x\ 11\ 13})\ (\lam{a}\lam{b}{a*b}) \\
                                                            & (\lam{a}\lam{b}{a*b})\ 11\ 13 & 143 
     \end{array}
 \end{align*}
