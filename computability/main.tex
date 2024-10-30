@@ -5,6 +5,7 @@
 \usepackage{algorithm2e}
 \usepackage[symbol]{footmisc}
 \usepackage{cancel}
+\usepackage{amssymb}
 
 \RestyleAlgo{ruled}
 
@@ -12,6 +13,7 @@
 \input{../common}
 
 \newcommand{\floor}[1]{\ensuremath{\lfloor #1 \rfloor}}
+\newcommand{\tvs}[0]{\textvisiblespace}
 
 \title{Appunti Computability}
 \author{Diego Oniarti}
@@ -578,7 +580,7 @@ Se $L_1$ può essere ridotto a $L_2$:
 
 \section{Unione di $RE\setminus R$}
 Supponiamo di avere due linguaggi $L_1,L_2\in RE\setminus R$. \\
-Sappiamo $L_{12}=L_1\cup L_2 \in RE$. Basta runnare $m_1$ e $m_2$ assieme e se una delle due halta haltimo $m_{12}$.\\
+Sappiamo $L_{12}=L_1\cup L_2 \in RE$. Basta runnare $m_1$ e $m_2$ assieme e se una delle due halta haltiamo $m_{12}$.\\
 Ma possiamo dire se $L_12$ in $RE$ o in $RE\setminus R$? No. Non possiamo imporre alcun constrain sul fatto che sia \textit{recursive}.
 
 \begin{callout}{Proof}
@@ -587,6 +589,74 @@ Ma possiamo dire se $L_12$ in $RE$ o in $RE\setminus R$? No. Non possiamo imporr
     Ora $L_1=E\cup HALT_\epsilon$ e $L_2=O\cup HALT_\epsilon$.
 \end{callout}
 
+\section*{Esercizio}
+\begin{gather*}
+    L \in \Sigma^*\ \text{recursive} \\
+    TM\ m\ \text{Partially decides }L \\
+    \forall x\in\Sigma^* m(x)=\infty \vee m(x) = \begin{cases}0 & x\not\in L \\ 1 & x\in L\end{cases} \\
+    \begin{array}{c | c c c c c}
+        x & \epsilon & 0 & 1 & 00 & 01 \\
+        \hline
+        m(x) & 0 & \infty & 1 & 0 & \infty
+    \end{array}
+\end{gather*}
+Possiamo dire che una macchina $m$ \textit{decide parzialmente} $L$ se: "Quando halta da la risposta giusta". Trivialmente la macchina che non halta mai decide parzialmente tutti i linguaggi.
+
+\paragraph{domanda} La proprietà "partially decides $L$" è decidibile? \\
+Iniziamo vedendo se possiamo usare il teorema di Rice.
+\subparagraph{La proprietà è triviale?} No, possiamo facilmente creare una macchina che non soddisfa la proprietà.
+\subparagraph{La proprietà è semantica?} No. Quindi non possiamo usare Rice. \\
+Dimostrazione che la proprietà non è semantica.
+\begin{gather*}
+    L = \{0, 01\} \\
+    \begin{array}{c|ccccc}
+        x & \epsilon & 0 & 1 & 00 & 01 \\
+        \hline
+        m_1(x) & \infty & \infty & 1 & \infty & \infty \\
+        m_2(x) & 0 & 0 & 1 & 0 & 0 \\
+    \end{array}
+\end{gather*}
+Le due macchine riconoscono lo stesso linguaggio $L'=\{1\}$. Ma la prima ha la proprietà, mentre la seconda no.$_\square$
+
+\paragraph{Dimostrazione che $P$ non è decidibile}
+Questo può essere dimostrato con la stessa prova che abbiamo usato per dimostrare il teorema di Rice. Ovvero riducendo la macchina $H$ che risolve l'halting problem a quella che decide la proprietà $P$.
+
+$(m,t)\mapsto n_{m,t}(x)$
+\begin{algorithm}
+    \caption{n}
+    move $x$ on aux tape\;
+    replace it with $t$\;
+    run $m_m$(t)\;
+    restore original input $x$\;
+    run $m_A(x)$
+\end{algorithm}
+
+\section*{esercizio}
+\begin{align*}
+    & \Sigma = \{\text{\textvisiblespace},0,1\} \\
+    & Q = \{q_0, q_1, \dots, q_n\} \\
+    & q_0\ \text{initial state} \\
+    & f: \Sigma\times Q \to \Sigma\times Q\times \{\leftarrow,\rightarrow\}
+\end{align*}
+
+Vediamo come possiamo "modificare" una TM.
+\begin{enumerate}
+    \item Se la posizione iniziale della TM fosse sconosciuta (quindi la posizione dell'input) possiamo creare una macchina che si posiziona all'inizio dell'input? Si. Dovrebbe fare la spola a destra e sinistra spostando dei marker fino a che non trova l'input.
+    \item Ipotizziamo che la macchina abbia delle celle "difettose". $\Sigma' = \Sigma\cup\{x\}$. Possiamo modificare $Q$ e $f$ per ignorare le celle difettose?
+\end{enumerate}
+
+Per ogni stato $q_n$ creiamo 4 stati $q_{nl1},q_{nl2}, q_{nr1},q_{nr2}$
+\begin{align*}
+    \begin{array}{c|c|c|c|c}
+                    & x & \tvs & 0 & 1 \\
+        \hline
+        q_{nl1} & x,q_{nl1},\leftarrow & \tvs,q_{nl2},\rightarrow & 0,q_{nl2},\rightarrow & 0,q_{nl2},\rightarrow \\
+        q_{nl2} & x,q_n,\leftarrow & \tvs,q_n\leftarrow & 0,q_n\leftarrow & 1,q_n\leftarrow \\
+        q_{nr1} & x,q_{nr1},\rightarrow & \tvs,q_{nr2},\leftarrow & 0,q_{nr2},\leftarrow & 0,q_{nr2},\leftarrow \\
+        q_{nr2} & x,q_n,\rightarrow & \tvs,q_n\rightarrow & 0,q_n\rightarrow & 1,q_n\rightarrow \\
+    \end{array}
+\end{align*}
+Dopodiché, nella funzione di transizione originale, sostituiamo ogni regola del tipo $(\sigma,q_n,\leftarrow)$ con $(\sigma,q_{nl1},\leftarrow)$ e ogni regola del tipo $(\sigma,q_n,\rightarrow)$ con $(\sigma,q_{nr1},\rightarrow)$
 
 
 \end{document}

@@ -56,14 +56,15 @@ Attacchi XSS consistono nell'iniezione di codice "maliziono" in siti fidati. \\
 Questo è un tipo di attacco \textit{client side}. Quindi l'attaccante ha accesso a dati client side come cookie, token di sessione, etc..
 Questo rende l'attacco meno dannoso di una SQL-injection. Ma piò comunque essere molto pericoloso.
 
-\begin{lstlisting}
-<?php
-    $query = $_GET["query"];
-    if (isset($query)) {
-        echo "Search results for: ".$query;
-    }
-?>
-\end{lstlisting}
+% \begin{lstlisting}
+% <?php
+%     $query = $_GET["query"];
+%     if (isset($query)) {
+%         echo "Search results for: ".$query;
+%     }
+% ?>
+% \end{lstlisting}
+
 Ci sono molti tag html che possono portare all'esecuzione di codice javascript. Per esempio: script, body, img, ifreame, input, etc..
 
 \paragraph{Possibili soluzioni}
@@ -146,9 +147,63 @@ Un test case descrive una procedura che mette alla prova il sistema
 ???
 
 \section{Tainted Variable}
-Una variabile è detta \textit{"tainted"} quando non è checkata. Quando il vaore di una tainted variable è checkato, diventa \textit{untainted}. \\
+Una variabile è detta \textit{"tainted"} quando non è checkata. \\ 
+Quando il vaore di una tainted variable è checkato, diventa \textit{untainted}.
 
 L'analisi di queste variabili nel codice è detta \textit{"taint analysis"}, è può essere di tipo statico o dinamico.
+
+\section{Testing}
+A \textit{Test Suite} is a set of test cases. When defining a test suit there are some generic problems:
+\begin{enumerate}
+    \item How to identify the required test inputs \\
+        It is not possible to test EVERY input. One approach is to test with random inputs, but various approaches depend on the type of problem.
+    \item How to identify the right test oracle to be used
+    \item When to stop testing \\
+        Testing could end when some coverage criteria is met, or when some resource (like time) runs out. There is also Mutation testing.
+\end{enumerate}
+
+\subsection{test coverage}
+Test coverage aims at ensuring that a test suite is comprehensive enough and that all relevant and critical applications aspects and functionalities are covered. It is based on "coverage measures or criteria"
+
+\subsection{integration testing}
+
+\subsection{test coverage criteria}
+There are many criteria that can be used to valuate test coverage. Some of these are
+\begin{itemize}
+    \item Code coverage
+    \item data flow code coverage
+    \item Boundary value coverage
+    \item risk coverage
+    \item requirements coverage
+    \item type of bugs
+\end{itemize}
+But there are many more.
+
+Different criteria are better suited for different kinds of applications. Code coverage is the easiest to use (especially if the code can be easily instrumented) but it gives little guarantee about the security of the code.
+
+\subsection{Statement Coverage}
+Statement coverage aims at involving the execution of all the executable statements at least once.
+\begin{callout}{}
+    Vedi slide 14 per l'esempio con la tabellina fatta bene.
+\end{callout}
+
+Un test case è detto \textit{ridondante} se testa degli statement che sono già testati da altri casi.\\
+Un test che è completamente ridondante può essere eliminato dalle test suit.
+
+\subsection{Decision Coverage}
+Decision coverage reports the true or false outcomes of each boolean expression (or code decision point)
+
+\subsection{Condition Coverage}
+Condition coverage reveals how the (atomic) logical operands in the conditional statement are evaluated. This is similar to the decision coverage, but instead of evaluating the `IF` statement as either true or false, we do the evaluation on the atomic parts of the boolean conditions.
+
+\subsection{Branch coverage.}
+Branch coverage tests every outcome from the code to ensure that every branch (CFG edge) es executed at least once
+
+\subsection{Code coverage testing tools}
+\begin{itemize}
+    \item Emma: java eclipse plugin
+    \item JacCoCo: Specializzato per le servlet
+\end{itemize}
 
 \end{document}
 
