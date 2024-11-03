@@ -764,10 +764,26 @@ Syntactic type checking:
 % \end{multiline*}
 \subsection{Existential Types}
 
-Un record con almeno due label is_on e is_off. 
+Un record con almeno due label is\_on e is\_off. 
 Definire il tipo Switch e un termine di questo tipo
 
-jjk:
+\section{free theorem}
+\begin{align*}
+    \IF 
+\end{align*}
+
+\paragraph{bool}
+\begin{align*}
+    \forall\alpha.\alpha\to\alpha\to\alpha \\
+    T: \Lambda\alpha.\lam{t:\alpha}\lam{f:\alpha}{t} \\
+    F: \Lambda\alpha.\lam{t:\alpha}\lam{f:\alpha}{f} \\
+    \IF v \THEN\ v_t \ELSE v_f \equiv v[\tau]\ v_t\ v_f
+\end{align*}
+
+\section{altro system F}
+\begin{align*}
+    pack\ \left\langle\N,\left.\begin{cases}val=0\\ison=\lam{x:\N}{x==0}\\toggle=\lam{x:N}{\IF x==0\THEN 1 \ELSE 0}\end{cases}\right\}\right\rangle
+\end{align*}
 
 \end{document}
 

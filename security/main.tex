@@ -205,6 +205,74 @@ Branch coverage tests every outcome from the code to ensure that every branch (C
     \item JacCoCo: Specializzato per le servlet
 \end{itemize}
 
+\section{mutation testing}
+Una tecnica usata per valutare la qualità di una test suite. Introduciamo un bug noto nel programma e verifichiamo che la test suite rilevi questo bug.\\
+In caso contrario c'è una mancanza nella suite.
+
+Alcune assunzioni sono:\begin{itemize}
+    \item solo un cambiamento è introdotto alla volta
+    \item l'obbiettivo può essere raggiunto misurando \textit{quanto bene trova il bug introdotto}
+    \item il bug introdotto è indicativo delle problematiche effettive che potrebbero essere nel codice.
+    \item errori veri e introdotti artificialmente non devono essere identici, ma le differenze non dovrebbero affliggere l'obbiettivo.
+\end{itemize}
+
+\subsection{Mutanti}
+\begin{itemize}
+    \item Un \textbf{Mutant} è il programma modificato
+    \item Un mutant è \textbf{Killed} quando è rilevato dalla test suite
+    \item Un \textbf{Mutant Score} è $\frac{killed mutants}{total mutants}*100$
+    \item Una test suite è \textbf{mutation-adequate} se il mutant score è $100$
+\end{itemize}
+
+\subsection{Common mutation}
+Ci sono dei mutant che vengono comunemente usati
+\paragraph{operand replacement}
+Cambiare operatori o operandi in una espressione. $(x>y)$ può diventare $(x<y)$ o $(x>3)$ 
+
+Rimuovere l'\textit{else} in un blocco condizionale, rimuovere l'intero \textit{if-else}, aggiungere un return
+
+Queste modifiche non devono causare errori a compile time ma solo runtime (deve compilare).
+
+Altri mutanti comuni:
+\begin{itemize}
+    \item remove regex sanitization
+    \item remove path traversal sanitization
+    \item remove http-only flag from cookie
+    \item permit sql injection
+    \item sql 
+    \begin{itemize}
+        \item add or/and clauses
+        \item add ";"
+        \item change the encoding of whitespaces
+    \end{itemize}
+\end{itemize}
+
+\subsection{tools}
+Two tools for mutation testing are \textit{stryker mutator} e \textit{PITest (eclipse plugin)}
+
+\section{fuzzing}
+Fuzzing è la generazione automatica di input con l'obbiettivo di crashare \\ l'applicazione.
+
+Gli input sono "casuali" ma tipicamente sono stringhe molto lunghe, numeri grandi, input "strani" in generale, e altri input che possano metter alla prova l'applicazione.\\
+Questo include numeri ai limiti dei range rappresentabili, stringhe composte da caratteri particolari, etc..
+
+L'oracolo di un fuzzer quindi è un crash.
+
+Tecniche più sofisticate non mirano a un crash ma a altre metriche come memory leak, stati non validi dell'applicazione, accessi invalidi a memoria, etc.. Questi test sono molto più difficili da progettare.
+
+Il fuzzing ha il vantaggio di essere molto semplice, in quanto ci sono tools che possono dare molti input automaticamente a un app, ma non è molto efficace per alcuni tipi di applicazione.
+
+\section{Blackbox vs graybox}
+
+\section{Esecuzione simbolica}
+Esecuzione del software non con valori effettivi ma con simboli che rappresentano la classe di tutti i valori che i simboli potrebbero avere. Poi vengono generati dei \textit{path constraint}, delle limitazioni e relazioni tra i simboli che sono valide globalmente o in determinati branch di codice.
+
+La path condition ci dice quale relazione deve essere presente tra gli input per far si che il programma segua un certo path.
+
+Possiamo definire degli input validi e tenere tracci della esecuzione simbolica durante quella effettiva. La condition ci permette poi di definire nuovi input che non matchino la path condition e ripetere il processo.
+
+Durante la symbolic execution potremmo imbatterci in chiamate a funzioni private. In questo caso il simbolo prende il valore di ritorno della funzione.
+
 \end{document}
 
 
