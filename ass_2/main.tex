@@ -20,6 +20,7 @@
 \newcommand{\case}[3]{\ensuremath{\text{case}\ #1\ \text{of}\ \left|\begin{aligned}#2\\#3\end{aligned}\right.}}
 \newcommand{\Da}[0]{\ensuremath{\Downarrow}}
 \newcommand{\while}[2]{\ensuremath{\text{while }#1\text{ do }#2\text{ end}}}
+\newcommand{\for}[3]{\ensuremath{\text{for }i=#1\text{ to }#2\text{ do }#3\text{ end}}}
 \newcommand{\mE}[0]{\ensuremath{\mathbb{E}}}
 \usepackage{pdflscape}
 
@@ -87,13 +88,44 @@ semantics in COS.
 \subsection{while}
 \begin{align*}
     t = \cdots |& \while{t}{t} \\
+    v = \cdots |& \Xi \\
     \tau = \cdots |& \xi \\
     \mE = \cdots |& \while{\mE}{t} \\
-                 |& \while{true}{\mE}
+                 %|& \while{true}{\mE}
 \end{align*}
 \begin{gather*}
     \st[t-while]{\Gamma\vdash \while{t_0}{t_1}: \xi }{\Gamma\vdash t_0:bool \quad \Gamma\vdash t_1:\tau} \\
-    \st[c-while]{\while{}{}}{}
+    \\
+    \st[c-whileT]{\while{true}{t} \leadsto^p t;\while{true}{t} }{} \\
+    \\
+    \st[c-whileF]{\while{false}{t} \leadsto^p \Xi }{}
+\end{gather*}
+
+\subsection{for}
+\begin{align*}
+    t = \cdots |& \for{t}{t}{t} \\
+    v = \cdots |& \Xi \\
+    \tau = \cdots |& \xi \\
+    \mE = \cdots  |& \for{\mE}{t}{t} \\
+                  |& \for{n}{\mE}{t} \\
+                  %|& \for{n}{n}{\mE} \\
+\end{align*}
+\begin{gather*}
+    \st[t-for]{\Gamma\vdash \for{t_0}{t_1}{t_2}: \xi }{\Gamma\vdash t_0:\N \quad \Gamma\vdash t_1:\N \quad \Gamma,i:\N\vdash t_2:\tau} \\
+    \\
+    \st[c-for1]{
+        \for{n_1}{n_2}{t} \leadsto^p t[n/i];\for{n_1'}{n_2}{t}
+    }{
+        n_1<n_2
+        \quad
+        n_1' = n_1+1
+    } \\
+    \\
+    \st[c-for2]{
+        \for{n_1}{n_2}{t} \leadsto^p \Xi
+    }{
+        n_1\geq n_2
+    } \\
 \end{gather*}
 
 
