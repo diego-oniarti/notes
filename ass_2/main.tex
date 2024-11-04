@@ -19,6 +19,8 @@
 \newcommand{\inr}[0]{\ensuremath{\ inr\ }}
 \newcommand{\case}[3]{\ensuremath{\text{case}\ #1\ \text{of}\ \left|\begin{aligned}#2\\#3\end{aligned}\right.}}
 \newcommand{\Da}[0]{\ensuremath{\Downarrow}}
+\newcommand{\while}[2]{\ensuremath{\text{while }#1\text{ do }#2\text{ end}}}
+\newcommand{\mE}[0]{\ensuremath{\mathbb{E}}}
 \usepackage{pdflscape}
 
 \title{Assignment \#2}
@@ -71,9 +73,28 @@ $\inl t.\text{VAL}$ by I1 and definition of $\inl$. $_\square$
 \]
 
 \subsection{$t \equiv \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}$}
+\begin{multline*}
+    \text{ if } \emptyset \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}:\tau \text{ then either } \\ \cancel{ \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}.\text{VAL} } \\ \text{ or } \exists t'.\case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}\leadsto t'
+\end{multline*} 
 
 \section{Missing Compatibility Lemmas}
 Write the proof for these compatibility lemmas:
+
+\section{Adding Cycles}
+Add \texttt{for} and \texttt{while} constructs to STLC. Add their syntax, their typing and their operational
+semantics in COS.
+
+\subsection{while}
+\begin{align*}
+    t = \cdots |& \while{t}{t} \\
+    \tau = \cdots |& \xi \\
+    \mE = \cdots |& \while{\mE}{t} \\
+                 |& \while{true}{\mE}
+\end{align*}
+\begin{gather*}
+    \st[t-while]{\Gamma\vdash \while{t_0}{t_1}: \xi }{\Gamma\vdash t_0:bool \quad \Gamma\vdash t_1:\tau} \\
+    \st[c-while]{\while{}{}}{}
+\end{gather*}
 
 
 \end{document}

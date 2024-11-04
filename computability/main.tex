@@ -13,8 +13,15 @@
 \input{../common}
 
 \newcommand{\floor}[1]{\ensuremath{\lfloor #1 \rfloor}}
-\newcommand{\tvs}[0]{\textvisiblespace}
+\newcommand{\tvs}[0]{\text{\textvisiblespace}}
+\newcommand{\N}[0]{\ensuremath{\mathbb{N}}}
 
+\usepackage{tikz}
+\usetikzlibrary{tikzmark,calc,,arrows,shapes,decorations.pathreplacing}
+\tikzset{every picture/.style={remember picture}}
+\usepackage{accents}
+\newcommand\myubar[1]{%
+\underaccent{\bar}{#1}}
 \title{Appunti Computability}
 \author{Diego Oniarti}
 \date{Anno 2024-2025}
@@ -658,5 +665,57 @@ Per ogni stato $q_n$ creiamo 4 stati $q_{nl1},q_{nl2}, q_{nr1},q_{nr2}$
 \end{align*}
 Dopodiché, nella funzione di transizione originale, sostituiamo ogni regola del tipo $(\sigma,q_n,\leftarrow)$ con $(\sigma,q_{nl1},\leftarrow)$ e ogni regola del tipo $(\sigma,q_n,\rightarrow)$ con $(\sigma,q_{nr1},\rightarrow)$
 
+\section{Computational Complexity}
+Da ora in poi prenderemo in considerazione solo linguaggi ricorsivi. Quindi c'è sempre una macchina di Turing che li riconosce.
+\begin{gather*}
+    L \text{ is recursive } \\
+    \exists m: L(m)=L \wedge \forall s\in \Sigma^* m(s)<\infty
+\end{gather*}
 
+Data una stringa $s\in\Sigma^*$, $t_m:\Sigma^*\mapsto\mathbb{N}$ è una funzione che mappa $s$ al \textit{numero di step} svolti da $m(s)$ prima di interrompersi.
+
+$T_m:\N\mapsto\N:n\mapsto \max_{|s|=n} t_m(s)$ ci dice il numero di step in relazione alla \textit{dimensione} dell'input.
+
+\begin{callout}{es}
+    Prendiamo la funzione $f$ che decide se un numero è pari o no 
+    \begin{align*}
+        &\Sigma=\{\tvs,0,1\} \\
+        f:&\N\mapsto\{0,1\} \\
+          &n\mapsto \begin{cases}
+              1 & even \\
+              0 & odd
+          \end{cases}
+    \end{align*}
+    Assumiamo che i numeri siano rappresentati in binario e che $m$ si comporti così:
+    \begin{enumerate}
+        \item scorri a destra fino a fine del numero (n steps)
+        \item fai un controllo sull'ultimo bit (1 step)
+        \item scorri a sinistra cancellando il numero (n steps)
+        \item scrivi l'output (1 step)
+    \end{enumerate}
+    $T_m(\underbrace{n}_{\text{size of representation of $m$}})=2n+2 = O(n)$
+\end{callout}
+
+\subsection{Deterministic Time}
+\begin{align*}
+    DTIME(f) = \{L\subseteq\Sigma^*:\exists m. L(m)=L\wedge T_m(n)=O(f(n))\}
+\end{align*}
+
+\subsection{Polynomial Languages}
+\begin{align*}
+    \mathbb{P} = \bigcup_{k=0}^\infty DTIME(n^k)
+\end{align*}
+
+\subparagraph{Input types}
+Se il problema che stiamo affrontando non prende espressamente stringhe come input dobbiamo escogitare un encoding per l'input in maniera che una Turing machine possa lavorarci.
+
+Nel caso di un grafo possiamo decidere di usare una matrice di adiacenza.
+\begin{align*}
+    A&\in\{0,1\}^{n\times n} \\
+    A_{ij} &= \begin{cases}
+        1 & \{i,j\} \in E \\
+        0 & else
+    \end{cases}
+\end{align*}
+$\text{input size} = O(n^2)$
 \end{document}
