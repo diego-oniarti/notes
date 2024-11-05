@@ -5,6 +5,7 @@
 \usepackage{amsfonts}
 \usepackage{semantic}
 \usepackage{cancel}
+\usepackage{amssymb}
 
 \input{../common}
 
@@ -75,11 +76,51 @@ $\inl t.\text{VAL}$ by I1 and definition of $\inl$. $_\square$
 
 \subsection{$t \equiv \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}$}
 \begin{multline*}
-    \text{ if } \emptyset \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}:\tau \text{ then either } \\ \cancel{ \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}.\text{VAL} } \\ \text{ or } \exists t'.\case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}\leadsto t'
+    \text{if } \underbrace{\emptyset \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}:\tau}_\text{HY} \text{ then either } \\ \cancel{ \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}.\text{VAL} } \\ \text{ or } \exists t'.\case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}\leadsto t'
 \end{multline*} 
+\begin{align*}
+    by I.H. w.h. \text{ either} & \vdash t_0.\text{VAL} & \text{I1}\\
+    \text{or}                   & \exists t_0'.t_0\leadsto t_0' & \text{I2}
+\end{align*}
+
+\paragraph{Assuming I1}
+\begin{equation*}
+    \text{by typing definition of case and HY}\begin{array}{r@{\quad}l} 
+        \text{either} & t_0 \equiv \inl t_0^l \\
+        \text{or}     & t_0 \equiv \inr t_0^r
+    \end{array}
+\end{equation*}
+\begin{itemize}
+    \item $t_0\equiv\inl t_0^l$ \\
+        by COS rule for case: $\case{\inl t_0^l}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto^p t_1[t_0^l/x_1]_\square$ \\
+        (qui devo probabilmente inserire che \mE=[] e tutta la tiritera)
+    \item $t_0\equiv\inr t_0^r$ \\
+        by COS rule for case: $\case{\inr t_0^r}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto^p t_2[t_0^r/x_2]_\square$
+\end{itemize}
+\paragraph{Assuming I2}
+\[
+    \begin{array}{rl @{\quad} l}
+        \text{by inversion on I2 w.h.}   &  t_0  \equiv E[t_0^z]         & \text{HE1}\\
+                                         &  t_0' \equiv E[t_0'^z]        & \text{HE1'}\\
+                                         &  t_0^z \leadsto^p t_0'^z     & \text{HPR}\\
+        \text{by HE1, HE1' t.s.}         &  \case{E[t_0^z]}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto \case{E[t_0'^z]}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \\
+        \text{by ctx with HPR and}       &  E' = \case{E}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} _\square \\
+    \end{array}
+\]
+
 
 \section{Missing Compatibility Lemmas}
 Write the proof for these compatibility lemmas:
+\begin{itemize}
+    \item Pairs \\
+        Assuming: \begin{itemize}
+            \item $\Gamma \vDash t_1:\tau_1$
+            \item $\Gamma \vDash t_2:\tau_2$
+        \end{itemize}
+        Prove: \begin{itemize}
+            \item $\Gamma \langle t_1,t_2 \rangle : \tau_1\times\tau_2$
+        \end{itemize}
+\end{itemize}
 
 \section{Adding Cycles}
 Add \texttt{for} and \texttt{while} constructs to STLC. Add their syntax, their typing and their operational
