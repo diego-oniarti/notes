@@ -34,12 +34,16 @@
 \newcommand{\appl}[2]{\ensuremath(#1)\ #2}
 \newcommand{\st}[3][]{\ensuremath \displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}
 \newcommand{\N}{\ensuremath \mathbb N}
+\newcommand{\mE}{\ensuremath \mathbb E}
+\newcommand{\V}{\ensuremath{\mathcal{V}}}
+\newcommand{\cE}{\ensuremath{\mathcal{E}}}
 \usepackage{pdflscape}
 
 \newcommand{\IF}[0]{\ensuremath {\text{ if }}}
 \newcommand{\THEN}[0]{\ensuremath {\text{ then }}}
 \newcommand{\ELSE}[0]{\ensuremath {\text{ else }}}
 \newcommand{\AND}[0]{\ensuremath {\text{ and }}}
+\newcommand{\OR}[0]{\ensuremath {\text{ or }}}
 
 \title{Appunti Semantics}
 \author{Diego Oniarti}
@@ -635,8 +639,8 @@ Questo non possiamo provarlo con gli strumenti che abbiamo fin ora. Serve quindi
 
 \section{Logical Relationships (and semantic typing)}
 \begin{align*}
-    V\left[\tau\right] & \text{Quali valori constituiscono un tipo} \\
-    E\left[\tau\right] & \text{Quali termini constituiscono un tipo}\\
+    \V\left[\tau\right] & \text{Quali valori costituiscono un tipo} \\
+    E\left[\tau\right] & \text{Quali termini costituiscono un tipo}\\
     G\left[\Gamma\right] & \text{Sostituzione} \\
     \gamma ::=&\emptyset \\
     |&\gamma[v/x] 
@@ -650,17 +654,16 @@ Questo non possiamo provarlo con gli strumenti che abbiamo fin ora. Serve quindi
 \begin{align*}
     if\ \Gamma\vdash t:\tau\ then\ \Gamma \vDash t:\tau
 \end{align*}
-Se un programma è well typed in sintactic typing, lo è anche in semantic typing.
+Se un programma è well typed in syntactic typing, lo è anche in semantic typing.
 
-\subparagraph{AAAH}
 \begin{align*}
-    V[\N] &= \{n\} \\
-    or \\
-    V[\N] &= \{v|v\equiv n\} \\
-    V[\tau'\to\tau] &= \{v|v\equiv \lam{x:\tau'}{t}\ and\ \forall v'\ if\ v'\in V[\tau']\ then\ t[v'/x] \in E[\tau]\} \\
-    E[\tau]&=\{t|\exists v.t\cred^* v\ and\ v\in V[\tau] \} \\
-    V[\tau\times\tau'] &= \{v|v\equiv <v_1,v_2>\ and\ t \in V[\tau]\ and\ t'\in V[\tau']\} \\
-    V[\tau\uplus\tau'] &= \{v|v\equiv v.inl v_1\ and\ v_1\in V[\tau]\} \cup \{v|v\equiv v.inr v_2\ and\ v_2\in V[\tau']\}
+    \mathcal{V}[\N] &= \{n\} \OR \V[\N] = \{v|v\equiv n\} \\
+    \V[\tau\to\tau'] &= \{v|v\equiv \lam{x:\tau}{t} \AND \forall v' \IF v'\in \V[\tau] \THEN t[v'/x] \in \cE[\tau']\} \\
+    \V[\tau\times\tau'] &= \{v|v\equiv \pair{v_1,v_2} \AND t \in \V[\tau] \AND t'\in \V[\tau']\} \\
+    \V[\tau\uplus\tau'] &= \{v|v\equiv \inl v_1 \AND v_1\in \V[\tau]\} \cup \{v|v\equiv \inr v_1 \AND v_1\in \V[\tau']\} \\
+    \mE[\tau]&=\{t|\exists v.t\cred^* v \AND v\in \V[\tau] \} \\
+    G[\emptyset] &= \emptyset \\
+    G[\Gamma, x:\tau] &= \{\gamma[v/x] | \gamma\in G[\Gamma] \AND v\in\V[\tau] \}
 \end{align*}
 
 \section{Proof of Normalization}

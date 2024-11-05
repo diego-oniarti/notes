@@ -718,4 +718,54 @@ Nel caso di un grafo possiamo decidere di usare una matrice di adiacenza.
     \end{cases}
 \end{align*}
 $\text{input size} = O(n^2)$
+
+\subsection{Prime numbers}
+\begin{algorithm}
+    \caption{is\_prime}
+    function is\_prime($n\in\N$) \{\;
+        \For{$i=2\dots\sqrt{n}$}{
+            \If{$n\%i==0$}{
+                reject\;
+            }
+        }
+        accept\;
+    \}
+\end{algorithm}
+
+La dimensione dell'input è $|s| = O(\log n)$. Quindi $n=O(2^{|s|})$. $\sqrt{n}=O(2^{|s|/2})$. I numeri sono esponenzialmente proporzionali al numero di bit usati per rappresentarli. Quindi questo algoritmo per decidere se un numero è primo non è polinomiale.
+
+Ci sono algoritmi più sofisticati che possono decidere se un numero è primo in tempo polinomiale con rispetto alla quantità di bit usati.
+
+\subparagraph{Satisfiability}
+Date $n$ variabili booleane $x_1,\dots,x_n$, una congiunzione di disgiunzioni $(x\wedge x\wedge\dots\wedge x) \vee (x\wedge x\wedge\dots\wedge x)$
+
+\begin{itemize}
+    \item term(atom): a variable $x$ or its negation
+    \item clause: $c_j=\vee{i=1}^{n_j} t_{ij}$
+    \item formula: $\wedge_{j=1}^m c_j$
+\end{itemize}
+
+Una formula è \textit{soddisfacibile} se esiste una combinazione di variabili tale per cui risulta vera.\\
+Il problema SAT è trovare questa combinazioni (almeno una di queste combinazioni).
+
+Non abbiamo un algoritmo che risolva questo problema in tempo polinomiale. Quindi non possiamo dire se SAT sia in $\mathbb{P}$ o meno.
+
+\subsection{Integer Linear Programming}
+
+\subsection{Certificazione}
+\textit{Clique}, \textit{D ILP}, e \textit{SAT} non hanno algoritmi polinomiali che trovino una soluzione. Ma, data una soluzione, verificare che essa sia valida o meno è molto semplice (polinomiale). Quindi la difficoltà sta nel fare questa semplice prova su un numero smisurato di possibili soluzioni.
+
+\begin{callout}{Problemi difficili da controllare}
+    Non tutti i problemi condividono questa proprietà. Prendiamo l'esempio di un gioco da tavolo (come scacchi) e di voler decidere se la board è a favore di un giocatore o dell'altro. L'input del problema è limitato, essendo ristretto alla rappresentazione della board, ma ogni decisione del giocatore vincente non può essere realisticamente fatta senza simulare ogni possibile evoluzione del gioco.\\
+    Questo è ovviamente computazionalmente complesso (esponenziale), a discapito dell'input limitato.
+\end{callout}
+
+Definiamo più formalmente questa proprietà.
+\begin{gather*}
+    \forall x \in L \\
+    \exists M\text{ verifying machine} \\
+    \exists \underbrace{m}_\text{certificate} \in \Sigma^*: M(x,m) = 1 \\
+    \exists p,q\text{ polinomiale}. |m|<p(|x|) \wedge t_m(x,m)\leq q(|x|)
+\end{gather*}
+
 \end{document}
