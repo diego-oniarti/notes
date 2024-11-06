@@ -788,5 +788,88 @@ Definire il tipo Switch e un termine di questo tipo
     pack\ \left\langle\N,\left.\begin{cases}val=0\\ison=\lam{x:\N}{x==0}\\toggle=\lam{x:N}{\IF x==0\THEN 1 \ELSE 0}\end{cases}\right\}\right\rangle
 \end{align*}
 
+\section{STLC-$\mu$}
+STLC-$\mu$ aggiunge i tipi ricorsivi.
+
+\begin{align*}
+    \tau ::= \cdots | \mu\alpha.\tau
+\end{align*}
+
+\begin{align*}
+    list[nat] \overset{\Delta}{=}\mu\alpha.\underbrace{B}_\text{empty}\uplus(\N\times\alpha)
+\end{align*}
+This unfolds to:
+\begin{gather*}
+    B\uplus(\N\times \mu\alpha. B\uplus(\N\times\alpha))
+\end{gather*}
+And we could keep unfolding the $\alpha$ over and over.
+
+There are two schools of thought over this topic: isorecursive and equirecursive
+
+\subsection{isorecursive}
+We assume the folded and unfolded type are isomorphic. This isomorphism is seen at the term level.
+\begin{align*}
+    t ::=\cdots &|fold_{\mu\alpha.\tau}t \\
+                &|unfold_{\mu\alpha.\tau} t \\
+    v ::= \cdots &|fold_{\mu\alpha.\tau} t
+\end{align*}
+Questo metodo rende il type-checking deterministico, ma aggiunge uno step di riduzione
+
+\subsection{equirecursive}
+L'equirocorsione rende il typing non deterministico ma non aggiunge step di riduzione. 
+
+È possibile dimostrare che i due metodo sono tecnicamente equivalenti.
+
+\subsection{Typing rule ISO}
+\begin{gather*}
+    \st[t-fold]{
+        \Gamma\vdash fold_{\mu\alpha.\tau} t : \mu\alpha.\tau
+    }{
+        \Gamma\vdash t:\tau[\mu\alpha.\tau/\alpha]
+    } \\
+    \st[t-unfold]{
+        \Gamma\vdash unfold_{\mu\alpha.\tau}t:\tau[\mu\alpha.\tau/\alpha]
+    }{
+        \Gamma\vdash t:\mu\alpha.\tau
+    } \\
+\end{gather*}
+
+\subsection{Modelliamo una lista in ISO}
+\begin{align*}
+    nil &\overset\Delta=fold_{list[nat]}\inl false \\
+    cons &\overset\Delta= \lam{x:\N}\lam{l:list[nat]}{fold_{list[nat]}\inr\pair{x, l}}
+\end{align*}
+
+\begin{callout}{typing derivation}
+    \begin{align*}
+        \emptyset\vdash\lam{x:\N}\lam{l:list[nat]}{fold_{ln}}
+    \end{align*}
+    Couldn't be arsed. Look at the lecture.
+\end{callout}
+
+List of generic $\alpha$:
+\begin{align*}
+    \forall\alpha.\mu\beta.B\uplus(\alpha\times\beta)
+\end{align*}
+
+%List of mixed generic types
+%\begin{align*}
+%    \mu\beta.\forall\alpha.B\uplus(\alpha\time\beta)
+%\end{align*}
+
+\begin{align*}
+    cons \overset\Delta= \Lambda\beta.\lam{x:\beta}\lam{l:list[\alpha]}{fold_{list[\alpha]}\inr\pair{x, l}}
+\end{align*}
+
+\subsection{fold unfold cancellation}
+\begin{gather*}
+\end{gather*}
+
+\subsection{Diverging computation}
+\begin{align*}
+    K \overset\Delta= \mu\alpha.\alpha\to\alpha \\
+    (\lam{x}{x\ x})(\lam{x}{x\ x}) \\
+\end{align*}
+
 \end{document}
 
