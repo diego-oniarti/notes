@@ -866,10 +866,70 @@ List of generic $\alpha$:
 \end{gather*}
 
 \subsection{Diverging computation}
-\begin{align*}
+\begin{gather*}
     K \overset\Delta= \mu\alpha.\alpha\to\alpha \\
     (\lam{x}{x\ x})(\lam{x}{x\ x}) \\
+    (\lam{x:\mu\alpha.\alpha\to\alpha}{(unfold\ x)\ x})\ fold(\lam{x:\mu\alpha.\alpha\to\alpha}{(unfold\ x)\ x})
+\end{gather*}
+
+\subsection{recap isorecursion}
+\begin{gather*}
+    \tau ::= \cdots | \mu\alpha.\tau \\
+    t ::= fold_{\mu\alpha.\tau}t | unfold_{\mu\alpha.\tau}t \\
+    unfold_{\mu\alpha.\tau}fold_{\mu\alpha.\tau}v\leadsto^p v \\
+    \st[t-fold]{
+        \Delta;\Gamma\vdash fold_{\mu\alpha.\tau} t : \mu\alpha.\tau
+    }{
+        \Delta;\Gamma\vdash t:\tau[\mu\alpha.\tau/\alpha]
+    } \\
+    \st[t-unfold]{
+        \Delta;\Gamma\vdash unfold_{\mu\alpha.\tau}t:\tau[\mu\alpha.\tau/\alpha]
+    }{
+        \Delta;\Gamma\vdash t:\mu\alpha.\tau
+    } \\
+\end{gather*}
+
+\subsection{Equirecursion}
+\begin{gather*}
+    \st[t-eqi]{
+        \Delta;\Gamma\vdash t:\tau
+    }{
+        \Delta,\Gamma \vdash t:\sigma
+        \quad
+        \Delta \vdash \sigma \overset o= \tau
+    }
+\end{gather*}
+Questa regola può potenzialmente essere applicata in ogni passaggio del type-checking. Questo rende il processo non deterministico.
+
+$\Delta\vdash \sigma\overset o= \tau$
+\begin{gather*}
+    \st[t-sym]{\Delta\vdash\sigma\circeq\tau}{\Delta\vdash\tau\circeq\sigma} \\
+    \st[t-trans]{\Delta\vdash\sigma\circeq\tau}{\Delta\vdash\sigma\circeq\gamma\quad \Delta\vdash\gamma\circeq\tau} \\
+    \st[t-base]{\Delta\vdash\tau\circeq\tau}{\tau\in\{\N,Bool,Unit\}} \\
+    \st[t-bin]{\Delta\vdash\tau_1\star\tau_2\circeq\sigma_1\star\sigma_2}{\Delta\vdash\tau_1\circeq\sigma_1\quad\Delta\vdash\tau_2\circeq\sigma_2} \\
+    \st[t-$\mu$]{\Delta\vdash\mu\alpha.\tau \circeq \mu\alpha.\sigma}{\Delta,\alpha\vdash \tau\circeq\sigma} \\
+    \st[t-unfold]{\Delta\vdash\mu\alpha.\tau\circeq\sigma}{\Delta\vdash\tau[\mu\alpha.t/\alpha]\circeq\sigma} \\
+    \st[t-var]{\Delta\vdash\alpha\circeq\alpha}{\alpha\in\Delta} \\
+\end{gather*}
+
+\subsection{Logical relations}
+La vecchia term relation
+\begin{align*}
+    \cE[\tau]=\{t|\underbrace{\exists v.t\leadsto^* v}_\text{safety}\AND v\in\V[\tau]\}
 \end{align*}
+aveva un certo concetto di "safety" che non accetta l'esecuzione divergente. Quindi dobbiamo modificarlo.
+
+Introduciamo questo judgment $t\searrow_n t'$ chiamato \textit{numbered stepping}. $t$ steppa a $t'$ in esattamente $n$ step e non può più steppare.
+
+La nuova definizione di safety che definiamo è questa:
+\begin{align*}
+    \vdash t:safe\triangleq \forall k,t'.\IF t\searrow_k t'\THEN \vdash t'.val
+\end{align*}
+\begin{itemize}
+    \item $t\Downarrow$ 
+    \item $t\not\to$
+    \item $t\Uparrow$
+\end{itemize}
+La correttezza di questo viene dimostrata per induzione sulla $k$
 
 \end{document}
-

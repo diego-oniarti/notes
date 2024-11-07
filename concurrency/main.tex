@@ -437,5 +437,19 @@ Un modo più compatto di scrivere derivazioni nel proof system per non avere alb
     \item exponential backoff: Meno chase miss ancora ma dipende molto da\\ parametri dati
 \end{itemize}
 
+\section{Linearizability}
+Each method should take effect instantaneously between invasion an response evenest.
+
+A linearisable object is one whose possible executions are linearisable.
+
+Split method Calls into two events:
+\begin{itemize}
+    \item invocation \\
+        q.enq(x)
+    \item response \\
+        q.enq(x) returns void / x / empty
+\end{itemize}
+
+
 \end{document}
 

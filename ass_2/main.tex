@@ -18,7 +18,7 @@
 \newcommand{\lam}[2]{\ensuremath{\lambda#1.#2}}
 \newcommand{\inl}[0]{\ensuremath{\ inl\ }}
 \newcommand{\inr}[0]{\ensuremath{\ inr\ }}
-\newcommand{\case}[3]{\ensuremath{\text{case}\ #1\ \text{of}\ \left|\begin{aligned}#2\\#3\end{aligned}\right.}}
+\newcommand{\case}[3]{\ensuremath{\text{case}#1\ \text{of}\ \left|\begin{aligned}#2\\#3\end{aligned}\right.}}
 \newcommand{\Da}[0]{\ensuremath{\Downarrow}}
 \newcommand{\while}[2]{\ensuremath{\text{while }#1\text{ do }#2\text{ end}}}
 \newcommand{\for}[3]{\ensuremath{\text{for }i=#1\text{ to }#2\text{ do }#3\text{ end}}}
@@ -66,17 +66,17 @@ $\inl t.\text{VAL}$ by I1 and definition of $\inl$. $_\square$
 \paragraph{Assuming I2}
 \[
     \begin{array}{rl @{\quad} l}
-        \text{by inversion on I2 w.h.}   &  t \equiv E[t_0]         & \text{HE1}\\
-                                         &  t" \equiv E[t_0"]        & \text{HE1'}\\
+        \text{by inversion on I2 w.h.}   &  t \equiv \mE[t_0]         & \text{HE1}\\
+                                         &  t" \equiv \mE[t_0"]        & \text{HE1'}\\
                                          &  t_0 \leadsto^p t_0"     & \text{HPR}\\
-        \text{by HE1, HE1' t.s.}         &  \inl E[t_0] \leadsto \inl E[t_0"] \\
-        \text{by ctx with HPR and}       &  E' = \inl E _\square \\
+        \text{by HE1, HE1' t.s.}         &  \inl \mE[t_0] \leadsto \inl \mE[t_0"] \\
+        \text{by ctx with HPR and}       &  \mE' = \inl \mE _\square \\
     \end{array}
 \]
 
 \subsection{$t \equiv \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}$}
 \begin{multline*}
-    \text{if } \underbrace{\emptyset \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}:\tau}_\text{HY} \text{ then either } \\ \cancel{ \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}.\text{VAL} } \\ \text{ or } \exists t'.\case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}\leadsto t'
+    \text{if } \underbrace{\emptyset \vdash \case{\ t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}:\tau}_\text{HY} \text{ then either } \\ \cancel{ \vdash \case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}.\text{VAL} } \\ \text{ or } \exists t'.\case{t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}\leadsto t'
 \end{multline*} 
 \begin{align*}
     by I.H. w.h. \text{ either} & \vdash t_0.\text{VAL} & \text{I1}\\
@@ -85,26 +85,26 @@ $\inl t.\text{VAL}$ by I1 and definition of $\inl$. $_\square$
 
 \paragraph{Assuming I1}
 \begin{equation*}
-    \text{by typing definition of case and HY}\begin{array}{r@{\quad}l} 
+    \text{by typing definition of $case$ and HY}\begin{array}{r@{\quad}l} 
         \text{either} & t_0 \equiv \inl t_0^l \\
         \text{or}     & t_0 \equiv \inr t_0^r
     \end{array}
 \end{equation*}
 \begin{itemize}
     \item $t_0\equiv\inl t_0^l$ \\
-        by COS rule for case: $\case{\inl t_0^l}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto^p t_1[t_0^l/x_1]_\square$ \\
-        (qui devo probabilmente inserire che \mE=[] e tutta la tiritera)
+            by COS rule for $case$: $\case{\inl t_0^l}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto^p t_1[t_0^l/x_1]_\square$ \\
+
     \item $t_0\equiv\inr t_0^r$ \\
         by COS rule for case: $\case{\inr t_0^r}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto^p t_2[t_0^r/x_2]_\square$
 \end{itemize}
 \paragraph{Assuming I2}
 \[
     \begin{array}{rl @{\quad} l}
-        \text{by inversion on I2 w.h.}   &  t_0  \equiv E[t_0^z]         & \text{HE1}\\
-                                         &  t_0' \equiv E[t_0'^z]        & \text{HE1'}\\
+        \text{by inversion on I2 w.h.}   &  t_0  \equiv \mE[t_0^z]         & \text{HE1}\\
+                                         &  t_0' \equiv \mE[t_0'^z]        & \text{HE1'}\\
                                          &  t_0^z \leadsto^p t_0'^z     & \text{HPR}\\
-        \text{by HE1, HE1' t.s.}         &  \case{E[t_0^z]}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto \case{E[t_0'^z]}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \\
-        \text{by ctx with HPR and}       &  E' = \case{E}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} _\square \\
+        \text{by HE1, HE1' t.s.}         &  \case{\ \mE[t_0^z]}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \leadsto \case{\ \mE[t_0'^z]}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} \\
+        \text{by ctx with HPR and}       &  \mE' = \case{\ \mE}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2} _\square \\
     \end{array}
 \]
 
@@ -155,7 +155,7 @@ semantics in COS.
     \st[t-for]{\Gamma\vdash \for{t_0}{t_1}{t_2}: \xi }{\Gamma\vdash t_0:\N \quad \Gamma\vdash t_1:\N \quad \Gamma,i:\N\vdash t_2:\tau} \\
     \\
     \st[c-for1]{
-        \for{n_1}{n_2}{t} \leadsto^p t[n/i];\for{n_1'}{n_2}{t}
+        \for{n_1}{n_2}{t} \leadsto^p t[n_1/i];\for{n_1'}{n_2}{t}
     }{
         n_1<n_2
         \quad
