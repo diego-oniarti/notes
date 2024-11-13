@@ -37,6 +37,7 @@
 \newcommand{\mE}{\ensuremath \mathbb E}
 \newcommand{\V}{\ensuremath{\mathcal{V}}}
 \newcommand{\cE}{\ensuremath{\mathcal{E}}}
+\newcommand{\te}[1]{\text{#1}}
 \usepackage{pdflscape}
 
 \newcommand{\IF}[0]{\ensuremath {\text{ if }}}
@@ -44,6 +45,8 @@
 \newcommand{\ELSE}[0]{\ensuremath {\text{ else }}}
 \newcommand{\AND}[0]{\ensuremath {\text{ and }}}
 \newcommand{\OR}[0]{\ensuremath {\text{ or }}}
+\newcommand{\LET}[0]{\ensuremath {\text{ let }}}
+\newcommand{\TIN}[0]{\ensuremath {\text{ in }}}
 
 \title{Appunti Semantics}
 \author{Diego Oniarti}
@@ -931,5 +934,90 @@ La nuova definizione di safety che definiamo è questa:
     \item $t\Uparrow$
 \end{itemize}
 La correttezza di questo viene dimostrata per induzione sulla $k$
+
+\section{System F with recursive types}
+\begin{align*}
+    \V[\tau]^\delta.\tau\times\delta\times v\times n
+\end{align*}
+Ci aspettiamo che nella value relationship compaia un numero $n$, che indica per quanti step il termine è safe.
+
+Modifichiamo $Semty$ così:
+\begin{gather*}
+    Semty(\tau)=\{s|s\in\mathcal{P}(\N\times CVal(\tau)),\forall(k,v)\in S,\forall y<k,(j,v)\in S\}
+\end{gather*}
+
+\begin{align*}
+    & \mathcal{D}[\cdot] = \te{unchanged} \\
+    & G[\Gamma,x:\tau]^\delta = \{(k,\gamma[v/x])|(k,\gamma)\in G[\Gamma]^\delta, (k,v)\in \V[\tau]^\delta\} \\
+    & \V[\alpha]^\delta = \sigma(\alpha).S \\
+    & \V[\N]^\delta = \{(k,n)\} \\
+    & \V[\tau_1\to\tau_2]^\delta = \{(k,\lam{x:\tau_1}{t})| \forall j\leq k \forall v \IF (j,v)\in\V[\tau]^\delta \THEN (j,t[v/x])\in\cE[\tau_2]^\delta)\} \\
+    & \V[\mu\alpha.\tau]^\delta = \{(k,fold_{\mu\alpha.\tau}v)|\forall j<k (j,v)\in\V[\tau[\mu\alpha.\tau/\alpha]]^\delta \} \\
+    & \cE[\tau]^\delta = \{(k,t)|\forall j<k,\forall t' \IF t\searrow_j t' \THEN (k-j,t')\in\V[\tau]^\delta\}
+\end{align*}
+
+\begin{gather*}
+    \Delta,\Gamma\vDash t.\tau\triangleq \forall \sigma\in D[\Delta],forall(k,\gamma)\in G[\Gamma]^\delta, (k,t\gamma\delta)\in \cE[\tau]^\delta
+\end{gather*}
+
+\section{state}
+$\LET f=\LET ctr=0 \TIN \lam{x:\N}{\pair{x*2,ctr+1}\TIN f\ 1;f\ 2}$ \\
+Fino ad ora questo riduceva a $\pair{4,1}$, perché non abbiamo stato.
+
+\subsection{Adding Heap}
+\begin{align*}
+    H ::= \emptyset | H,l\mapsto v \\
+    \Omega ::= H \triangleright t \\
+    t ::= \cdots | new\ t | !t | t:= t \\
+    \mE ::= \cdots | new\ \mE | !\mE | \mE:=t | l:=\mE
+\end{align*}
+Dove $l\in\mathcal{L}$ è la "location", su cui non possiamo però fare pointer arithmetics o simili
+
+\begin{gather*}
+    \st[ctx]{
+        H\triangleright E[t]\leadsto H'\triangleright E[t']
+    }{
+        H\triangleright t \leadsto^p H'\triangleright t'
+    }
+    \\
+    \st[prm]{
+        H\triangleright \leadsto^p 
+    }{
+    }
+\end{gather*}
+nuove regole 
+\begin{gather*}
+    \st[nbv]{
+        H\triangleright new\ v \leadsto^p H;l\mapsto v \triangleright l
+    }{
+        fresh(l,H)
+    }
+    \\
+    \st[read]{
+        H\triangleright !l \leadsto^p H\triangleright v
+    }{
+        H(l)=v
+    }
+    \\
+    \textcolor{gray}{
+        \st[]{
+            H,l\mapsto v(l) = v
+        }{}
+    }\\
+    \textcolor{gray}{
+        \st[]{
+            H,l\mapsto v(l') = v
+        }{
+            H(l') = v
+        }
+    }
+    \\
+    \st[write]{
+        H\triangleright l_1:= v l\leadsto^p H'\triangleright \textcolor{blue}{0}
+    }{
+        H'=H[l_1\mapsto v / l_1\mapsto\_]
+    }
+\end{gather*}
+Dove \textcolor{blue}{0} è una costante generica. Potremmo usare \textit{nil} o qualsiasi altra cosa.
 
 \end{document}

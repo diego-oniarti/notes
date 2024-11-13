@@ -15,6 +15,7 @@
 \newcommand{\floor}[1]{\ensuremath{\lfloor #1 \rfloor}}
 \newcommand{\tvs}[0]{\text{\textvisiblespace}}
 \newcommand{\N}[0]{\ensuremath{\mathbb{N}}}
+\newcommand{\te}[1]{\text{#1}}
 
 \usepackage{tikz}
 \usetikzlibrary{tikzmark,calc,,arrows,shapes,decorations.pathreplacing}
@@ -765,7 +766,107 @@ Definiamo più formalmente questa proprietà.
     \forall x \in L \\
     \exists M\text{ verifying machine} \\
     \exists \underbrace{m}_\text{certificate} \in \Sigma^*: M(x,m) = 1 \\
-    \exists p,q\text{ polinomiale}. |m|<p(|x|) \wedge t_m(x,m)\leq q(|x|)
+    \exists p,q\text{ polinomiali}. |m|<p(|x|) \wedge t_m(x,m)\leq q(|x|)
 \end{gather*}
+
+\paragraph{Più formalmente}
+Diciamo $L$ possa essere SAT, Clique, o ILP.\\
+Assumiamo poi
+\begin{equation*}
+    \exists m:x\in L \iff m(x)=1\te{ and } \forall k: T_m\neq O(n^k)
+\end{equation*}
+\begin{equation*}
+    \exists m:x\in L \iff \exists c\in\Sigma^*:m(x,c)=1 \wedge T_m(|x|+|c|)\leq q(|x|+|c|)
+\end{equation*}
+Con $q,p$ polinomiali e $|c| \leq p(|x|)$
+
+\section{Non-deterministic Turing machines}
+Come ogni Turing machine, abbiamo un alfabeto $\Sigma$ e un set di stati $Q$. La funzione di transizione è ciò che varia. \\
+Una scelta implementatici può essere quella di definire più funzioni di transizione $f_1, \dots, f_n$. 
+\begin{align*}
+    & f_1 : \Sigma\times Q \to \Sigma\times Q\times \{\leftarrow,\rightarrow\} \\
+    & \vdots \\
+    & f_n : \Sigma\times Q \to \Sigma\times Q\times \{\leftarrow,\rightarrow\} \\
+\end{align*}
+In ogni stato della TM abbiamo tutti gli archi in uscita dettati dalle varie funzioni di transizione.
+
+Un'altra opzione è quella di tenere una singola funzione di transizione ma modificarne il codominio
+\begin{gather*}
+    f_1 : \Sigma\times Q \to \mathcal{P}(\Sigma\times Q\times \{\leftarrow,\rightarrow\}) \\
+\end{gather*}
+
+Prendiamo una macchina NTM $N$. Come possiamo dire che $N$ \textit{decide} $L$?
+Innanzitutto, la macchina deve haltare. Quindi tutte le possibili branch devono arrivare a uno stato finale (anche diversi stati finali). Questo esclude la presenza di cicli nel grafo. \\
+Se tutti gli stati finali accettano o rigettano l'input, la macchina \textit{riconosce} $L$.
+Se gli stati finali non concordano, ma almeno uno accetta, la macchina \textit{decide} $L$
+
+Per una macchina non deterministica prendiamo il tempo di computazione $t_n(x)$ come la profondità dell'albero di computazione di $n$ sull'input $x$. Quindi prendiamo sempre il worst case scenario.
+\begin{gather*}
+    T_N(n) = \max_{s\in\Sigma^n}t_n(s)
+\end{gather*}
+
+\begin{callout}{def}
+    \begin{gather*}
+        \mathbb{NP} = \{L\subseteq\Sigma: \exists m\ DTM\ \exists p,q\ poly\ s.t\forall x\in\Sigma^* \cdots \} \\
+        \mathbb{NP} = C = \bigcup_k \te{NTIME}(n^k)
+    \end{gather*}
+\end{callout}
+
+\subsection{Independent Set}
+\begin{multline*}
+    IS = \{(G=(V,E),k) : G\te{ undirected}, k\in\N, 1\leq k\leq |\N| \\
+    \exists V'\subseteq V\te{ s.t. } |V'|=k\te{ s.t. } \forall i,j\in V' \{i,j\}\not\in E \}
+\end{multline*}
+Più intuitivamente, un \textit{independent set} è un sottoinsieme dei vertici di un grafo tale che non esista alcun arco che colleghi direttamente i nodi. \\
+La grandezza del set è dettata da un numero $k$ dato.
+$IS$ è $\mathbb{NP}$. Questo può essere facilmente dimostrato dal fatto che $IS$ è equivalente a Clique sul grafo complementare a $G$.
+
+\subsection{Reductions (polynomial)}
+Ricordiamo che una \textit{reduction function} è una funzione (o una macchina di Touring) che mappa tutte e solo le stringhe di un linguaggio $L$ a stringhe di un linguaggio $L'$.
+Se definiamo una funzione di riduzione \textbf{polinomiale} e la usiamo per ridurre un problema $p$ ad un altro problema $p'\in\mathbb{NP}$, possiamo dire che $p$ sia in $\mathbb{NP}$.
+Una riduzione di questo tipo si chiama \textit{Polynomial Reduction}
+
+\begin{align*}
+    indset <_p clique \\
+    clique <_p indset
+\end{align*}
+Quindi possiamo dire che i due problemi sono equivalenti
+
+\begin{callout}{$sat<_p ilp$}
+    La dimostrazione consiste solo nel fornire una funzione di riduzione. È lunga da spiegare.
+\end{callout}
+
+\subsection{k-CNF}
+Possiamo specializzare il problema \textit{CNF} limitando il numero di termini che possono essere in ogni clausola. \\
+Per esempio in $3-cnf$ ogni clausola non può avere più di $3$ termini.
+\begin{gather*}
+    (x_1\vee \neg x_2) \wedge (x_2\vee x_3\vee x_4) \wedge \dots \wedge (\dots)
+\end{gather*}
+Altre formulazioni del problema impongono che le clausole abbaino esattamente $k$ termini. Ma sono equivalenti.
+
+È palese che $3-cnf \subseteq cnf$. Ma possiamo dimostrare che $3SAT<_p SAT$
+\begin{align*}
+    f:\Sigma^* &\to \Sigma^* \\
+    F&\mapsto\begin{cases}
+        F & F\te{ is } 3-cnf \\
+        x_1\vee \neg x_1 & F\te{ not in } 3CNF
+    \end{cases}
+\end{align*}
+Questa funzione riduce ogni problema 3-sat in un problema sat equivalente.
+
+È poi possibile ridurre un problema sat qualsiasi in un problema 3-sat equivalente. Per fare questo basta dividere tutte le clausole con più di 3 termini in più clausole a 3 termini.
+\begin{gather*}
+    c_i = (t_{i1} \vee t_{i2} \vee \dots \vee t_{in} \vee) \\
+    if n_i>3: \\
+    c_i' = (t_{i1}\vee t_{i2} \vee x_1') \wedge (\neg x_1' \vee t_{i3}\vee \dots \vee t_{in})
+\end{gather*}
+Aggiungiamo nuovi termini e ripetiamo questo processo iterativamente fino a che non abbiamo un problema 3-sat.
+
+Quindi possiamo dire che sat e 3-sat sono perfettamente equivalenti.
+
+\paragraph{3sat to indset} riduciamo il problema 3 sat a uno di independent set costruendo un grafo specializzato a partire dalla formula 3-dnf del problema sat.
+\begin{callout}{nb}
+    Il problema independent set deve essere del tipo $m$-independent set, dove $m$ è il numero di clausole nel problema 3-sat.
+\end{callout}
 
 \end{document}
