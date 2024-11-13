@@ -650,7 +650,7 @@ Questo non possiamo provarlo con gli strumenti che abbiamo fin ora. Serve quindi
 \end{align*}
 
 \paragraph{Def SemTy (semantic typing)}: \begin{align*}
-    \Gamma \vDash t:\tau \hat{=} \forall \gamma\in G[\tau].t\gamma\in E[\tau] 
+    \Gamma \vDash t:\tau \hat{=} \forall \gamma\in G[\tau].t\gamma\in \cE[\tau] 
 \end{align*}
 
 \paragraph{Semantic soundness}
@@ -664,7 +664,7 @@ Se un programma è well typed in syntactic typing, lo è anche in semantic typin
     \V[\tau\to\tau'] &= \{v|v\equiv \lam{x:\tau}{t} \AND \forall v' \IF v'\in \V[\tau] \THEN t[v'/x] \in \cE[\tau']\} \\
     \V[\tau\times\tau'] &= \{v|v\equiv \pair{v_1,v_2} \AND t \in \V[\tau] \AND t'\in \V[\tau']\} \\
     \V[\tau\uplus\tau'] &= \{v|v\equiv \inl v_1 \AND v_1\in \V[\tau]\} \cup \{v|v\equiv \inr v_1 \AND v_1\in \V[\tau']\} \\
-    \mE[\tau]&=\{t|\exists v.t\cred^* v \AND v\in \V[\tau] \} \\
+    \cE[\tau]&=\{t|\exists v.t\cred^* v \AND v\in \V[\tau] \} \\
     G[\emptyset] &= \emptyset \\
     G[\Gamma, x:\tau] &= \{\gamma[v/x] | \gamma\in G[\Gamma] \AND v\in\V[\tau] \}
 \end{align*}

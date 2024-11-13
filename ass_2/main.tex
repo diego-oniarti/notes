@@ -23,6 +23,17 @@
 \newcommand{\while}[2]{\ensuremath{\text{while }#1\text{ do }#2\text{ end}}}
 \newcommand{\for}[3]{\ensuremath{\text{for }i=#1\text{ to }#2\text{ do }#3\text{ end}}}
 \newcommand{\mE}[0]{\ensuremath{\mathbb{E}}}
+\newcommand{\pair}[1]{\ensuremath{\langle#1\rangle}}
+\newcommand{\V}{\ensuremath{\mathcal{V}}}
+\newcommand{\cE}{\ensuremath{\mathcal{E}}}
+\newcommand{\cD}{\ensuremath{\mathcal{D}}}
+\newcommand{\IF}[0]{\ensuremath {\text{ if }}}
+\newcommand{\THEN}[0]{\ensuremath {\text{ then }}}
+\newcommand{\ELSE}[0]{\ensuremath {\text{ else }}}
+\newcommand{\AND}[0]{\ensuremath {\text{ and }}}
+\newcommand{\OR}[0]{\ensuremath {\text{ or }}}
+\newcommand{\unpack}[3]{\ensuremath{\text{unpack } #1 \text{ as }\langle #2 \rangle\text{ in }#3}}
+\newcommand{\pack}[2]{\ensuremath{\text{pack } \pair{#1} \text{ as }\langle #2 \rangle}}
 \usepackage{pdflscape}
 
 \title{Assignment \#2}
@@ -114,12 +125,56 @@ Write the proof for these compatibility lemmas:
 \begin{itemize}
     \item Pairs \\
         Assuming: \begin{itemize}
-            \item $\Gamma \vDash t_1:\tau_1$
-            \item $\Gamma \vDash t_2:\tau_2$
+            \item $\Gamma \vDash t_1:\tau_1$ (HP1)
+            \item $\Gamma \vDash t_2:\tau_2$ (HP2)
         \end{itemize}
         Prove: \begin{itemize}
-            \item $\Gamma \langle t_1,t_2 \rangle : \tau_1\times\tau_2$
+            \item $\Gamma \vDash \langle t_1,t_2 \rangle : \tau_1\times\tau_2$
         \end{itemize}
+        \begin{align*}
+            \text{by def. ST take} &\ \gamma \in G[\tau] \\
+            \text{t.s.} &\ \pair{t_1,t_2}\gamma\in\cE[\tau_1,\tau_2] \\
+            \text{by def. $\cE$ t.s.} &\ \exists v.\pair{t_1,t_2}\gamma\leadsto^{*}v\AND v\in\V[\tau_1\times\tau_2] \\
+            \text{by HP1 w.h.} &\ t_1\in\cE[\tau_1] & (A1) \\
+            \text{by A1 and def. $\cE$ w.h.} &\ \exists v_1.t_1 \leadsto^{*}v_1\AND v_1\in\V[\tau_1] & (A2) \\
+            \text{by HP2 w.h.} &\ t_2\in\cE[\tau_2] & (B1) \\
+            \text{by B1 and def. $\cE$ w.h.} &\ \exists v_2.t_2 \leadsto^{*}v_2\AND v_2\in\V[\tau_2] & (B2) \\
+            \text{by A2,B2 w.h.} &\ \pair{t_1,t_2}\gamma \leadsto^{*}\pair{v_1,v_2} & (C1) \\
+            \text{by C1 and def. $\V[\tau_1\times\tau_2]$ w.h.} &\ v\equiv\pair{v_1,v_2}\in\V[\tau_1\times\tau_2]_\square
+        \end{align*}
+
+    \item Projection \\
+        Assuming: \begin{itemize}
+            \item $\Gamma \vDash t:\tau_1\times\tau_2$ (HP)
+        \end{itemize}
+        Prove: \begin{itemize}
+            \item $\Gamma \vDash t.1:\tau_1$
+        \end{itemize}
+        \begin{align*}
+            \text{by def. ST take} &\ \gamma\in G[\tau] \\
+            \text{t.s.} &\ t.1\gamma \in \cE[\tau_1] \\
+            \text{by def $\cE$ t.s.} &\ \exists v_1.\ t.1\leadsto^{*} v_1\AND v_1\in\V[\tau_1] & (B1) \\
+            \text{by HP and def. ST w.h.} &\ \exists v.\ t\leadsto^{*} v\AND v\in\V[\tau_1\times\tau_2] & (A1) \\
+            \text{by A1 and def. $\V_\times$ w.h.} &\ v\equiv \pair{v_1',v_2'} \AND v_1' \in \V[\tau_1] & (A2) \\
+            \text{by A1,A2 with} &\ v_1'=v_1\ B1\ holds_\square
+        \end{align*}
+
+    \item Unpack \\
+        Assuming: \begin{itemize}
+            \item $\Delta \vdash \tau'$ (HP1)
+            \item $\Delta,\Gamma \vDash t:\exists\alpha.\tau$ (HP2)
+            \item $\Delta;\alpha,\Gamma;x : \tau\vDash t':\tau'$ (HP3)
+        \end{itemize}
+        Prove: \begin{itemize}
+            \item $\Delta,\Gamma\vDash \unpack{t}{\alpha,x}{t'} \tau'$
+        \end{itemize}
+        \begin{align*}
+            \text{by  def. ST take} &\ \delta\in\cD[\Delta],\gamma\in G[\Gamma]^\delta \\
+            \text{t.s.} &\ (\unpack{t}{\alpha,x}{t'})^\delta\gamma\in\cE[\tau']^\delta & (TY) \\
+            \text{by def. $\cE$ t.s.} &\ \exists v.(\unpack{t}{\alpha,x}{t'})^\delta\gamma\in\cE[\tau']^\delta \leadsto^{*} v \\
+            \text{and}                &\ v\in\V[\tau']^\delta \\
+        \end{align*}
+        From this point on the proof is trivial and left to the reader
 \end{itemize}
 
 \section{Adding Cycles}
