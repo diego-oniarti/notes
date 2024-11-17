@@ -16,3 +16,28 @@ boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,
 after title={:\ }, coltitle=blue,colback=blue!10,colframe=blue, title={#2},
 fonttitle=\bfseries,#1}
 
+\newcommand{\na}[0]{\ensuremath {\overset{N}{\rightarrow}}}
+\newcommand{\rl}[3]{\inference{#1}{#2}\text{ #3}}
+\newcommand{\bop}[0]{\ensuremath\oplus}
+\newcommand{\appl}[2]{\ensuremath(#1)\ #2}
+\newcommand{\st}[3][]{\ensuremath{\displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}}
+\newcommand{\N}{\ensuremath \mathbb N}
+\newcommand{\lam}[2]{\ensuremath{\lambda#1.#2}}
+\newcommand{\inl}[0]{\ensuremath{\ inl\ }}
+\newcommand{\inr}[0]{\ensuremath{\ inr\ }}
+\newcommand{\case}[3]{\ensuremath{\text{case}#1\ \text{of}\ \left|\begin{aligned}#2\\#3\end{aligned}\right.}}
+\newcommand{\Da}[0]{\ensuremath{\Downarrow}}
+\newcommand{\while}[2]{\ensuremath{\text{while }#1\text{ do }#2\text{ end}}}
+\newcommand{\for}[3]{\ensuremath{\text{for }i=#1\text{ to }#2\text{ do }#3\text{ end}}}
+\newcommand{\mE}[0]{\ensuremath{\mathbb{E}}}
+\newcommand{\pair}[1]{\ensuremath{\langle#1\rangle}}
+\newcommand{\V}{\ensuremath{\mathcal{V}}}
+\newcommand{\cE}{\ensuremath{\mathcal{E}}}
+\newcommand{\cD}{\ensuremath{\mathcal{D}}}
+\newcommand{\IF}[0]{\ensuremath {\text{ if }}}
+\newcommand{\THEN}[0]{\ensuremath {\text{ then }}}
+\newcommand{\ELSE}[0]{\ensuremath {\text{ else }}}
+\newcommand{\AND}[0]{\ensuremath {\text{ and }}}
+\newcommand{\OR}[0]{\ensuremath {\text{ or }}}
+\newcommand{\unpack}[3]{\ensuremath{\text{unpack } #1 \text{ as }\langle #2 \rangle\text{ in }#3}}
+\newcommand{\pack}[2]{\ensuremath{\text{pack } \pair{#1} \text{ as }\langle #2 \rangle}}

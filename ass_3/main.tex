@@ -1,0 +1,56 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{semantic}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{nicefrac, xfrac}
+
+\input{../common}
+
+\usepackage{pdflscape}
+
+\title{Assignment \#3}
+\author{Diego Oniarti - 257835}
+\date{}
+\begin{document}
+
+\maketitle
+
+\section{Polymorphic behaviour}
+Prove that for any closed term $f$ of type $\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta)$ and for any closed types $\tau_1,\tau_2$ value $v:\tau_1$, we have $f\ \tau_1\ \tau_2\ v\leadsto^{*} \inl v$
+
+Assuming:
+\begin{align*}
+    & \Delta,\Gamma\vDash f:\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta) & HP1 \\
+    & \Delta \vdash \tau_1 & HP2 \\
+    & \Delta \vdash \tau_2 & HP3 \\
+    & \vdash v:\tau_1       & HP4 \\
+\end{align*}
+Prove:
+\begin{align*}
+    & f\ \tau_1\ \tau_2\ v \leadsto^{*} \inl v  & THS
+\end{align*}
+
+\begin{align*}
+    \text{by HP1 w.h.} &\ \forall\delta\in D[\Delta],\forall\gamma\in G[\Gamma]^\delta, f\gamma\delta\in\cE[\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta)]^\delta \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v'.f\gamma\delta\leadsto^{*}v' \AND v'\in\V[\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta)]^\delta \\
+    \text{by def. of $\V$ w.h.} &\ v'\equiv \Lambda\alpha.t \AND \forall \tau'.\forall S\in\text{semty}(\tau').t[\sfrac{\tau'}\alpha]\in\cE[\forall\beta.\alpha\to(\alpha\uplus\beta)]^{\substack{\delta,\hfill\\\alpha\mapsto\tau',S}} \\
+    \text{pick} &\ \tau'=\tau_1,S=\{v\} \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v".t[\sfrac{\tau'}{\alpha}]\leadsto^{*}v"\AND v"\in\V[\forall\beta.\alpha\to(\alpha\uplus\beta)]^{\substack{\delta,\hfill\\\alpha\mapsto\tau_1,\{v\}}} \\
+    \text{by def. of $\V$ w.h.} &\ v"\equiv \Lambda\beta.t' \AND \forall\tau".\forall S'\in\text{semty}(\tau").t'[\sfrac{\tau"}\beta]\in\cE[\alpha\to(\alpha\uplus\beta)]^{\textcolor{purple}{\overbrace{\textcolor{black}{\substack{\delta,\hfill\\\alpha\mapsto\tau',S,\\\beta\mapsto\tau",S'}}}^{\delta'}}} \\
+    \text{pick} &\ \beta=\tau_2,S'=\emptyset \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v'''.t'[\sfrac{\tau"}\beta]\leadsto^{*}v'''\AND v'''\in\V[\alpha\to(\alpha\uplus\beta)]^{\delta'} \\
+    \text{by def. of $\V$ w.h.} &\ v'''\equiv \lam{x:\alpha}{t"}\AND \forall v"" \in\V[\alpha]^{\delta'}.t"[\sfrac{v""}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
+    \text{by def. of $\V$ w.h.} &\ v'''\equiv \lam{x:\alpha}{t"}\AND \forall v"" \in \{v\}.t"[\sfrac{v""}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
+    \text{by $v""=v$ w.h.} &\ v'''\equiv \lam{x:\alpha}{t"}\AND t"[\sfrac{v}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v'''''. t"[\sfrac{v}{x}] \leadsto^{*} v''''' \AND v'''''\in\V[\alpha\uplus\beta]^{\delta'} \\
+    \text{by def. of $\V$ w.h.} &\  \begin{array}{rl}\text{either}&v'''''\equiv \inl v""" \AND v"""\in\V[\alpha]^{\delta'} \\
+    \text{or} & v'''''\equiv \inr v""" \AND v"""\in\V[\beta]^{\delta'}\end{array} \\
+        \text{by def. of $\V$ w.h.}  &\ \begin{array}{rl}\text{either}&v'''''\equiv \inl v""" \AND v"""\in \{v\} \\
+        \text{or} & \textcolor{purple}{\cancel{\textcolor{black}{v'''''\equiv \inr v""" \AND v"""\in \emptyset}}}\end{array} \\
+            \text{by no val in $\emptyset$ w.h.} &\ v'''''\equiv \inl v _\square\\
+        \end{align*}
+\end{document}
