@@ -1020,4 +1020,52 @@ nuove regole
 \end{gather*}
 Dove \textcolor{blue}{0} è una costante generica. Potremmo usare \textit{nil} o qualsiasi altra cosa.
 
+\section{higher order heap}
+\begin{gather*}
+    \tau ::= \cdots | ref\ \tau \\
+    \st[t-new]{
+        \Delta,\Gamma\vdash new\ t:\ ref \tau
+    }{
+        \Delta,\Gamma\vdash t:\tau
+    } \\
+    \st[t-read]{
+        \Delta,\Gamma\vdash !t: \tau
+    }{
+        \Delta,\Gamma\vdash t:ref \tau
+    } \\
+    \st[t-read]{
+        \Delta,\Gamma\vdash t:=t':\N
+    }{
+        \Delta,\Gamma\vdash t:ref\ \tau \quad \Delta,\Gamma\vdash t:\tau
+    }
+\end{gather*}
+
+Aggiungiamo $\Sigma$ per tenere traccia dei type bindings:
+\begin{gather*}
+    \Sigma ::= \emptyset | \Sigma,l:ref\ \tau \\
+    \Delta,\Gamma\vdash t:\tau \to \Sigma,\Delta,\Gamma \vdash t:\tau
+\end{gather*}
+Modifichiamo progress judgment
+\begin{gather*}
+    \textcolor{red}{\IF H:\Sigma\AND \Sigma},\emptyset,\emptyset\vdash t:\tau\THEN\ either \vdash t.val\OR \textcolor{red}{\exists t'.H':H\triangleright t\leadsto H'\triangleright t'}
+\end{gather*}
+Modifichiamo preservation:
+\begin{multline*}
+    \textcolor{red}{\IF H:\Sigma \AND \Sigma,}\emptyset,\emptyset\vdash t:\tau \AND H\triangleright t\leadsto H'\triangleright t' \\ \textcolor{red}{\THEN \exists\Sigma'\supseteq \Sigma. H':\Sigma'\AND \Sigma',\emptyset,\emptyset\vdash t':\tau}
+\end{multline*}
+dove:
+\begin{gather*}
+    \st[]{
+        H:\Sigma
+    }{
+        \forall l:ref\ \tau\in\Sigma. \Sigma,\emptyset,\emptyset\vdash H(l):\tau
+    } \\
+    \st[]{
+        \Sigma,\Delta,\Gamma\vdash l:ref\ \tau
+    }{
+        \Sigma(l)=ref\ \tau
+    }
+\end{gather*}
+
+
 \end{document}
