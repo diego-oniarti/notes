@@ -131,4 +131,96 @@ Rules:
     } \\
 \end{gather*}
 
+\section{From the Register Machine to an Assembly Language}
+\begin{align*}
+    t ::= & r:=n \\
+        |& sum\ r\ r \\
+        |& sub\ r\ r \\
+        |& cmp\ r\ r \\
+        |& jmp\ r \\
+        |& jiz\ r \\
+        |& jeq\ r \\
+        |& read\ r\ r \\
+        |& write\ r\ r \\
+    r ::= & ar|br|cr|dr|er|fr|gr|hr \\
+        |&ir|jr|kr|lr|mr|nr|or \\
+    C ::=& \emptyset | C,\N\mapsto t \\
+    F ::=& \emptyset | F,\N\mapsto b \\
+    R ::=& \emptyset | R, r\mapsto \N \\
+    M ::=& \emptyset | M, \N\mapsto \N \\
+\end{align*}
+
+Judgement:
+\begin{equation*}
+    n;C;R;F;M \rightrightarrows n;C;R;F;M
+\end{equation*}
+Codebase, registers, flags, and memory:
+\[\setstretch{3} \begin{array}{cccc}
+    \st[]{C(n)=t}{C=C',n\mapsto t} &
+    \st[]{R(r)=n}{R=R',r\mapsto n} &
+    \st[]{F(n)=B}{F=F',n\mapsto B} \\
+    \st[]{C(n)=t}{C=C',n'\mapsto \_\quad C'(n)=t} &
+    \st[]{R(r)=n}{R=R',r'\mapsto \_\quad R'(r)=n} &
+    \st[]{F(n)=B}{F=F',n'\mapsto \_\quad F'(n)=B} \\
+    \st[]{M(n)=n'}{M=M',n\mapsto n'} &
+    \st[]{M(n)=n'}{M=M',n"\mapsto \_\quad M'(n)=n'} \\
+\end{array}\]
+Rules:
+\begin{gather*}
+    \st[load]{n;C;R;F;M \execs n';C;R';F;M}{C(n)=r_1:=n_1 \quad R'=R,r_1\mapsto n_1 \quad n'=n+1} \\
+    \st[sum]{n;C;R;F;M \execs n';C;R';F;M}{
+        C(n)=sum\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1+n_2 \ 
+        n'=n+1
+    } \\
+    \st[sub]{n;C;R;F;M \execs n';C;R';F';M}{
+        C(n)=sub\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1-n_2 \ 
+        n'=n+1 \
+        F'=F,0\mapsto n_2>n_1
+    } \\
+    \st[cmp]{n;C;R;F;M \execs n';C;R;F';M}{
+        C(n)=cmp\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        F'=F,1\mapsto n_1==n_2 \
+        n'=n+1
+    } \\
+    \st[jmp]{n;C;R;F;M \execs n';C;R;F;M}{
+        C(n)=jmp\ r_1 \quad
+        R(r_1)=n_1 \quad
+        n'=n_1
+    } \\
+    \st[jiz]{n;C;R;F;M \execs n';C;R;F;M}{
+        C(n)=jiz\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(1)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[jeq]{n;C;R;F;M \execs n';C;R;F;M}{
+        C(n)=jeq\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(0)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[read]{n;C;R;F;M \execs n';C;R';F;M}{
+        C(n)=read\ r_1\ r_2 \quad
+        R(r_2)=n_2 \quad
+        M(n_2) = n" \quad
+        R' = R,r_1\mapsto n" \quad
+        n'=n+1
+    } \\
+    \st[write]{n;C;R;F;M \execs n';C;R;F;M'}{
+        C(n)=write\ r_1\ r_2 \quad
+        R(r_1)=n_1 \quad
+        R(r_2)=n_2 \quad
+        M' = M,n_1\mapsto n_2 \quad
+        n'=n+1
+    }
+\end{gather*}
+
 \end{document}
