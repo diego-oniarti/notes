@@ -7,8 +7,11 @@
 \usepackage{cancel}
 \usepackage{amssymb}
 \usepackage{nicefrac, xfrac}
+\usepackage[a4paper, margin=0.5in]{geometry}
+\usepackage{setspace}
 
 \input{../common}
+\newcommand{\execs}[0]{\ensuremath{\rightrightarrows}}
 
 \usepackage{pdflscape}
 
@@ -53,4 +56,79 @@ Prove:
         \text{or} & \textcolor{purple}{\cancel{\textcolor{black}{v'''''\equiv \inr v""" \AND v"""\in \emptyset}}}\end{array} \\
             \text{by no val in $\emptyset$ w.h.} &\ v'''''\equiv \inl v _\square\\
         \end{align*}
+
+\section{Free Theorems}
+\section{A Register Machine Language}
+\begin{align*}
+    t ::= & r:=n \\
+        |& sum\ r\ r \\
+        |& sub\ r\ r \\
+        |& cmp\ r\ r \\
+        |& jmp\ r \\
+        |& jiz\ r \\
+        |& jeq\ r \\
+    r ::= & ar|br|cr|dr|er|fr|gr|hr \\
+        |&ir|jr|kr|lr|mr|nr|or \\
+    C ::=& \emptyset | C,\N\mapsto t \\
+    F ::=& \emptyset | F,\N\mapsto b \\
+    R ::=& \emptyset | R, r\mapsto \N \\
+\end{align*}
+
+Judgement:
+\begin{equation*}
+    n;C;R;F \rightrightarrows n;C;R;F
+\end{equation*}
+Codebase, registers, and flags:
+\[\setstretch{3} \begin{array}{ccc}
+    \st[]{C(n)=t}{C=C',n\mapsto t} &
+    \st[]{R(r)=n}{R=R',r\mapsto n} &
+    \st[]{F(n)=B}{F=F',n\mapsto B} \\
+    \st[]{C(n)=t}{C=C',n'\mapsto \_\quad C'(n)=t} &
+    \st[]{R(r)=n}{R=R',r'\mapsto \_\quad R'(r)=n} &
+    \st[]{F(n)=B}{F=F',n'\mapsto \_\quad F'(n)=B} \\
+\end{array}\]
+Rules:
+\begin{gather*}
+    \st[load]{n;C;R;F \execs n';C;R';F}{C(n)=r_1:=n_1 \quad R'=R,r_1\mapsto n_1 \quad n'=n+1} \\
+    \st[sum]{n;C;R;F \execs n';C;R';F}{
+        C(n)=sum\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1+n_2 \ 
+        n'=n+1
+    } \\
+    \st[sub]{n;C;R;F \execs n';C;R';F'}{
+        C(n)=sub\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1-n_2 \ 
+        n'=n+1 \
+        F'=F,0\mapsto n_2>n_1
+    } \\
+    \st[cmp]{n;C;R;F \execs n';C;R;F'}{
+        C(n)=cmp\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        F'=F,1\mapsto n_1==n_2 \
+        n'=n+1
+    } \\
+    \st[jmp]{n;C;R;F \execs n';C;R;F}{
+        C(n)=jmp\ r_1 \quad
+        R(r_1)=n_1 \quad
+        n'=n_1
+    } \\
+    \st[jiz]{n;C;R;F \execs n';C;R;F}{
+        C(n)=jiz\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(1)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[jeq]{n;C;R;F \execs n';C;R;F}{
+        C(n)=jeq\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(0)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+\end{gather*}
+
 \end{document}

@@ -14,8 +14,6 @@
 
 \newcommand{\floor}[1]{\ensuremath{\lfloor #1 \rfloor}}
 \newcommand{\tvs}[0]{\text{\textvisiblespace}}
-\newcommand{\N}[0]{\ensuremath{\mathbb{N}}}
-\newcommand{\te}[1]{\text{#1}}
 
 \usepackage{tikz}
 \usetikzlibrary{tikzmark,calc,,arrows,shapes,decorations.pathreplacing}
@@ -868,5 +866,12 @@ Quindi possiamo dire che sat e 3-sat sono perfettamente equivalenti.
 \begin{callout}{nb}
     Il problema independent set deve essere del tipo $m$-independent set, dove $m$ è il numero di clausole nel problema 3-sat.
 \end{callout}
+
+\section{Cook-Levin theorem}
+Ogni linguaggio (o problema) in $\mathbb{NP}$ può essere ridotto a SAT (e quindi anche a 3-SAT).
+
+\paragraph{Recap di cosa voglia dire $NP$} Un problema $L$ è $NP$ se possiamo definire una macchina non deterministica $n$ tale che $n(x)=1\iff x\in L$. Il tempo di esecuzione per questa macchina deve essere dominato da una funzione polinomiale sulla dimensione dell'input.
+
+Possiamo vedere le ramificazioni della macchina non deterministica come un albero, e ogni divergenza come un Problema sat.
 
 \end{document}
