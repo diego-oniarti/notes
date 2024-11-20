@@ -874,4 +874,21 @@ Ogni linguaggio (o problema) in $\mathbb{NP}$ può essere ridotto a SAT (e quind
 
 Possiamo vedere le ramificazioni della macchina non deterministica come un albero, e ogni divergenza come un Problema sat.
 
+Prendiamo una funzione di transizione $f$ per una macchina di Turing. Possiamo tradurre questa macchina in un circuito binario.
+\begin{gather*}
+    (q_1,\dots,q_k) \in \{0,1\}^k \\
+    Q\quad k\geq \lceil \log_2(|Q|+1)\rceil \\
+    \Sigma = \{0,1\} \\
+    \delta = \left|\begin{array}{c}0\mapsto\leftarrow\\1\mapsto\rightarrow\end{array}\right. \\
+\end{gather*}
+Questo circuito può essere rappresentato da una truth-table.
+Se abbiamo due funzioni di transizione, possiamo aggiungere un bit extra a ogni tabella per differenziare le due.
+
+\paragraph{Facciamola corta} Ogni problema in NP può essere ridotto a 3-SAT
+
+\subsection{NP-complete}
+Un linguaggio è $NP$-completo se ogni problema in NP può essere ridotto polinomialmente a esso.
+
+Siccome abbiamo dimostrato che 3-SAT riduce a INDSET e che 3-SAT è NP-complete, possiamo dire che INDSET è NP-complete.
+
 \end{document}

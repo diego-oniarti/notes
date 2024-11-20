@@ -1,12 +1,5 @@
 \documentclass{article}
 
-\newcommand{\na}[0]{\ensuremath {\overset{N}{\rightarrow}}}
-\newcommand{\rl}[3]{\inference{#1}{#2}\text{ #3}}
-\newcommand{\bop}[0]{\ensuremath\oplus}
-\newcommand{\appl}[2]{\ensuremath(#1)\ #2}
-\newcommand{\st}[3][]{\ensuremath{\displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}}
-\newcommand{\N}{\ensuremath \mathbb N}
-\newcommand{\lam}[2]{\ensuremath{\lambda#1.#2}}
 \usepackage{pdflscape}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -449,6 +442,54 @@ Split method Calls into two events:
     \item response \\
         q.enq(x) returns void / x / empty
 \end{itemize}
+
+\section{Metodi di sincronizzazione}
+Il modo più becero per parallelizzare un set è aggiungere un lock che blocca l'intera data structure e la sblocca.\\
+Questo approccio non è un granché, in quanto vorremmo che più thread possano svolgere operazioni in simultaneo.
+
+\subsection{Course grained sync}
+Un lock blocca l'intera struttura dati.
+
+\subsection{Fine Grained Synchronization}
+Una soluzione è quella di proteggere con dei lock porzioni più piccole della data structure. \\
+Idealmente la suddivisione deve essere la più alta possibile.
+
+\subsection{Optimistic Synchronization}
+Search without locking. If you find it, lock and check. (Ok: we are done, NOK: start over)
+
+Questo approccio è più veloce in quanto non richiede un lock, ma gli errori diventano molto costosi.
+
+\subsection{Lazy Synchronization}
+Postpone hard work.\\
+Prendiamo per esempio la rimozione di un nodo.
+Iniziamo facendo una rimozione "logica" del nodo (marcarlo come cancellato) e più avanti facciamo la rimozione fisica più costosa.
+
+\subsection{Lock-Free Synchronization}
+Non usare lock ma istruzioni come CAS.\\
+Questo approccio è molto più difficile da implementare e alcune volte aggiunge un grande overhead. Ma non fa alcuna assunzione sullo scheduler.
+
+\section{Implementazione Set}
+I set avranno 3 metodi. (add, remove, has)
+Possiamo implementare un set come una linked list. Ogni nodo ha \begin{enumerate}
+    \item una key (hash di solito)
+    \item un valore
+    \item un puntatore a un nodo
+\end{enumerate}
+Nella lista terremo le key ordinate e 2 nodi aggiunti all'inizio e la fine ($\infty$ e $-\infty$)
+
+\subsection{Invarianti}
+\begin{enumerate}
+    \item la tail è raggiungibile dalla head.
+    \item il set non ha duplicati
+    \item la lista rimane ordinata (in funzione delle chiavi)
+\end{enumerate}
+
+\subsection{remove(x) add(x) fine-grained}
+Possiamo implementare un fine-grained sync approach usando 2 lock per scorrere la lista fino al punto desiderato. Poi sostituiamo il puntatore da $x-1$ a $x$ con quello a $x+1$ \\
+In maniera analoga, per aggiungere un nodo alla lista dobbiamo prendere il lock sul predecessore di x e il successore. O posso fare con un solo lock? Non ho capito
+
+\subsection{Optimistic}
+Cerchiamo il punto nella lista e ci prendiamo il lock senza prenderlo sugli elementi prima.
 
 \end{document}
 

@@ -28,25 +28,7 @@
 \input{../cmds}
 \input{../common}
 
-\newcommand{\na}[0]{\ensuremath {\overset{N}{\rightarrow}}}
-\newcommand{\rl}[3]{\inference{#1}{#2}\text{ #3}}
-\newcommand{\bop}[0]{\ensuremath\oplus}
-\newcommand{\appl}[2]{\ensuremath(#1)\ #2}
-\newcommand{\st}[3][]{\ensuremath \displaystyle\frac{#3\hfill}{#2\hfill} \text{#1}}
-\newcommand{\N}{\ensuremath \mathbb N}
-\newcommand{\mE}{\ensuremath \mathbb E}
-\newcommand{\V}{\ensuremath{\mathcal{V}}}
-\newcommand{\cE}{\ensuremath{\mathcal{E}}}
-\newcommand{\te}[1]{\text{#1}}
 \usepackage{pdflscape}
-
-\newcommand{\IF}[0]{\ensuremath {\text{ if }}}
-\newcommand{\THEN}[0]{\ensuremath {\text{ then }}}
-\newcommand{\ELSE}[0]{\ensuremath {\text{ else }}}
-\newcommand{\AND}[0]{\ensuremath {\text{ and }}}
-\newcommand{\OR}[0]{\ensuremath {\text{ or }}}
-\newcommand{\LET}[0]{\ensuremath {\text{ let }}}
-\newcommand{\TIN}[0]{\ensuremath {\text{ in }}}
 
 \title{Appunti Semantics}
 \author{Diego Oniarti}
@@ -1067,5 +1049,46 @@ dove:
     }
 \end{gather*}
 
+\section{Program Equivalence}
+Due programmi sono equivalenti se un osservatore esterno non può in alcun modo distinguere i due, con le limitazioni del linguaggio utilizzato.
+
+\subsection{Contextual equivalence}
+\textit{Program contexts} are a generalization of evaluation context but capture a different concept.\\
+Program contexts represent the resto of the world we're linking with.\\
+The goal of program context is to divide the program in two different parts. There's the one we care about, which gets plugged in the hole, and the "observer" which has the hole.
+
+Grammar of program context
+\begin{align*}
+    C ::= & [\cdot] \\
+    |& \lam{x:\tau}{C} \\
+    |& C\ t \\
+    |& t\ C \\
+    |& t\bop C | C\bop t \\
+    |& C.1 | C.2 \\
+    |& \pair{C,t} | \pair{t,C} \\
+    |& \case{\ t}{\inl x\mapsto C}{\inr x\mapsto t} \\
+    |& \case{\ t}{\inl x\mapsto t}{\inr x\mapsto C} \\
+    |& \case{\ C}{\inl x\mapsto t}{\inr x\mapsto t} \\
+\end{align*}
+huh?
+\begin{align*}
+    t_1\simeq t_2 &\triangleq \forall C. C[t_1] \Da \iff C[t_2]\Da \\
+    t\Da &\triangleq \exists n,v.t\leadsto^n v
+\end{align*}
+Possiamo raffinare la definizione aggiungendo il typing:
+\begin{align*}
+    \emptyset \vdash t_1\simeq t_2:\tau \triangleq& \forall C \\
+                                                  &\IF C\cdash \emptyset : \tau\to\Gamma,\tau' \AND \emptyset \vdash t_1:\tau \AND \emptyset \vdash t_2:\tau \\
+                                                  &\THEN C[t_1]\Da \iff C[t_2]\Da
+\end{align*}
+
+\subsection{aaaa}
+\begin{gather*}
+    \Delta;\Gamma\vdash t_1 \approx t_2:\tau \triangleq \forall \delta\in D[\Delta].\forall(\gamma_1,\gamma_2) \in G[\Gamma]^\delta. (t_1\gamma_1\delta , t_2\gamma_2\delta)\in \cE[\tau]^\delta \\
+    \delta ::= \emptyset | \delta,\alpha\mapsto (\tau_1S_1, \tau_2S_2) \\
+    \cE[\tau]^\delta = \{(t_1,t_2)|\exists v_1,v_2. \IF t_1\leadsto^{*}v_1 \AND t_2\leadsto^{*}v_2 \THEN (v_1,v_2) \in \V[\tau]^\delta\} \\
+    \V[\N]^\delta = \{(n,n)\} \\
+    \V[\tau\to\tau']^\delta = \{(\lam{x:\tau}{t_1},\lam{x:\tau}{t_2}) | \forall v_1,v_2 \IF (v_1,v_2)\in\V[\tau]^\delta \THEN (t_1[\sfrac{v_1}x],t_2[\sfrac{v_2}x]) \in \cE[\tau]^\delta\}
+\end{gather*}
 
 \end{document}

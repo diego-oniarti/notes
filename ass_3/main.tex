@@ -44,7 +44,7 @@ Prove:
     \text{pick} &\ \tau'=\tau_1,S=\{v\} \\
     \text{by def. of $\cE$ w.h.} &\ \exists v".t[\sfrac{\tau'}{\alpha}]\leadsto^{*}v"\AND v"\in\V[\forall\beta.\alpha\to(\alpha\uplus\beta)]^{\substack{\delta,\hfill\\\alpha\mapsto\tau_1,\{v\}}} \\
     \text{by def. of $\V$ w.h.} &\ v"\equiv \Lambda\beta.t' \AND \forall\tau".\forall S'\in\text{semty}(\tau").t'[\sfrac{\tau"}\beta]\in\cE[\alpha\to(\alpha\uplus\beta)]^{\textcolor{purple}{\overbrace{\textcolor{black}{\substack{\delta,\hfill\\\alpha\mapsto\tau',S,\\\beta\mapsto\tau",S'}}}^{\delta'}}} \\
-    \text{pick} &\ \beta=\tau_2,S'=\emptyset \\
+    \text{pick} &\ \tau"=\tau_2,S'=\emptyset \\
     \text{by def. of $\cE$ w.h.} &\ \exists v'''.t'[\sfrac{\tau"}\beta]\leadsto^{*}v'''\AND v'''\in\V[\alpha\to(\alpha\uplus\beta)]^{\delta'} \\
     \text{by def. of $\V$ w.h.} &\ v'''\equiv \lam{x:\alpha}{t"}\AND \forall v"" \in\V[\alpha]^{\delta'}.t"[\sfrac{v""}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
     \text{by def. of $\V$ w.h.} &\ v'''\equiv \lam{x:\alpha}{t"}\AND \forall v"" \in \{v\}.t"[\sfrac{v""}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
@@ -57,7 +57,28 @@ Prove:
             \text{by no val in $\emptyset$ w.h.} &\ v'''''\equiv \inl v _\square\\
         \end{align*}
 
+\newpage
 \section{Free Theorems}
+\begin{gather*}
+    \not\exists t. \emptyset;\emptyset\vdash t: \forall\alpha.\forall\beta.\beta\to\alpha (THM)
+\end{gather*}
+Proof by contradiction. We assume that $\emptyset;\emptyset\vdash t: \forall\alpha.\forall\beta.\beta\to\alpha$.
+\begin{align*}
+    \te{By semantic soundness w.h.} &\ \emptyset;\emptyset\vDash t: \forall\alpha.\forall\beta.\beta\to\alpha \\
+    \te{By semantic typing w.h.} &\ t\in\cE[\forall\alpha.\forall\beta.\beta\to\alpha] \\
+    \te{By def. of $\cE$ w.h.} &\ \exists v. t\ls v \AND v \in \V[\forall\alpha.\forall\beta.\beta\to\alpha] \\
+    \te{By def. of $\V_\forall$ w.h.} &\ v\equiv \Lambda \alpha.t'\AND \forall\tau',\forall S\in\te{SemTy}(\tau'). t'[\sfrac{\tau'}\alpha] \in \cE[\forall\beta.\beta\to\alpha]^{\alpha\mapsto \tau',S} \\
+    \te{pick} &\ S=\emptyset \\
+    \te{By def. of $\cE$ w.h.} &\ \exists v'. t'[\sfrac{\tau'}\alpha] \ls v' \AND v'\in\V[\forall\beta.\beta\to\alpha]^{\alpha\mapsto \tau',\emptyset} \\
+    \te{By def. of $\V_\forall$ w.h.} &\ v'\equiv \Lambda \beta.t"\AND \forall\tau",\forall S'\in\te{SemTy}(\tau"). t"[\sfrac{\tau"}\beta] \in \cE[\beta\to\alpha]^{\substack{\alpha\mapsto \tau',\emptyset\\\beta\mapsto \tau",S'}} \\
+    \te{pick} &\ S'=\emptyset \\
+    \te{By def. of $\cE$ w.h.} &\ \exists v".t"[\sfrac{\tau"}\beta]\ls v" \AND v"\in\V[\beta\to\alpha]^{\left.\substack{\alpha\mapsto \tau',\emptyset\\\beta\mapsto \tau",\emptyset}\right\}\delta} \\
+    \te{by def. of $\V_\to$ w.h.} &\ v" \in \{v|v\equiv \lam{x:\beta}{t'''} \AND \forall v''' \in\V[\beta]^\delta.t'''[\sfrac{v'''}x]\in\cE[\alpha]^\delta\} \\
+    \te{By def. of $\V_\alpha$ w.h.} &\ \V[\beta]^\delta = \emptyset \\
+    \te{hence $v"$ does not exist} &\ 
+\end{align*}
+
+\newpage
 \section{A Register Machine Language}
 \begin{align*}
     t ::= & r:=n \\
@@ -131,6 +152,7 @@ Rules:
     } \\
 \end{gather*}
 
+\newpage
 \section{From the Register Machine to an Assembly Language}
 \begin{align*}
     t ::= & r:=n \\
