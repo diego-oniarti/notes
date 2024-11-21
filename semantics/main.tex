@@ -1088,7 +1088,17 @@ Possiamo raffinare la definizione aggiungendo il typing:
     \delta ::= \emptyset | \delta,\alpha\mapsto (\tau_1S_1, \tau_2S_2) \\
     \cE[\tau]^\delta = \{(t_1,t_2)|\exists v_1,v_2. \IF t_1\leadsto^{*}v_1 \AND t_2\leadsto^{*}v_2 \THEN (v_1,v_2) \in \V[\tau]^\delta\} \\
     \V[\N]^\delta = \{(n,n)\} \\
-    \V[\tau\to\tau']^\delta = \{(\lam{x:\tau}{t_1},\lam{x:\tau}{t_2}) | \forall v_1,v_2 \IF (v_1,v_2)\in\V[\tau]^\delta \THEN (t_1[\sfrac{v_1}x],t_2[\sfrac{v_2}x]) \in \cE[\tau]^\delta\}
+    \V[\tau\to\tau']^\delta = \{(\lam{x:\tau}{t_1},\lam{x:\tau}{t_2}) | \forall v_1,v_2 \IF (v_1,v_2)\in\V[\tau]^\delta \THEN (t_1[\sfrac{v_1}x],t_2[\sfrac{v_2}x]) \in \cE[\tau]^\delta\} \\
+    \V[\alpha]^\delta = \delta(\alpha) \\
+\V[\forall\alpha.\tau]^\delta=\{(\Lambda\alpha.t_1,\Lambda\alpha.t_2)|\forall \tau_1,\tau_2,\forall S\in VRel(\tau_1,\tau_2).    (t[\sfrac{\tau_1}\alpha,t_2[\sfrac{\tau_2}\alpha])\in\cE[\tau]^{\delta, \alpha\mapsto(\tau_1,\tau_2);S}\} \\
+VRel(\tau,\tau') = \mathcal{P}(CVal(\tau)\times CVal(\tau')) \\
+\V[\exists\alpha.\tau]\delta = \{(\pack{\tau_1}{v_2}{\exists\alpha.\tau},\pack{\tau_2}{v_2}{\exists \alpha.\tau}) | \exists S\in VRel(\tau_1,\tau_2). (v_1,v_2)\in\V[\tau]^{\delta,\alpha\mapsto(\tau_1,\tau_2),S}\} \\
+\end{gather*}
+
+Generalizziamo la term relation e ne aggiungiamo una context 
+\begin{gather*}
+    \cE[\tau]^\delta = \{(t_1,t_2)|\forall E_1,E_2. \IF (E_1,E_2)\in K[\tau]\delta\THEN E_1[t_1]\Da\iff E_2[t_2]\Da\} \\
+    K[\tau]^\delta = \{(E_1,E_2)|\forall v_1,v_2 \IF (v_1,v_2)\in\V[\tau]^\delta\THEN E[v_1]\Da\iff E[v_2]\Da\}
 \end{gather*}
 
 \end{document}

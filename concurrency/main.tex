@@ -489,7 +489,24 @@ Possiamo implementare un fine-grained sync approach usando 2 lock per scorrere l
 In maniera analoga, per aggiungere un nodo alla lista dobbiamo prendere il lock sul predecessore di x e il successore. O posso fare con un solo lock? Non ho capito
 
 \subsection{Optimistic}
-Cerchiamo il punto nella lista e ci prendiamo il lock senza prenderlo sugli elementi prima.
+Cerchiamo il punto nella lista e ci prendiamo il lock senza prenderlo sugli elementi prima durante lo scrolling.
+Dopo aver preso i lock facciamo dei controlli: \begin{itemize}
+    \item che la head raggiunga il primo nodo
+    \item che il secondo possa raggiungere la tail
+    \item che il primo e il secondo siano ancora adiacenti
+\end{itemize}
+Se uno di questi controlli fallisce dobbiamo lasciare i lock e iniziare di nuovo
+
+Questi controlli ci costringono a fare almeno un altro traversing completo della lista, che piò diventare costoso su set molto grandi.
+
+\subsection{Lazy}
+Like optimistic, expect: \begin{itemize}
+    \item scan once
+    \item contains(x) never locks...
+\end{itemize}
+
+We add a flag to the cells, which tells us whether the value is inside the set or not.
+
 
 \end{document}
 
