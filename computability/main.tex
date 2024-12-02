@@ -872,7 +872,7 @@ Ogni linguaggio (o problema) in $\mathbb{NP}$ può essere ridotto a SAT (e quind
 
 \paragraph{Recap di cosa voglia dire $NP$} Un problema $L$ è $NP$ se possiamo definire una macchina non deterministica $n$ tale che $n(x)=1\iff x\in L$. Il tempo di esecuzione per questa macchina deve essere dominato da una funzione polinomiale sulla dimensione dell'input.
 
-Possiamo vedere le ramificazioni della macchina non deterministica come un albero, e ogni divergenza come un Problema sat.
+Possiamo vedere le ramificazioni della macchina non deterministica come un albero, e sogni divergenza come un Problema sat.
 
 Prendiamo una funzione di transizione $f$ per una macchina di Turing. Possiamo tradurre questa macchina in un circuito binario.
 \begin{gather*}
@@ -891,4 +891,42 @@ Un linguaggio è $NP$-completo se ogni problema in NP può essere ridotto polino
 
 Siccome abbiamo dimostrato che 3-SAT riduce a INDSET e che 3-SAT è NP-complete, possiamo dire che INDSET è NP-complete.
 
-\end{document}
+\section{2024-11-25}
+Abbiamo constatato che NP contiene P e NP-complete.
+
+\paragraph{2-sat}
+Un problema 2 sat è come 3-sat ma ogni clausola ha 2 termini e basta. Quindi, sapendo che $a\implies b$ è equivalente a $\neg a \vee b$, possiamo riscrivere ogni clausola come un'implicazione (con le opportune negazioni).\\
+Possiamo poi costruire un grafo orientato dove i nodi sono i termini e le loro negazioni, e gli archi sono le implicazioni. È dimostrato che la formula originale è satisfiable se e solo se non co sono path tra un termine e la sua negazione.
+
+\subsection{3-vertex coloring}
+Dato un grafo non orientato, possiamo assegnare una label a ogni nodo in modo che due nodi con la stessa label non si tocchino?\\
+Questo problema è NP-complete, in quanto 3-sat può essere ridotto a 3-vertex coloring.
+
+\section{Everything is in $EXP$}
+Prendiamo un linguaggio $L$ in $NP$ qualsiasi. Quindi $x\in L \iff \mathcal N(x)=1 \quad t_\mathcal N(x)\leq p(|x|)$
+Possiamo simulare la macchina non deterministica $\mathcal{N}$ con una macchina deterministica? NO. \\
+Questo è facilmente dimostrabile partendo dalla rappresentazione della macchina non deterministica come un albero binario, dove ogni bivio è una divergenza nel non determinismo. I possibili outcome di questa macchina (quindi le foglie) sono $2^{p(|x|)}$.
+
+Quindi per esplorarli tutti in maniera deterministica ci servirebbero $q(|x|)\cdot 2^{p(|x|)}$ step. Questa è una funzione di complessità esponenziale quindi la macchina deterministica \textit{non può} essere polinomiale.
+
+La classe $EXP= \bigcup_{k=0}^\infty DTIME(2^{n^k})$ contiene $NP$, $coNP$, e $P$
+
+\subsection{Linguaggio EXP non NP}
+Esistono linguaggi $L$ in $EXP$ e non in $NP$? Pensiamo di si, ma non lo sappiamo. 
+
+Questo però non ci ferma dal definire la sottoclasse di $EXP$ contenente i linguaggi $EXP-complete$. Ovvero tutti i linguaggi a cui ogni problema in $EXP$ può essere ridotto polinomialmente.
+
+C'è il problema \textit{restricted halt} che è $EXP-complete$, ma non sappiamo dimostrare che sia fuori da $NP$.
+
+\section{space complexity}
+Non ha senso parlare di macchine con una complessità di tempo inferiore a quella polinomiale, perché anche la macchina migliore deve almeno leggere l'input.
+
+Se parliamo dello spazio occupato in memoria invece, possiamo. Da ora in poi assumiamo ogni macchina abbia 2 nastri, uno di input e uno di lavoro. La complessità viene calcolata solo in base alla dimensione necessaria del nastro di lavoro. 
+Facciamo anche l'assunzione che il nastro di input sia di sola lettura.
+\begin{align*}
+    \mathbb{P}&\subseteq\mathbb{P}space \\
+    \mathbb{NP}&\subseteq\mathbb{P}space \\
+    \mathbb{P}space &\subseteq \mathbb{EXP}
+\end{align*}
+
+\end{document} 

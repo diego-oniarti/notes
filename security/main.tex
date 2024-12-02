@@ -285,6 +285,26 @@ Durante la symbolic execution potremmo imbatterci in chiamate a funzioni private
     \item convolutional: good in handling image data
 \end{enumerate}
 
+\section{Adversarial attacks}
+\subsection{Evasion attacks}
+Fooling the model during inference by lightly altering inputs (common in classification tasks).\\
+Some common evasion attack types are:
+\begin{itemize}
+    \item input perturbation
+    \item feature-space attacks
+    \item model inversion attacks
+\end{itemize}
+
+\subsubsection{Model Inversion}
+un tipo di attacco in cui l'attaccante tenta di utilizzare il modello per esporre i dati che sono stati usati in fase di training. Questo è utile in case in cui il modello è stato allenato su dati confidenziali.
+
+\subsection{Poisoning attack}
+Evasion attacks are performed on the already trained (black box) model. Poisoning attacks are performed on the model during training. Manipulating training data to introduce biases or vulnerabilities into the model. Data poisoning attacks occur when an adversity intentionally injects harmful data into the training data.
+
+\subsection{System and model level}
+Un attacco a livello di modello mira solo a compromettere o sfruttare falle nel modello di IA, ma non si spinge oltre. \\
+Un attacco a livello di sistema, invece, sfrutta una falla nel modello per condurre l'intero sistema a una condizione indesiderata. Convincere una self-driving car a schiantarsi è system level.
+
 \end{document}
 
 

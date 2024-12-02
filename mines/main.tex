@@ -1,0 +1,100 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\input{../common}
+
+\usepackage{algorithm2e}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+
+\RestyleAlgo{ruled}
+
+\title{Minesweeper solver}
+\author{Diego Oniarti}
+\date{}
+
+\begin{document}
+
+\maketitle
+% \tableofcontents
+
+\section{Complessità di una mossa}
+\paragraph {Metodo naive}
+\begin{gather*}
+    O\left( \binom{n^2}{m} \cdot n^2 \right) \\
+    n^2 = \#celle  \\
+    m = \#bombe \\
+\end{gather*}
+
+\paragraph {Permutazioni simili}
+\begin{gather*}
+    O\left( \binom{n^2}{m} \right) \\
+    n^2 = \#celle  \\ 
+    m = \#bombe \\
+\end{gather*}
+
+\newpage
+
+\section{Algoritmi di risoluzione}
+L'idea è di implementare diversi algoritmi di risoluzione e di provarli tutti in ordine di complessità crescente. Se uno degli algoritmi riesce a far progredire la partita inizia il processo di nuovo sulla board ottenuta.
+
+\subsection{Trivial cells}
+Alcune celle sono trivialmente libere o bombe. Questo nel caso il numero di una cella sia il numero di flag o celle libere circostanti
+\begin{algorithm}
+    \caption{Trivial cells}
+    \label{algo:trivial}
+    \ForAll{$c\in celle$} {
+        \If {c.hidden} {
+            continue\;
+        }
+        $n \gets c.num()$\;
+        $neigh \gets c.neighbors().filter(hidden)$\;
+        \If {$n = |neigh|$} {
+            \ForAll {$f\in neigh$} {
+                $f.flag()$\;
+            }
+            continue\;
+        }
+        \If {$n = |neigh.filter(flagged)|$} {
+            \ForAll {$f\in neigh.filter(!flagged)$} {
+                $f.click()$\tcp*{Counts as progress}
+            }
+        }
+    }
+\end{algorithm}
+
+\newpage
+\subsection{Set theory}
+L'implementazione di questo algoritmo assume che sia già stato svolto \textit{Algo.\ref{algo:trivial}}
+
+\newpage
+\subsection{Brute-force}
+Questo algoritmo è molto pesante, quindi viene usato solo se $\binom{celle\ libere}{bombe}$ si tiene sotto un certo limite
+\begin{algorithm}
+    \caption{Brute-force method}
+    $p\_count \gets 0$\;
+    \ForAll {$p\in Permutations$}{
+        \If {!is\_possible($p$)} { 
+            continue\; 
+        }
+        $c\_count++$\;
+        \ForAll {$b\in p$} {
+            $b.count++$\;
+        }
+    }
+    $progress \gets false$\;
+    \ForAll{$c\in celle$} {
+        $p \gets \frac{c.count}{p\_count}$\;
+        \If {$p==1$} {
+            $p.flag()$ \tcp*{Reduce number of bombs}
+            $progress \gets true$\;
+        }
+        \If {$p==0$} {
+            $p.click()$ \tcp*{Expand neighbors if possible}
+            $progress \gets true$\;
+        }
+    }
+\end{algorithm}
+
+\end{document}

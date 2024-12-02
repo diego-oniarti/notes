@@ -1,0 +1,44 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{semantic}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{nicefrac, xfrac}
+\usepackage[a4paper, margin=0.5in]{geometry}
+\usepackage{setspace}
+
+\input{../common}
+\newcommand{\execs}[0]{\ensuremath{\rightrightarrows}}
+
+\usepackage{pdflscape}
+
+\title{Assignment \#4}
+\author{Diego Oniarti - 257835}
+\date{}
+\begin{document}
+\maketitle
+
+\section{Progress}
+Write the proof for the progress theorem for the cases related to locations, allocations, dereferencing, and update.
+
+\section{Program equivalence}
+For each of these programs, tell if they are equivalent or not. If they are equivalent, show what they reduce to, no matter the input. If they are not, argy why and if possible, show a context that tells them apart.
+
+\section{A private memory for ASM}
+Add a private memory to ASM. The domain of the memory becomes integers, so positive and negative numbers. Negative integers represent a private memory. \\
+Modify the semantics of ASM to reflect the following access control policy:
+If the program counter is within the address range $0$ to $100$, then any read or write to the private memory succeeds, otherwise any read or write returns $0$.
+
+\section{Labelled ASM Functions}
+Add named functions to ASM. ASM programs become a list mapping names to codebases. ASM instructions now include
+\begin{enumerate}
+    \item calling a function whose name is statically known
+    \item calling a function by jumping to the address where it starts (the address value is read from a register)
+    \item returning from a called function
+\end{enumerate}
+
+
+\end{document}

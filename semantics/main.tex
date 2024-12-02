@@ -1078,7 +1078,7 @@ huh?
 Possiamo raffinare la definizione aggiungendo il typing:
 \begin{align*}
     \emptyset \vdash t_1\simeq t_2:\tau \triangleq& \forall C \\
-                                                  &\IF C\cdash \emptyset : \tau\to\Gamma,\tau' \AND \emptyset \vdash t_1:\tau \AND \emptyset \vdash t_2:\tau \\
+                                                  &\IF C\vdash \emptyset : \tau\to\Gamma,\tau' \AND \emptyset \vdash t_1:\tau \AND \emptyset \vdash t_2:\tau \\
                                                   &\THEN C[t_1]\Da \iff C[t_2]\Da
 \end{align*}
 
@@ -1099,6 +1099,75 @@ Generalizziamo la term relation e ne aggiungiamo una context
 \begin{gather*}
     \cE[\tau]^\delta = \{(t_1,t_2)|\forall E_1,E_2. \IF (E_1,E_2)\in K[\tau]\delta\THEN E_1[t_1]\Da\iff E_2[t_2]\Da\} \\
     K[\tau]^\delta = \{(E_1,E_2)|\forall v_1,v_2 \IF (v_1,v_2)\in\V[\tau]^\delta\THEN E[v_1]\Da\iff E[v_2]\Da\}
+\end{gather*}
+
+\section{Lambda calculus with security}
+\begin{align*}
+    & e ::= () | true | false | \IF e \THEN e \ELSE e | \lam{x:\tau}{e} | l\ l|x \\
+    & \tau ::= unit | bool | \tau\to\tau \\
+    & v ::= () | true | false | (x.e, \theta) \\
+    & \theta::= \emptyset | \theta,x\to v \\
+    & \Gamma ::= \emptyset | \Gamma,x:\tau \\
+\end{align*}
+\begin{gather*}
+    \st[]{
+        (\lam{x:\tau}{e})\Da^\theta (x.e,\theta)
+    }{} \\
+    \st[]{
+        e_1\ e_2 \Da^\theta v
+    }{
+        e_1 \Da^\theta(x.e,\theta) \quad e_2\Da^\theta v' \quad e\Da^{\theta,x\to v'} v
+    } \\
+\end{gather*}
+
+\subsection{Security Latice}
+\begin{gather*}
+    \mathcal L = (\{P,S\}, \sqsubseteq) \\
+    \sqsubseteq \begin{cases}
+        P \sqsubseteq P \\
+        P \sqsubseteq S \\
+        S \sqsubseteq S \\
+    \end{cases}
+\end{gather*}
+\begin{align*}
+    & \tau = s^l \\
+    & l \in \mathcal L \\
+    & s ::= Unit| Bool | \tau\to\tau \\
+\end{align*}
+
+\begin{gather*}
+    \st[t-true]{
+        \Gamma \vdash true: Bool^l
+    }{} \\
+    \st[t-false]{
+        \Gamma \vdash false: Bool^l
+    }{} \\
+    \st[t-var]{
+        \Gamma \vdash x: s^l
+    }{
+        \Gamma(x):s^l
+    } \\
+    \st[]{
+        \Gamma\vdash(\lam{x:\tau}{l}): (\tau\to\tau')^l
+    }{
+        \Gamma,x:\tau \vdash l:\tau'
+    } \\
+    \st[t-if]{
+        \Gamma\vdash \IF e \THEN e_1 \ELSE e_2: s^{l'}
+    }{
+        \Gamma\vdash e:Bool^l \quad
+        \Gamma\vdash e_1:s^{l'} \quad
+        \Gamma\vdash e_2:s^{l'} \quad
+        l\sqsubseteq l'
+    } \\
+    \st[t-app]{
+        \Gamma\vdash e_1\ e_2:
+    }{
+        \Gamma\vdash e_1:(\tau_1\to\tau_2)^l \quad
+        \Gamma\vdash e_2:\tau_1 \quad
+        \tau_2:s^{l'} \quad
+        l\sqsubseteq l'
+    }
 \end{gather*}
 
 \end{document}
