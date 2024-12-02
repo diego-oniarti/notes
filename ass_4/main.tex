@@ -23,9 +23,37 @@
 
 \section{Progress}
 Write the proof for the progress theorem for the cases related to locations, allocations, dereferencing, and update.
+\begin{enumerate}
+    \item locations
+    \item allocation
+    \item dereferencing
+    \item update
+\end{enumerate}
 
 \section{Program equivalence}
-For each of these programs, tell if they are equivalent or not. If they are equivalent, show what they reduce to, no matter the input. If they are not, argy why and if possible, show a context that tells them apart.
+For each of these programs, tell if they are equivalent or not. If they are equivalent, show what they reduce to, no matter the input. If they are not, argue why and if possible, show a context that tells them apart.
+\begin{enumerate}
+    \item
+        \begin{itemize}
+            \item $z:Ref(\N\to\N)$
+            \item $t_1=\lam{x:\N}{!z\ 0;2+x}$
+            \item $t_2=\lam{x:\N}{\IF x>0 \THEN x+2 \ELSE !z\ x;x+2}$
+        \end{itemize}
+        Not equivalent. Let's say we have a context where we set a value to $0$ and define $z$ to override that value with$1$. Applying $t_1$ and $t_2$ to $0$ and reading the value we set in the beginning would give us different outcomes.
+    \item 
+        \begin{itemize}
+            \item $t_1= \LET x=\lam{y:\forall\alpha.\alpha\to\alpha}\lam{z:\N}{y[\N]\ (z+1)} \TIN x$
+            \item $t_2= \lam{y:\forall\alpha.\alpha\to\alpha}\lam{x:\N}{(y[\N]\ x)+1}$
+        \end{itemize}
+        Not equivalent
+
+    \item 
+        \begin{itemize}
+            \item $f:(Ref\ \N)\to\N$
+            \item $t_1=\LET x= new\ 0 \TIN f\ x; !x$
+            \item $t_2=\LET x= new\ 1\ \TIN f\ (new\ 0); x:=(!x-1)$
+        \end{itemize}
+\end{enumerate}
 
 \section{A private memory for ASM}
 Add a private memory to ASM. The domain of the memory becomes integers, so positive and negative numbers. Negative integers represent a private memory. \\
