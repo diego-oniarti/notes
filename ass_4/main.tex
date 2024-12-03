@@ -40,7 +40,10 @@ Write the proof for the progress theorem for the cases related to locations, all
         \end{align*}
     \item allocation
         \begin{align*}
-            \text{w.h.} &\ H:\Sigma\AND \Sigma,\emptyset,\emptyset\vdash \NEW v: ref(\tau)
+            \text{w.h.} &\ H:\Sigma\AND \Sigma,\emptyset,\emptyset\vdash \NEW t_0: ref(\tau) \\
+            \text{by IH w.h.} &\ \IF H_0:\Sigma_0 \AND \Sigma_0,\emptyset,\emptyset\vdash t_0:\tau \THEN \text{either } \textcolor{blue}{t_0.val} \OR \textcolor{purple}{\exists t_0',H_0'. H_0\triangleright t_0 \leadsto H_0'\triangleright t_0'} \\
+            \text{case $\textcolor{blue}{t_0.val}$:} &\ H\triangleright\NEW t_0 \leadsto H,l\mapsto t_0\triangleright l \square \\
+            \text{case $\textcolor{purple}{\exists t_0',H_0'. H_0\triangleright t_0 \leadsto H_0'\triangleright t_0'}$:} &\ H\triangleright\NEW t_0 \leadsto H\triangleright \NEW t_0' \square \\
         \end{align*}
     \item dereferencing
     \item update
@@ -55,19 +58,37 @@ For each of these programs, tell if they are equivalent or not. If they are equi
             \item $t_1=\lam{x:\N}{!z\ 0;2+x}$
             \item $t_2=\lam{x:\N}{\IF x>0 \THEN x+2 \ELSE !z\ x;x+2}$
         \end{itemize}
-        Not equivalent. Let's say we have a context where we set a value to $0$ and define $z$ to override that value with$1$. Applying $t_1$ and $t_2$ to $0$ and reading the value we set in the beginning would give us different outcomes.
+        Not equivalent. Can be distinguished by this context:
+        \begin{align*}
+            & \LET d = \NEW 0 \TIN\\
+            & \LET z = \lam{x:\N}{d:=1;12} \TIN\\
+            &\ t_{1/2}\ 0; \IF !d == 0 \THEN 0 \ELSE \omega
+        \end{align*}
     \item 
         \begin{itemize}
             \item $t_1= \LET x=\lam{y:\forall\alpha.\alpha\to\alpha}\lam{z:\N}{y[\N]\ (z+1)} \TIN x$
             \item $t_2= \lam{y:\forall\alpha.\alpha\to\alpha}\lam{x:\N}{(y[\N]\ x)+1}$
         \end{itemize}
-        Not equivalent
+        % Not equivalent
+        % \begin{align*}
+        %     & \LET d = \NEW 0 \TIN \\
+        %     &\ t_{1/2}\ (\Lambda \alpha.\lam{x:\alpha}{d:=x;x})\ 0; \\
+        %     & \IF !d == 0 \THEN 0 \ELSE \omega
+        % \end{align*}
+        Equivalent. In both cases the function passed to $t$ is an identity function, and we can't differentiate the two since they both return the input increased by $1$.
 
     \item 
         \begin{itemize}
             \item $f:(Ref\ \N)\to\N$
             \item $t_1=\LET x= new\ 0 \TIN f\ x; !x$
             \item $t_2=\LET x= new\ 1\ \TIN f\ (new\ 0); x:=(!x-1)$
+        \end{itemize}
+
+    \item 
+        \begin{itemize}
+            \item $r:Ref(\N)$
+            \item $t_1=\left|\begin{array}{l}\LET x=!r \TIN\\ \LET y=\NEW x \TIN\\\ r:=!y;\\\ !y\end{array}\right.$
+            \item $t_2=\left|\begin{array}{l}\LET x=\NEW 0 \TIN \\ \LET y=!x;!r \TIN\\\ y\end{array}\right.$
         \end{itemize}
 \end{enumerate}
 
