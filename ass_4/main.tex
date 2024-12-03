@@ -23,9 +23,25 @@
 
 \section{Progress}
 Write the proof for the progress theorem for the cases related to locations, allocations, dereferencing, and update.
+\begin{esempio}{Progress}
+    $\IF H:\Sigma\AND\Sigma,\emptyset,\emptyset\vdash  t:\tau \THEN \text{either } \vdash t.VAL \OR \exists t',H'.H\triangleright t \leadsto H'\triangleright t'$ \\
+    Proven by induction
+\end{esempio}
 \begin{enumerate}
     \item locations
+        \begin{align*}
+            \text{w.h.} &\ H:\Sigma \AND \Sigma,\emptyset,\emptyset\vdash l:ref(\tau) \\
+            \text{t.s.} &\ 
+            \begin{array}{ll}
+                \text{either}  & \vdash l.VAL \\
+                \text{or}  & \exists t',H'. H\triangleright l \leadsto H'\triangleright t'
+            \end{array} \\
+            \text{by def.} &\ l.val_\square
+        \end{align*}
     \item allocation
+        \begin{align*}
+            \text{w.h.} &\ H:\Sigma\AND \Sigma,\emptyset,\emptyset\vdash \NEW v: ref(\tau)
+        \end{align*}
     \item dereferencing
     \item update
 \end{enumerate}
