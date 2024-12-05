@@ -25,7 +25,7 @@
 \section{Progress}
 Write the proof for the progress theorem for the cases related to locations, allocations, dereferencing, and update.
 \begin{esempio}{Progress}
-    $\IF H:\Sigma\AND\Sigma,\emptyset,\emptyset\vdash  t:\tau \THEN \text{either } \vdash t.VAL \OR \exists t',H'.H\triangleright t \leadsto H'\triangleright t'$ \\
+    $\IF H:\Sigma\AND\Sigma,\emptyset,\emptyset\vdash  t:\tau \THEN \text{either } \vdash t.val \OR \exists t',H'.H\triangleright t \leadsto H'\triangleright t'$ \\
     Proven by induction
 \end{esempio}
 \begin{enumerate}
@@ -34,12 +34,12 @@ Write the proof for the progress theorem for the cases related to locations, all
             \text{w.h.} &\ H:\Sigma \AND \Sigma,\emptyset,\emptyset\vdash l:ref(\tau) \\
             \text{t.s.} &\ 
             \begin{array}{ll}
-                \text{either}  & \vdash l.VAL \\
+                \text{either}  & \vdash l.val \\
                 \text{or}  & \exists t',H'. H\triangleright l \leadsto H'\triangleright t'
             \end{array} \\
             \text{by def.} &\ l.val_\square
         \end{align*}
-    \item allocation
+    \item allocation $t=\NEW t_1$
         \begin{align*}
             \text{w.h.} &\ H:\Sigma\AND \Sigma,\emptyset,\emptyset\vdash \NEW t_1: ref(\tau) \\
             \text{by IH w.h. either }   & \textcolor{blue}{t_1.val}\\
@@ -72,13 +72,33 @@ Write the proof for the progress theorem for the cases related to locations, all
                                 &\ t_1'\equiv \mE[t_0']& (HE2) \\
                                 &\ H\triangleright t_0\leadsto^p H'\triangleright t_0'  & (HPR) \\
             \text{by HE1, HE2 t.s. } & H\triangleright !\mE[t_0] \leadsto H'\triangleright !\mE[t_0'] \\
-            \text{by ctx with HPR and $\mE'=[!\mE]$: } & H\triangleright \mE'[t_0] \leadsto H'\triangleright E'[t_0']\square
+            \text{by ctx with HPR and $\mE'=!\mE$: } & H\triangleright \mE'[t_0] \leadsto H'\triangleright E'[t_0']\square
         \end{align*}
     \item update $t=t_1:=t_2$
         \begin{align*}
             \text{by HP w.h.} &\ H:\Sigma \AND \Sigma,\emptyset,\emptyset\vdash t:\N & (HP1)\\
             \text{by typing of := w.h.} &\ H:\Sigma \AND \Sigma,\emptyset,\emptyset\vdash t_1:ref(\tau) & (HP2) \\
             \text{and} &\ H:\Sigma \AND \Sigma,\emptyset,\emptyset\vdash t_2:\tau & (HP3) \\
+            \text{by IH w.h. } & \begin{array}{llr}\text{either} & t_1.val & (A1) \\ \text{or}& \exists H',t_1'.\ H\triangleright t_1 \leadsto H'\triangleright t_1' & (A2)\end{array} \\
+            \text{by IH w.h. } & \begin{array}{llr}\text{either} & t_2.val & (B1) \\ \text{or}& \exists H',t_2'.\ H\triangleright t_2 \leadsto H'\triangleright t_2' & (B2)\end{array} \\
+            \hline
+            \text{case } & A1\ B1 \\
+            \text{by canonicity and A1: } & t_1\equiv l \\
+            \text{by definition of := w.h. } & H\triangleright t \leadsto H[\sfrac{l\mapsto t_2}{l\mapsto \_}]\triangleright 0\ \square \\
+            \hline
+            \text{case } & A2 \\
+            \text{by inversion } & t_1 \equiv \mE[t_0] & (HE1) \\
+                                 & t_1'\equiv \mE[t_0'] & (HE2) \\
+                                 & H\triangleright t_0 \leadsto^p H'\triangleright t_0' & (HPR) \\
+            \text{by HE1,HE2 t.s. } & H\triangleright \mE[t_0]:=t_2 \leadsto H'\triangleright \mE[t_0']:=t_2 \\
+            \text{by HPR with $\mE'=\mE:=t_2$: } & H\triangleright\mE'[t_0]\leadsto H'\triangleright \mE'[t_0'] \square \\
+            \hline
+            \text{case } & B2 \\
+            \text{by inversion } & t_2 \equiv \mE[t_0] & (HE1) \\
+                                 & t_2'\equiv \mE[t_0'] & (HE2) \\
+                                 & H\triangleright t_0 \leadsto^p H'\triangleright t_0' & (HPR) \\
+            \text{by HE1,HE2 t.s. } & H\triangleright t_1:=\mE[t_0] \leadsto H'\triangleright t_1:=\mE[t_0'] \\
+            \text{by HPR with $\mE'=t_1:=\mE$: } & H\triangleright\mE'[t_0]\leadsto H'\triangleright \mE'[t_0'] \square \\
         \end{align*}
 \end{enumerate}
 
@@ -95,7 +115,7 @@ For each of these programs, tell if they are equivalent or not. If they are equi
         Not equivalent. Can be distinguished by this context:
         \begin{align*}
             & \LET d = \NEW 0 \TIN\\
-            & \LET z = \lam{x:\N}{d:=1;12} \TIN\\
+            & \LET z = \NEW(\lam{x:\N}{d:=1;12}) \TIN\\
             &\ [\cdot]\ 0; \IF !d == 0 \THEN 0 \ELSE \omega
         \end{align*}
 
@@ -128,6 +148,7 @@ For each of these programs, tell if they are equivalent or not. If they are equi
             & \LET f = \lam{d:Ref\ \N}{d:=12;1} \TIN \\
             & \IF [\cdot] == 0 \THEN 0 \ELSE \omega
         \end{align*}
+        Assuming the value of the update is $0$ as stated in class.
 
     \item 
         \begin{itemize}
