@@ -1,13 +1,13 @@
 # Primo anno
 ## primo semestre
-| name                                       | creds | year  | reason |
-| ------------------------------------------ | ----- | ----- | :----: |
-| Computability and computational complexity | 6     | 1     |        |
-| Innovation and Business in ICT             | 6     | 1     |        |
-| Security testing                           | 6     | 1     |        |
-| Programming Language Semantics             | 6     | 1     |   +    |
-| Concurrency                                | 6     | 1-(2) |   +    |
-| Signal, Image and Video                    | 6     | 1     |   !    |
+| name                                       | creds | year  | reason | date  |
+| ------------------------------------------ | ----- | ----- | :----: | :---: |
+| Computability and computational complexity | 6     | 1     |        | pass? |
+| Innovation and Business in ICT             | 6     | 1     |        | pass  |
+| Security testing                           | 6     | 1     |        | 15/01 |
+| Programming Language Semantics             | 6     | 1     |   +    | 10/02 |
+| Concurrency                                | 6     | 1-(2) |   +    | 21/01 |
+| Signal, Image and Video                    | 6     | 1     |   !    | 23/01 |
 
 ## secondo semestre
 | name                                       | creds | year | reason |
