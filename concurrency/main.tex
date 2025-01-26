@@ -497,7 +497,7 @@ Dopo aver preso i lock facciamo dei controlli: \begin{itemize}
 \end{itemize}
 Se uno di questi controlli fallisce dobbiamo lasciare i lock e iniziare di nuovo
 
-Questi controlli ci costringono a fare almeno un altro traversing completo della lista, che piò diventare costoso su set molto grandi.
+Questi controlli ci costringono a fare almeno un altro traversing completo della lista, che può diventare costoso su set molto grandi.
 
 \subsection{Lazy}
 Like optimistic, expect: \begin{itemize}
@@ -507,6 +507,14 @@ Like optimistic, expect: \begin{itemize}
 
 We add a flag to the cells, which tells us whether the value is inside the set or not.
 
+\section{Wrap Up}
+\begin{itemize}
+    \item Hoare logic
+    \item simulations between I/O automata
+ciao
+\end{itemize}
+
+\section{Presentazione}
 
 \end{document}
 

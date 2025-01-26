@@ -1,0 +1,84 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{semantic}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{nicefrac, xfrac}
+\usepackage[a4paper, margin=0.5in]{geometry}
+\usepackage{setspace}
+\usepackage{tikzsymbols}
+\usepackage[parfill]{parskip}
+
+\input{../common}
+\newcommand{\execs}[0]{\ensuremath{\rightrightarrows}}
+
+\usepackage{pdflscape}
+
+\title{Assignment \#5}
+\author{Diego Oniarti - 257835}
+\date{}
+\begin{document}
+\maketitle
+
+\section{Encoding ULC into System F using recursive types}
+Try to define type $\tau_u$, which is the type that any ULC term can be given in F+isorecursive types. If you can define $\tau_u$, define a function inductively on ULC terms so that it maps any ULC term to a term of F+isorecursive types whose type is $\tau_u$ and that has the same behaviour as the original ULC term (i.e., if you map an ULC application, you get something that eventually behaves like an application).
+
+If you cannot define $\tau_u$, argue why it cannot exist.
+
+In this case, consider ULC terms to be: $t ::= n | x | \lam{x}{t} | t\ t | \langle t, t\rangle | t.1 | t.2 | \inl t | \inr t | \case{\ t}{\inl x_1 \to t}{\inr x_2 \to t}$ \\
+Encoding these terms into lambdas is not an option.
+
+\hline
+
+No, but why?
+
+\newpage
+\section{Formalising ASM capability machines}
+Capability machines extend assembly instructions with explicit capabilities such that reading and writing on memory is only allowed if a capability is provided.
+
+Take ASM without the private heap and extend the language with capabilities and formalise their semantics: call this CASM. You choose how to model them, choose wisely according to their behaviour as described below.
+
+Capabilities are unforgeable and unobservable tokens which the program can create. At the start, each memory location is unprotected. The language must provide instructions for creating a capability, and for protecting a location given a capability, this should only be possible if the location is unprotected. \\
+Reading and writing a memory location is always possible if the location is unprotected. However, if the location is protected with a capability, reading and writing that location is only possible if the same capability is provided at reading and writing time.
+
+\newpage
+\section{Typing CASM}
+Provide typing rules for all instructions of CASM (that is, all instructions from RML, ASM and CASM).
+
+\newpage
+\section{Subtyping}
+Subtyping lets you use a term of type $\tau$ at a super-type $\tau'$. Intuitively, it is the same principle by which you can use an object of a class as if it were of a super class. \\
+Concretely, subtyping is achieved by introducing the subsumption rule below, as well as an ordering on types, indicated with $<:$.
+
+\begin{gather*}
+    \st[Subsumption]{
+        \Gamma\vdash t:\tau'
+    }{
+        \Gamma\vdash t:\tau \quad
+        \tau <:\tau'
+    }
+\end{gather*}
+
+Consider the standard typing of the sequencing rule and its related reduction. Suppose we extend our types with $Unit$, so $\tau ::= \cdots | Unit$ and our terms with $unit$ (a new value), so $t ::= \cdots | unit$.
+
+$$
+\begin{array}{lr}
+    \st[Type-seq]{
+        \Gamma\vdash t;t':\tau
+    }{
+        \Gamma \vdash t: Unit \quad
+        \Gamma \vdash t':\tau
+    }
+    &
+    \st[Eval-seq]{
+        unit;t\leadsto^p t
+    }{}
+\end{array}
+$$
+
+Consider STLC with sums and pairs. Can we introduce an ordering on types to allow this kind of reduction: $v;t \leadsto^p t$ for any value $v$, effectively replacing Rule \textcolor{red}{Eval-seq} while keeping Rule \textcolor{red}{Type-seq} and Rule \textcolor{red}{Subsumption}? If yes, show such an ordering. If no, argue why not.
+
+\end{document}
