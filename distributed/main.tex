@@ -1,0 +1,95 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\input{../common}
+\usepackage[parfill]{parskip}
+
+\title{Distributed Systems}
+\author{Diego Oniarti}
+\date{Anno 2024-2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\newpage
+\section{Introduction}
+
+\paragraph{What is a data center?}
+
+\paragraph{Cloud computing}
+pushes the concept further, providing users with generic services, at various layers
+
+\paragraph{The Internet Of Things}
+Internet of things is not only used in domotic systems. A large amount of sensors and actuators are used for industrial use and for "smart cities".
+
+\paragraph{What is a distributes system?}
+We can give a pragmatic definition to: "a collection of independent, autonomous hosts connected through a communication network. Hosts communicate via message passing to achieve some form of cooperation".\\
+This definition gives some good insight, specifying the hosts must be separate, there is message passing instead of shared memory, and so on.
+
+We can also define what is \textbf{not} a distributed system, or properties a distributed system does not have:
+\begin{itemize}
+    \item shared global clock
+    \item shared memory
+    \item accurate failure detection
+\end{itemize}
+
+Another definition, the 'optimistic' one, describes only how the systems has to appear to an observer: "A collection of independent computers that appears to its users as a single coherent system".
+
+In the same vein, we have a \textit{pessimistic} description: "One in which I cannot get any work done because some machine I have never heard of has crashed".
+
+\paragraph{Why distribution?}
+Distribution of a system can be a requirement as well as a design choice.
+Some applications are \textit{inherently} distributed, like those that require the propagation of information over a large geographical area, or the collection of data from sensors in different places.
+
+Sometimes it is a design choice, opting to have a system which is fault tolerant.
+
+\paragraph{Defining features}
+Like all other design choices, distributed systems have pros and cons. Some pros are:
+\begin{itemize}
+    \item concurrency 
+    \item absence of a global clock 
+    \item absence of a shared memory 
+    \item independent and partial failures
+\end{itemize}
+Some cons are:
+\begin{itemize}
+    \item higher delays
+\end{itemize}
+
+On the topic of distributed failures, in some distributed systems a failure can be critical, if the failure of a single host can take down the entire system.
+Other systems with independent hosts, have the opposite behaviour. If an host fails and cannot serve a client, some other host in the network can bare its load.
+
+\paragraph{Challenges of distribution}
+One challenge when implementing a distributed system is \textbf{heterogeneity}. The different hosts in a system can have different hardware, programming languages, operating systems, etc.\\
+This problem is tackled through adapters, or most commonly through a layer of middleware.
+
+Another challenge is failure handling. Some key concepts are
+\begin{itemize}
+    \item detection: using checksums or what not to detect failures
+    \item masking: hiding from the others that a failure happened in the first place
+    \item tolerance:
+    \item recovery: 
+\end{itemize}
+
+In distributed systems we can have \textbf{no consensus}. The \textit{two generals problem} is a good example of why we can have no consensus with more hosts.\\
+The two approaches to tackle this problem are:
+\begin{itemize}
+    \item change the assumptions: Assume the channels are secure and reliable
+    \item reduce the grantees: Like in TCP
+\end{itemize}
+
+\paragraph{Goals of distribution}
+Two of the main goals when implementing a distributed system are \textbf{Openness} and \textbf{Security}.\\
+Security is particularly difficult to ensure in a distributed system since it introduces a multitude of new points of failure for an intruder to take advantage of.
+
+Another goal is \textbf{scalability}. A scalable system eliminates the performance bottleneck that exists when working on a single host, but are much harder to design.
+
+Finally, \textbf{transparency} is the concept of hiding from the exterior how the systems is working. We can hide the allocation of resources, the replication of data, the occurrence of failures, and many other things.\\
+Some things that we can not mask are timezone, delays, etc.\\
+When taken too far, hiding aspects of the system can lead to performance loss.
+
+
+\end{document}
