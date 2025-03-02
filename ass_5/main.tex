@@ -234,45 +234,80 @@ The new commands are:
 \section{Typing CASM}
 Provide typing rules for all instructions of CASM (that is, all instructions from RML, ASM and CASM).
 \hline
-We can expand $\tau$ to include registers and side effects
-\begin{gather*}
-    \tau ::= \cdots | \mathcal R | sf | j | mw | cc | pm \\
-\end{gather*}
-The side effects are represented by types with no associated value
+% We can expand $\tau$ to include registers and side effects
+% \begin{gather*}
+%     \tau ::= \cdots | \mathcal R | sf | j | mw | cc | pm \\
+% \end{gather*}
+% The side effects are represented by types with no associated value
+% \begin{align*}
+%     & rw && \te{Write to register} \\
+%     & sf && \te{Set flag} \\
+%     & j  && \te{Jump} \\
+%     & mw && \te{Write to memory} \\
+%     & cc && \te{Create capability} \\
+%     & pm && \te{Protect memory with a capability} \\
+% \end{align*}
+% 
+% We define $\mathcal S$ as a generic side effect
+% \begin{align*}
+%     \mathcal S \triangleq sf \uplus j \uplus mw \uplus cc \uplus pm
+% \end{align*}
+% 
+% We define arguments as either registers or natural numbers
+% \begin{align*}
+%     \mathcal A \triangleq \mathcal R \uplus \N
+% \end{align*}
+% and a list of arguments as we defined lists in class
+% \begin{align*}
+%     \mathcal Args \triangleq \mu \alpha. Bool \uplus (\mathcal A \times \alpha)
+% \end{align*}
+% Finally each instruction can be typed as a pair containing a list of arguments and a side effect
+% \begin{gather*}
+%     \mathcal{I} \triangleq \mathcal Args \times \mathcal S \\
+% \end{gather*}
+% The values for $\mathcal R$ are the registers $ar,br,\dots,or$ as defined for RML
+% 
+% The typing rules for the instructions are
+% \begin{gather*}
+%     \begin{array}{lcr}
+%         \st[load]{\Gamma\vdash r:=n : }{\Gamma\vdash r: \mathcal R \quad \Gamma\vdash n:\N}
+%     \end{array}
+% \end{gather*}
+
+We can type each instruction by the arguments it receives and the type of side effect it has.\\
+We $\tau$ to contain the side effects, which have no value
 \begin{align*}
-    & rw && \te{Write to register} \\
-    & sf && \te{Set flag} \\
-    & j  && \te{Jump} \\
-    & mw && \te{Write to memory} \\
-    & cc && \te{Create capability} \\
-    & pm && \te{Protect memory with a capability} \\
+    \tau ::= \cdots |&\ rw && \te{Write to register} \\
+    &| sf && \te{Set flag} \\
+    &| j  && \te{Jump} \\
+    &| mw && \te{Write to memory} \\
+    &| cc && \te{Create capability} \\
+    &| pm && \te{Protect memory with a capability} \\
+\end{align*}
+We also expand $\tau$ with the register type, and $v$ with the registers defined for RML
+\begin{align*}
+    \tau ::=& \cdots | \mR \\
+    v ::=& \cdots | ar|br|\dots|or
 \end{align*}
 
-We define $\mathcal S$ as a generic side effect
 \begin{align*}
-    \mathcal S \triangleq sf \uplus j \uplus mw \uplus cc \uplus pm
+    \setstretch{3}\begin{array}{lll}
+        \st[load]{\Gamma\vdash r:=n: \mR\to\N\to rw}{\Gamma\vdash r:\mR \quad \Gamma\vdash n:\N} &
+        \st[sum]{\Gamma\vdash sum\ r_1\ r_2: \mR\to\mR\to rw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[sub]{\Gamma\vdash sub\ r_1\ r_2: \mR\to\mR\to rw \times sf}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} \\
+        \st[cmp]{\Gamma\vdash cmp\ r_1\ r_2: \mR\to\mR\to sf}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[jmp]{\Gamma\vdash jmp\ r: \mR\to sf}{\Gamma\vdash r:\mR} &
+        \st[jiz]{\Gamma\vdash jiz\ r: \mR\to sf}{\Gamma\vdash r:\mR} \\
+        \st[jeq]{\Gamma\vdash jeq\ r: \mR\to sf}{\Gamma\vdash r:\mR} &
+        \st[read]{\Gamma\vdash read\ r_1\ r_2: \mR\to\mR\to rw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[write]{\Gamma\vdash write\ r_1\ r_2: \mR\to\mR\to mw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} \\
+        \st[cap]{\Gamma\vdash cap\ r: \mR\to cc}{\Gamma\vdash r:\mR} &
+        \st[prot]{\Gamma\vdash prot\ r_1\ r_2: \mR\to\mR\to pm}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[readp]{\Gamma\vdash prot\ r_1\ r_2\ r_3: \mR\to\mR\to\mR\to pm}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR \quad \Gamma\vdash r_3:\mR} \\
+                                                                                                                 &&\st[writep]{\Gamma\vdash prot\ r_1\ r_2\ r_3: \mR\to\mR\to\mR\to mw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR \quad \Gamma\vdash r_3:\mR}
+    \end{array}\setstretch{1}
 \end{align*}
-
-We define arguments as either registers or natural numbers
-\begin{align*}
-    \mathcal A \triangleq \mathcal R \uplus \N
-\end{align*}
-and a list of arguments as we defined lists in class
-\begin{align*}
-    \mathcal Args \triangleq \mu \alpha. Bool \uplus (\mathcal A \times \alpha)
-\end{align*}
-Finally each instruction can be typed as a pair containing a list of arguments and a side effect
-\begin{gather*}
-    \mathcal{I} \triangleq \mathcal Args \times \mathcal S \\
-\end{gather*}
-The values for $\mathcal R$ are the registers $ar,br,\dots,or$ as defined for RML
-
-The typing rules for the instructions are
-\begin{gather*}
-    \begin{array}{lcr}
-        \st[load]{\Gamma\vdash r:=n}{\Gamma\vdash r: \mathcal R \quad \Gamma\vdash n:\N}
-    \end{array}
-\end{gather*}
+The types for each instruction work to represent their "shape" and behaviour.
 
 \newpage
 \section{Subtyping}
