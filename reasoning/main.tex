@@ -1,0 +1,51 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\input{../common}
+\usepackage[parfill]{parskip}
+\usepackage{hyperref}
+
+
+\title{Automated Reasoning and Formal Verification}
+\author{Diego Oniarti}
+\date{Anno 2024-2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{25-02-2025}
+\subsection*{intro}
+Slides will be on his \href{https://disi.unitn.it/rseba/DIDATTICA/arfv2025/}{webpage} along with the recordings.
+
+The exam will consist of a script and an oral exam on the topics of the whole course.
+
+\subsection*{boolean/propositional logic}
+A propositional \textbf{formula} can be:
+\begin{itemize}
+    \item $\top$, $\bot$
+    \item Propositional \textbf{atoms} $A_1, A_2, \dots, A_n$
+    \item A combination of other formulas. If $\phi_1$ and $\phi_2$ are formulas, so are:
+        \begin{itemize}
+            \item $\neg \phi_1$
+            \item $\phi_1\wedge\phi_2$
+            \item $\phi_1\vee\phi_2$
+            \item $\phi_1\to\phi_2$
+            \item $\phi_1\leftarrow\phi_2$
+            \item $\phi_1\leftrightarrow\phi_2$
+            \item $\phi_1\oplus\phi_2$
+        \end{itemize}
+\end{itemize}
+
+We define a function $Atoms(\phi)$ representing the set $\{A_1,\dots,A_n\}$ of atoms in $\phi$
+
+A \textbf{clause} is a disjunction of literals $\bigvee_j l_j$ or $(A_1\vee \neg A_2 \vee ...)$
+
+A \textbf{cube} is a conjunction of literals $\bigwedge_j l_j$ or $(A_1\wedge \neg A_2 \wedge ...)$
+
+\subsection*{trees and DAGS}
+A tree is a natural representation of a 
+
+\end{document}

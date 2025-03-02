@@ -1,0 +1,55 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\input{../common}
+\usepackage[parfill]{parskip}
+\usepackage{multirow}
+
+\title{Distributed Systems}
+\author{Diego Oniarti}
+\date{Anno 2024-2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\newpage
+\section{Introduction} 
+\paragraph{Prisoner's dilemma}
+\begin{center}
+\begin{tabular}{r|c c}
+    & not confess & confess \\
+    \hline
+    not confess & 3,3 & 0,4 \\
+    confess & 4,0 & 1,1
+\end{tabular}
+\end{center}
+This is a representation of the \textit{prisoner's dilemma} in which the values are not years of sentence but "utilities". We do this because we want a value to maximise instead of minimizing it.
+
+In this classical example, the cell (1,1) where both prisoners confess is an "equilibrium". Once the system settles in that state no agent has an incentive to deviate.
+
+\paragraph{Multiple equilibriums}
+Another example could be Alice and Bob deciding where they wanna go on the weekend, with the choices being a concert and a baseball game
+\begin{center}
+    \begin{tabular}{r | r | c c}
+        & & \multicolumn{2}{|c}{bob} \\
+        \hline
+        & & game & concert \\
+        \hline
+        \multirow{2}{2em}{alice} & game & 4,1 & 0,0 \\
+                                 &  concert &  0,0 & 1, 4\\
+    \end{tabular}
+\end{center}
+In this situation there are two identical equilibriums, so there might be a \textit{convention} to decide between the two of them. In the real world this convention could be "let's be a gentleman and pick what the woman prefers".
+
+\begin{esempio}{Peek at Nash's theorem}
+The Nash's theorem states that every game has an equilibrium. This equilibrium could be single, mixed, or other kind of equilibrium.\\
+This is a non-constructive theorem, as it gives no indication on how to find the equilibrium.
+\end{esempio}
+
+\subsection{Mixed vs Pure equilibriums}
+
+
+\end{document}
