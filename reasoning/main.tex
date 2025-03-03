@@ -1,11 +1,13 @@
 \documentclass{article}
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=3.5cm]{geometry}
 
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath}
 \input{../common}
 \usepackage[parfill]{parskip}
-\usepackage{hyperref}
+\usepackage{marginnote}
+\usepackage{ulem}
 
+\usepackage{graphicx}
 
 \title{Automated Reasoning and Formal Verification}
 \author{Diego Oniarti}
@@ -46,6 +48,75 @@ A \textbf{clause} is a disjunction of literals $\bigvee_j l_j$ or $(A_1\vee \neg
 A \textbf{cube} is a conjunction of literals $\bigwedge_j l_j$ or $(A_1\wedge \neg A_2 \wedge ...)$
 
 \subsection*{trees and DAGS}
-A tree is a natural representation of a 
+A tree is a natural representation of an expression, but in the worst cases it can grow exponentially. The same information about the formula can be conveyed by a \textit{Directed Acyclic Graph}, which can grow linearly in size.
+
+\subsection*{Total Truth Assignment}
+They can also be abbreviated as \textit{Total Assignment}.\\
+A total truth assignment $\mu: Atoms(\phi)\mapsto\{\top,\bot\}$ represents \textit{one} possible state of the formula.
+
+\subsection*{Partial Truth Assignment}
+A partial truth assignment $\mu: \mathcal A \mapsto\{\top,\bot\}, \mathcal A\subset Atoms(\phi)$ represents $2^k$ total assignments, where $k$ is the number of unassigned literals.
+
+$\mu$ defined for total and partial truth assignments a can be seen as a set of literals (positive and negative ones) or a formula.
+
+\subsection*{Set of models}
+$M(\phi) \triangleq \{\mu | \mu\models\phi\}$ is the set of all models of $\phi$.
+
+\subsection*{Properties}
+\begin{itemize}
+    \item $\phi$ is \textit{valid} if every $\mu$ models $\phi$
+    \item $\phi\ \te{valid} \iff \neg\phi\te{ unsatisfiable}$
+    \item $\alpha\models\beta \iff \alpha\to\beta\te{ valid}$\marginnote{Deduction theorem}
+    \item $\alpha\models\beta \iff \alpha\wedge\neg\beta\ \te{not satisfiable}$\reversemarginpar\marginnote{corollary}
+\end{itemize}
+
+\subsection*{Equivalence and Equi-satisfiability}
+$\alpha$ and $\beta$ are \textit{equivalent} if $\forall \mu.\mu\models\alpha\iff\mu\models\beta$.\\
+In other terms, $M(\alpha)=M(\beta)$.
+
+\textbf{Equi-satisfiability} $M(\alpha)\neq\emptyset \iff M(\beta)\neq\emptyset$. This property is mostly used when applying transformations to formulas $\beta\triangleq T(\alpha)$.
+
+Transformations can be \textit{validity preserving} if they preserve the validity of the formula they're being applied to, or \textit{satisfiability preserving} if they preserve its satisfiability.
+
+\subsection*{Shannon's expansion}
+$$\exists v.\phi := \phi|v=\bot \vee \phi|v=\top$$ The existential is a disjunction between two possible formulas. One where $v$ is set to true, and one where it is set to false.
+$$\forall v.\phi := \phi|v=\bot \wedge \phi|v=\top$$ The universal one is similar, with a conjunction between the two.
+
+\subsection*{Polarity of subformulas}
+Polarity is a metric defined for each subformula of a formula $\phi$ that tells us under how many nested negations it occurs. It can either be positive, negative, or both in some cases.\\
+The recursive rules to determine the polarity are shown in the image below
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{images/polarity.png}
+\end{center}
+
+If we assume $\top=1,\bot=0$ we can also see the polarity of a subformula as "how much it contributes to the overall value of the formula".
+
+\section{Normal forms}
+\subsection{Negative Normal Form - NNF}
+A negative normal form is a formula in which each negations has been pushed down to the atoms. This implies that every subformula in $NNF(\phi)$ has positive polarity.
+
+\paragraph{Properties}
+\begin{itemize}
+    \item Every formula can be made into negative normal form
+    \item NNF transformation preserves equivalence
+\end{itemize}
+
+\subsection{Conjunctive Normal Form - CNF}
+\begin{gather*}
+\bigvee_{i=1}^L \bigwedge_{j=1}^{K_i} l_{ij} \\
+(l_{11} \wedge l_{12})\vee(l_{21} \wedge l_{22} \wedge l_{23})\vee(...)\vee...
+\end{gather*}
+
+Every formula can be converted in \textit{Conjunctive Normal Form}, but there are different ways to do so.
+
+\subsubsection{Naive CNF conversion}
+The more intuitive and straightforward method consist of:
+\begin{enumerate}
+    \item Expanding implications and equivalences
+    \item Pushing down negations like in NNF
+    \item Recursively applying DeMorgan's rule to get the CNF shape
+\end{enumerate}
+
+This method produces a CNF that is \underline{equivalent} to the original formula and \underline{has the same atoms}. It is however rarely used in practical applications because it can be up to \uwave{exponentially} larger than the original formula.
 
 \end{document}
