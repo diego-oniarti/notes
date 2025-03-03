@@ -74,6 +74,64 @@ Various filters can be applied to an image by manipulating the histogram with op
 We can equalize an histogram defining a partial sum $CHist_I(p) = \sum_{k=0}^p hist(k)$ e assegnando $hist_{eq}(p) = \frac{CHist(p) - CHist_{min}}{M\cdot N -1} \cdot 255$.\\
 Even equalizing we can not get to a flat histogram, but we can do our best to get to that point.
 
-\subsection*{Edge extraction} blah blah
+\subsection*{Edge extraction} Usual Sobel su X, Y, thresholding, etc. Convolution in 1D and its natural translation in two dimensions.\\
+A convolution in the space domain is equivalent to a product in the frequency domain and vice versa.
+
+\subsection*{Low-pass filtering}
+The easiest way to implement a discrete low pass filter is to design a kernel that takes the average of the values surrounding a pixel.\\
+A better visual result is given by a Gaussian filter. Funnily enough, the Fourier transform of a gaussian curve is still a gaussian curve.
+
+\subsection*{Low Pass vs Median}
+Low pass filtering can reduce noise in an image, but it also spreads the noise over the image. In some cases this may be undesirable. The common approach would be to threshold the filtered image, but finding the threshold value can be cumbersome.
+
+Some other filters to denoise is the \textbf{median filter}. It's not \textit{isotropic} and it doesn't work with a normal convolution, but it requires a \textit{sorting} operator.
+
+Gaussian and averaging filters introduce in the image values that were not in the original image. The median filter, instead, only "selects" values from the image, not inventing new ones.
+
+\section{Morphology}
+A form of non linear filtering that refers to the shape of a region.
+
+Goals:
+\begin{itemize}
+    \item check whether a certain shape fits into another
+    \item check whether a picture has holes of a certain size
+    \item remove areas smaller than a threshold
+\end{itemize}
+
+\section*{Binary morphology}
+We need a \textbf{binary image}\footnote{A binary image is not grayscale but an image composed only of true and false} and \textbf{structuring elements} and implement four main operations:
+\begin{itemize}
+    \item erosion
+    \item dilation
+    \item opening
+    \item closing
+\end{itemize}
+Erosion and dilation are intuitive, enlarging or reducing the size of a region. Opening and closing are combinations of erosion and dilation in sequence.
+
+Structuring elements can be squares, circles, other primitives, or custom shapes. For every structuring element we need to define a "center". It is usually the geometric center of the image but it doesn't have to be.
+
+\subsection{Dilation}
+Dilation performs an $\oplus$ (or) operation between the image and the element. More specifically:
+\begin{itemize}
+    \item sweep the element over the image
+    \item if the origin of the element touches the image (a $1$ in the image).
+        \begin{itemize}
+            \item perform the or, "stamping" the element onto the image
+        \end{itemize}
+\end{itemize}
+It is important to note that the output of the filter has to be stored in a separate image, to avoid it recursively dilating a pixel across the whole image.
+
+\subsection{Erosion}
+Erosion works in a similar way by scanning the element over the image:\\
+We don't check with the center of the element anymore but we "activate" the filter when every $1$ in the filter overlaps a $1$ in the image.\\
+
+Question: In the output image, do we only put the center of the element or the whole element?
+
+\subsection{Closing and Opening}
+Closing: dilate and then erode \\
+Opening: erode and then dilate.
+
+Closing fills the holes in the image with the dilation, and then removes the excess added by the first operation with erosion.\\
+Similar but inverse result is gotten by opening. The holes are enlarged, eating away at the shape. Then the remaining bits are consolidated.
 
 \end{document}
