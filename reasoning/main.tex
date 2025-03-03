@@ -119,4 +119,14 @@ The more intuitive and straightforward method consist of:
 
 This method produces a CNF that is \underline{equivalent} to the original formula and \underline{has the same atoms}. It is however rarely used in practical applications because it can be up to \uwave{exponentially} larger than the original formula.
 
+\subsubsection{Labeling CNF conversion}
+This is a more efficient \textit{bottom-up} approach, which can be executed while parsing the expression.\\
+The main idea is that of introducing new variables that serve as "\textit{labels}" for each subformula. The smaller formulas can be converted to CNF with the naive approach, and then assembled through the labels.
+
+This method introduces new atoms, but $\exists(B_1,\dots,B_k).CNF_l(\phi)\ \te{equiv}\ \phi$ where $B_1,\dots,B_k$ are the newly introduced variables. This means that $\phi$ and $CNF_l(\phi)$ are equisatisfiable.
+
+The representation obtained from the $CNF_l$ can be reduced  further in size by using polarization to change some implications around.
+
+\section{Basic SAT-solving techniques}
+
 \end{document}
