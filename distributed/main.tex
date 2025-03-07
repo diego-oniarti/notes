@@ -91,5 +91,87 @@ Finally, \textbf{transparency} is the concept of hiding from the exterior how th
 Some things that we can not mask are timezone, delays, etc.\\
 When taken too far, hiding aspects of the system can lead to performance loss.
 
+\begin{esempio}{recap}
+    \begin{enumerate}
+        \item \textit{ordering} and \textit{causality} enough to ensure working
+        \item history and partial-history
+        \item relevant events are \textit{send}, \textit{receive}, and \textit{local} ones
+    \end{enumerate}
+\end{esempio}
+
+\subsection{Happens-Before relation}
+We say that an evenr $e$ happens before an event $e'$, and write $e\to e'$, if one of the following three cases is true:
+\begin{enumerate}
+    \item $\exists p_i \in \Pi: e = e_i^r$...
+    \item ...
+\end{enumerate}
+
+\subsection{logical clocks}
+A logical clock LC i a function that maps an event $e$ from the history H of a distributed system execution to an element of a time domain T:
+$$
+LC: H\to T
+$$
+
+\paragraph{Clock consistency}
+$$
+e\to e' \implies LC(e) < LC(e')
+$$
+
+\paragraph{Strong clock consistency}
+$$
+e\to e' \iff LC(e) < LC(e')
+$$
+
+\paragraph{Update rule}
+$$
+LC_i = \begin{cases}
+    LC_i + 1 & \te{$e_i$ is internal or send event} \\
+    max(LC_i, TS(m))+1 & e_i=receive(m)
+\end{cases}
+$$
+
+\subsection{Causal Historyes and Clocks}
+The \textit{causal history} of an event $e$ is the set of events that happen-before $e$, plus $e$ itself.
+$$
+\theta(e) = \{e'\in H | e'\to e\} \cup \{e\}
+$$
+
+This is theoretically sound but grows too large in a practical setting and is hard to handle.\\
+We would much prefer to always have the \textit{front} of this causal history
+
+\subsection{Vector Clocks}
+The \textit{vector clock} associated to event $d$ is a $n$-dimenstional vector $VC(e)$ such that
+\begin{align*}
+VC(e)[i] = c_i \\
+where \theta_i = 
+\end{align*}
+
+Each process $p_i$ maintains a vector $VC_i$ of $n$ elements where every element is the logical lock of a specific process. 
+
+\paragraph{Update Rule}
+\begin{gather*}
+VC_i[i] = VC_i[i]+1 \\
+VC_i[j] = max(VC_i[j], TS(m)[j])+1 \forall j\neq i \\
+VC_i[i] = 
+\end{gather*}
+
+\subsubsection{Properties}
+Less than relation 
+$$VC < VC' \iff (VC\neq VC') \wedge (\forall k:1\leq k \leq n: VC[k]\leq VC'[k])$$
+
+Strong clock condition
+$$e\to e' \iff VC(e) < VC'(e) \iff \theta(e) \subset \theta(e')$$
+
+Concurrent clocks
+$$formula$$
+Two clocks are concurrent if some elements in $a$ are greater than the equivalent in $b$ and some elements in $b$ are greater than the equivalent in $a$.
+
+Determining causality
+$$formula$$
+
+\begin{callout}{}
+    When I receive a message I increment my value but not that of the other.\\
+    Sending a message increments my clock before sanding it.\\
+\end{callout}
 
 \end{document}

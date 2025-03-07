@@ -122,7 +122,7 @@ Dilation performs an $\oplus$ (or) operation between the image and the element. 
 It is important to note that the output of the filter has to be stored in a separate image, to avoid it recursively dilating a pixel across the whole image.
 
 \subsection{Erosion}
-Erosion works in a similar way by scanning the element over the image:\\
+Erosion works in a similar way by scanning the element over the image:
 We don't check with the center of the element anymore but we "activate" the filter when every $1$ in the filter overlaps a $1$ in the image.\\
 
 Question: In the output image, do we only put the center of the element or the whole element?
@@ -133,5 +133,93 @@ Opening: erode and then dilate.
 
 Closing fills the holes in the image with the dilation, and then removes the excess added by the first operation with erosion.\\
 Similar but inverse result is gotten by opening. The holes are enlarged, eating away at the shape. Then the remaining bits are consolidated.
+
+\section{Models}
+\subsection{Pinhole camera model}
+It consists of a box with a small hole on one of the walls. The light that passes through that hole projects a reflected image of the outside world onto the opposite wall.\\
+One clear problem is that only a small amount of light can pass through the hole, making the projection very dim. We can fix this by making the hole bigger but this also makes the image blurry.
+
+If the \textit{image plane} is the plane opposite to the camera, the \textit{virtual image plane} is an imaginary plane parallel to the image plane and equally spaced with the pinhole in the other direction.
+
+\paragraph{Model to reality} How do we map the pixel location to a location in space? Following the pinhole camera model we would also need the focal length $f$ of the camera.\\
+Then we know the point in space is somewhere on the line that passes through the pixel and the origin shifted by the focal length.
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{images/focal.png}
+\end{center}
+\begin{align*}
+    \begin{array}{cc}
+        \te{new coordinates} & \te{From the camera}\\
+        \begin{cases}
+            Z' = -f \\
+            X' = -f\frac{X}{Z} \\
+            Y' = -f\frac YZ
+        \end{cases} 
+                             &
+        (X,Y,Z) \to (x,y,f) = (f\frac XZ, f\frac YZ, f)
+    \end{array}
+\end{align*}
+
+It's easy to see that we loose some information, since a point in the camera plane is mapped to a whole line in the real world, loosing the distance.\\
+We can approximate the distance with context clues, knowing additional information about the space etc. but these are not means of \textbf{measuring} the distance, only approximating it.
+
+\paragraph{Multiple cameras} To solve the problem of the loss of information we can use \textit{two cameras}, or even more, to measure depth.
+
+Properties of the pinhole model
+\begin{itemize}
+    \item Parallel lines converge to a single vanishing point
+    \item Parallel lines on the same plane lead to collinear vanishing points
+    \item The line is called the horizon for a plane
+    \item Vertical lines are perpendicular to the horizon
+\end{itemize}
+
+\subsection{Orthographic projection model}
+The \textit{orthographic projection model} assumes that all rays originated from the 3D object and from the scene are parallel among each other.
+The image plane is parallel to $(X, Y)$
+
+Mathematically we're just taking the $x$ and $y$ of the point we're capturing, completely disregarding the depth component. This works since the model assumes object behave the same way regardless of distance.
+\begin{align*}
+    \left[
+    \begin{array}{c}
+        x\\ y
+    \end{array}
+\right] 
+    = 
+    \left[
+    \begin{array}{ccc}
+        1 &0&0\\0&1&0
+    \end{array}
+\right] 
+    \left[
+    \begin{array}{c}
+        X\\ Y\\ Z
+    \end{array}
+\right] 
+\end{align*}
+
+\section{Illumination models}
+Illumination is an important component in understanding the content of an image. Different lighting can change the colors perceived in the image, change the shape of perceived edges, etc.
+
+Some materials and surfaces respond to light in different manners, depending how much they \textbf{absorb}, \textbf{reflect}, and \textbf{transmit} it.
+
+Reflections can be
+\begin{itemize}
+    \item Specular: more energy is concentrated in the light source direction
+    \item Diffuse: constant in all directions
+\end{itemize}
+Surfaces vary in \textit{specularity}, going from matte to glossy. Glossy materials are harder to work with, because they introduce things in the image that are not "real".
+
+\paragraph{Illumination from one light source}
+Problem: determine how the surface is irradiated by the light source
+assumption: light is far, we can assume all rays can be represented by a single unit vector $s$ (ortho projection)
+
+For each surface element the light is irradiated considering the cosine of the angle between the surface normal and the light direction
+
+\subsection{Lambertian surface}
+Model for diffuse reflection, so the specular reflections are ignored. It is possible to make this assumption when the surface is rough enough.
+
+The luminance of a surface in this model is the same regardless of the viewing angle.
+
+This model assumes every surface has a property $\rho$ (\textit{albedo}) that describes how much of the light is reflected by the object.
+
 
 \end{document}
