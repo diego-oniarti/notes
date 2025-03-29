@@ -122,8 +122,7 @@ Dilation performs an $\oplus$ (or) operation between the image and the element. 
 It is important to note that the output of the filter has to be stored in a separate image, to avoid it recursively dilating a pixel across the whole image.
 
 \subsection{Erosion}
-Erosion works in a similar way by scanning the element over the image:
-We don't check with the center of the element anymore but we "activate" the filter when every $1$ in the filter overlaps a $1$ in the image.\\
+Erosion works in a similar way by scanning the element over the image: We don't check with the center of the element anymore but we "activate" the filter when every $1$ in the filter overlaps a $1$ in the image.
 
 Question: In the output image, do we only put the center of the element or the whole element?
 
@@ -196,7 +195,7 @@ Mathematically we're just taking the $x$ and $y$ of the point we're capturing, c
 \right] 
 \end{align*}
 
-\section{Illumination models}
+\subsection{Illumination models}
 Illumination is an important component in understanding the content of an image. Different lighting can change the colors perceived in the image, change the shape of perceived edges, etc.
 
 Some materials and surfaces respond to light in different manners, depending how much they \textbf{absorb}, \textbf{reflect}, and \textbf{transmit} it.
@@ -214,12 +213,171 @@ assumption: light is far, we can assume all rays can be represented by a single 
 
 For each surface element the light is irradiated considering the cosine of the angle between the surface normal and the light direction
 
-\subsection{Lambertian surface}
+\subsubsection{Lambertian surface}
 Model for diffuse reflection, so the specular reflections are ignored. It is possible to make this assumption when the surface is rough enough.
 
 The luminance of a surface in this model is the same regardless of the viewing angle.
 
 This model assumes every surface has a property $\rho$ (\textit{albedo}) that describes how much of the light is reflected by the object.
 
+\subsection{Lenses}
+The problem with the amount of light being allowed through a pinhole camera can be solved through the use of lenses.
+\begin{center}
+    \includegraphics[width=1\linewidth]{images/lense.png}
+\end{center}
+
+\subsection{resolving power}
+The \textbf{resolving power} is a property of a lens
+\begin{align*}
+    R_p = \frac{1}{2\Delta}
+\end{align*}
+Where $\Delta$ is the pixel spacing [in inches or millimeters].
+\begin{callout}{Esercizio}
+    Non stavo seguendo
+\end{callout}
+
+\subsection{Autofocus}
+There are \textit{active}, \textit{passive}, and fibred autofocus systems.
+
+\paragraph{Active}
+An infrared signal is sent and the time between sending and receiving is measured to compute distance. The distance is then used to focus.
+
+This method has problems with obstacles and glossy/bright surfaces scattering and distorting the signal.
+
+\paragraph{Passive}
+Checks the contrast of the pixels for a row of pixels. If the contrast is the lens is adjusted until the image is sharp enough.
+
+This method struggles with flat surfaces.
+
+Cameras can switch between these two systems to achieve better results when one of them struggles.
+
+\section{Motion Detection}
+In video analysis and processing motion is a fundamental feature.
+
+Projection of 3D motion onto the 2D image plane:
+\begin{gather*}
+3D: D(X; t_1; t_2) = X' - X = [Dx,Dy,Dz] \\
+2D: d(x; t_1; t_2) = x' - x = [dx, dy] 
+\end{gather*}
+
+Once again, we cannot capture motion in 3D space on a 2D plane because of the dimensional mismatch. This results in the fact that the camera cannot perceive the motion of an object coming straight at it or moving straight away from it.\\
+Moreover, the points appear to be moving \textit{outwards} as the object gets closer and the perspective makes it larger.
+
+\subsection{Motion Fields}
+Each frame is divided in 16x16 pixels macro blocks. Between a frame and the next, each block in frame $a$ is compared with every other block in frame $b$ and the best match is taken. The vector $a\to b$ is taken as the motion vector for that specific block.
+
+This method is costly and makes a lot of assumptions:
+\begin{itemize}
+    \item static lighting
+    \item rigid movement
+    \item no occlusion
+    \item etc...
+\end{itemize}
+on top of this it also struggles with flat surfaces.
+
+\paragraph{Occlusion} The surface is covered/revealed by the movement of an object in front of it.
+
+\paragraph{Aperture} The movement of an object can only be observed in the edges. Moreover, we can see only a component of the movement, since the one parallel to the edge is lost
+\begin{center}
+    \includegraphics[width=0.9\linewidth]{images/aperture.png}
+\end{center}
+
+\subsection{Optical flow / image flow}
+To calculate the optical flow we make some assumptions:
+\begin{itemize}
+    \item object illumination does not change in [$t, t+dt$]
+    \item distances do not change significantly
+    \item each point [x,y] is shifted in [$x+dx, y+dy$]
+\end{itemize}
+
+This is a translational model. It's not perfect but it's sufficient in a small enough time interval.
+
+\paragraph{Optical Flow Equation} Blah Blah Taylor expansion
+\begin{gather*}
+    \frac{\delta\psi}{\delta x}v_x +
+    \frac{\delta\psi}{\delta y}v_x +
+    \frac{\delta\psi}{\delta t}v_x = 0
+    \\ or \\
+    \triangledown \psi^T v + \frac{\delta\psi}{\delta t} = 0
+\end{gather*}
+
+This equation still only captures the projection of the motion along the perpendicular axis to the edge.
+
+\subsection{Motion detection in practice}
+Motion detectors can be \textit{intensity based} or \textit{feature based}, with the latter one taking into considerations corners (because of aperture) etc
+
+Two problems with motion detection are:
+\begin{itemize}
+    \item how to rappresenta the motion field
+    \item what do choose as a discrimination parameter?
+\end{itemize}
+
+\paragraph{Change detection - image differencing}
+The most trivial method to perform motion detection is to calculate the difference between each frame and the previous one.\\
+This method only highlights edges of moving objects, and only the edges perpendicular to the motion direction
+
+\paragraph{Background subtraction}
+Similar to change detection. You take the first frame as the \textit{background}. Then every subsequent frame is compared to that original background.
+
+Of course the background image must be taken in a "neutral" moment. An object that was captured in the background image and then moved will be shown in \textbf{every} frame, and it's called a "ghost".
+
+This model is \textbf{VERY} susceptible to scene change, lighting difference, camera motion, and weather condition.
+
+\paragraph{Adaptive background subtraction}
+Introduce a learning rate $\alpha$ to update the background as the video goes on
+\begin{align*}
+    B_t = \alpha I_t + (1-\alpha) B_{t-1}
+\end{align*}
+\begin{itemize}
+    \item $\alpha=0$ background subtraction
+    \item $\alpha=1$ frame differencing
+    \item $\alpha\in(0,1)$ something in between. To be tuned for the specific application.
+\end{itemize}
+The background is constantly updated, so that objects that stop moving get absorbed into the background and gradually fade from the change detector.
+
+\subsection{Gaussian average}
+\begin{align*}
+    \mu_t = \alpha I_t + (1-\alpha)\mu_{t-1}
+\end{align*}
+Build a probability density function for the value of a pixel and update it through time. If the pixel value exceeds the mean by a certain amount count it as movement.
+
+We put a pixel "in the foreground" if $|I_t - \mu_t| > k\sigma_t$ where $k$ is a constant (chosen by heart)
+
+This technique requires to "train" the model at the start, giving it some frames to calculate the gaussiana and adjust their initial values.
+
+\paragraph{Improved Gaussian average} The technique can be improved with a binary $M$ that decides if something will be added to the background or not $\mu_t = M\mu_t + (1-M)(\alpha I_t + (1-\alpha)\mu_{t-1})$. Even then this method is quite finicky.
+
+\subparagraph{Mixture of Gaussian distributions}
+To make the method more robust we can use $k$ Gaussian distributions instead of 1.
+\begin{align*}
+    P(x_t) = \sum_{i=0}^k \omega_{i,t}\eta(x_t,\mu_{i,t},\Sigma_{i,t})
+\end{align*}
+
+This is also called "\textit{multimodal}" Gaussian average, since it takes into account multiple "models" of motions that may affect the image.\\
+Take the example of movement that may be induced by \textit{rain}, \textit{wind}, and \textit{clouds}. Each one will induce some fake movement in the image, which can be accounted by a mixture of gaussiana.
+
+We then rank the Gaussians on their weight (decreasing) and select a threshold $T$. We take the first $B$ Gaussians until the sum of their weights reaches $T$.\\
+The first $B$ Gaussians model the background, while the remaining ones model the foreground.
+
+\section{Tracking}
+Identify moving objects and track their motion through time.
+
+We're tracking the path of moving objects on a 2D image gotten from the 3D world. We either get a projection of the motion, or we use stereo-cameras/lidar/other methods to capture a 3D path.
+
+\subsection{Region based}
+Tracking regions. It is good for real-time applications.
+
+\begin{callout}{wow}
+    By encoding an image in HSB colorspace we can ignore the B component and automatically filter out the shadows
+\end{callout}
+
+\begin{itemize}
+    \item Get regions
+    \item Calculate the histogram for each region
+    \item Use the histogram to ID the regions and track them through video
+\end{itemize}
+This method can be tricked by changes in illumination or color of the moving objects
+
+To make this method more robust we can further subdivide objects into smaller regions (like subdividing people in head-legs-torso). Each region has its own histogram and color vector
 
 \end{document}

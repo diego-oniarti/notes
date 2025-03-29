@@ -198,4 +198,91 @@ Dimacs is the standard format for representing SAT problems.
 \texttt{mathsat -input=dimacs -model file.cnf}\\
 \texttt{-model} tells it to provide a model, otherwise it gives a yes/no answer
 
+\section{19/03/202}
+(set-option :produce-models true) Generation of models \\
+(set-option :produce-unsat-cores true) Extraction of UNSAT cores \\
+(set-option :produce-proofs true) Building UNSAT proof \\
+(set-logic < logic >) Set background logic \\
+
+\section{Kripke Models}
+The semantic framework for a variety of logics like Modal Logics, Description Logics, and \textit{Temporal Logics}.
+
+The \textbf{practical role} of a Kripke model is to describe \textit{reactive systems}. This means nonterminating systems with infinite behaviors (like communication protocols and circuits).
+
+\subsection{Formal Definition}
+A Kripke model $\langle S, I, R, AP, L\rangle$ consists of:
+\begin{itemize}
+    \item a finite set of states $S$
+    \item a set of initial states $I \subseteq S$
+    \item a set of transitions $R\subseteq S\times S$
+    \item a set of atomic propositions $AP$
+    \item a labeling function $L: S\mapsto 2^{AP}$
+\end{itemize}
+
+We assume $R$ to be total, so for every state $s$ there exists at least one state $s'$ such that $s,s'\in R$.\\
+Sometimes we use variables with discrete bounded values $v_i\in\{d_1,\dots,d_k\}$
+
+\begin{callout}{Remark}
+    Unlike with other types of automata, in Kripke models the values of all variables are always assigned in each state
+\end{callout}
+
+\begin{center}
+    \includegraphics[width=1\linewidth]{images/kripke_example.png}
+\end{center}
+
+\paragraph{Path} A path in a Kripke model $M$ is an \textit{infinite} sequence of states $\pi = s_0, s_1, \dots \in S^\omega$
+
+\paragraph{Reachable} A state is reachable if there exists a path that includes it
+
+\paragraph{Asynchronous Composition/Product} At each time instant, one component is selected to perform a transition
+
+It is a typical formalization for protocols since it models agents well.
+
+$M\overset{def}= M_1||M_2\overset{def}= \langle S,I,R,AP,L\rangle$
+\begin{itemize}
+    \item $S \subseteq s_1\times s_2 \te{ s.t } \forall\langle s_1,s_2\rangle \in S, \forall I \in AP_1\cap AP_2, I\in I_1(s_i) \te{ iff } I \in L_2(s_2)$
+    \item $I \subseteq ...$
+\end{itemize}
+\begin{center}
+    \includegraphics[width=1\linewidth]{images/async_prod.png}
+\end{center}
+
+\paragraph{Synchronous Composition/Product} At each time instant, every component performs a transition.
+
+It is a typical formalization for circuits, since it models nicely the behaviour of a clock.
+\begin{center}
+    \includegraphics[width=1\linewidth]{images/sync_prod.png}
+\end{center}
+
+\subsection{Descriptor languages}
+most often a Kripke model is not given explicitly but represented in a structured language (like SMV, VHDL, etc...)
+
+\subsubsection{The SMV Language}
+\begin{callout}{riprendere}\end{callout}
+
+\subsection{Standard Programming Languages}
+Standard programming languages can be seen as a transition relation in terms also of the program counter.
+
+\subsection{Properties}
+\paragraph{Safety Properties}
+Bad events never happen (deadlock and other bad conditions). This can be seen as imposing that no reachable state satisfies a "bad" condition (e.g. never two processes in critical section)
+
+This property can be refuted by a finite behaviour (we just need to prove \textit{one} bad execution). This is fairly obvious.
+
+\paragraph{Liveness Properties}
+Something desirable will eventually happen. This can be refuted by \textit{infinite} behaviour.\\
+Since we're working with finite machines, infinite behaviours are only achieved by loops. Hence they can be detected with (advanced) loop detection.
+
+\paragraph{Fairness Properties}
+Something desirable will happen \textit{infinitely often}. This can be seed as a further restriction on the liveness property, since we no longer require that something happens but we require that it also \textit{keeps} happening.
+
+\subsection{Computation trees vs paths}
+Given a Kripke structure it's execution can be seen as an infinite set of computation paths or an infinite computations tree
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{images/pathVsTree.png}
+\end{center}
+
+\section{Temporal Logics}
+They are divided in \textit{Linear Temporal Logic (LTL)} and \textit{Computation Tree Logic (CTL)}
+
 \end{document}
