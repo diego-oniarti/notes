@@ -137,22 +137,28 @@ The representation obtained from the $CNF_l$ can be reduced  further in size by 
 \end{esempio}
 
 \subsection{Intro - Unit propagation}
-\paragraph{Resolution rule} Deduction of a new clause from a pair of clauses with exactly one incompatible variable (which is called the "\textit{resolvent}").
+\paragraph{Resolution rule} Deduction of a new clause from a pair of clauses with \textit{exactly} one incompatible variable (which is called the "\textit{resolvent}").
 \begin{align*}
-    (a\vee b\vee c) \wedge (d\vee e\vee \neg c) = (a\vee b\vee d\vee e)
+    (\underbrace{a}_\te{common}\vee \underbrace{b}_\te{left}\vee c) \wedge (\underbrace{a}_\te{common}\vee \underbrace{d}_\te{right}\vee \neg c) = (a\vee b\vee d)
 \end{align*}
+We get $(common \vee left \vee right)$.
 
 \paragraph{Removal of valid clauses}
 If a clause is valid (always true) it can be removed from the formula.
 
 \paragraph{Clause subsumption}
 If a clause appears on its own and inside another clause, we can remove the second, bigger, clause.
+\begin{gather*}
+    (\textcolor{purple}{a \vee b}) \wedge (c \vee \textcolor{purple}{a \vee b} \vee d) = (a \vee b)
+\end{gather*}
 
 \paragraph{Unit resolution}
 Having a clause composed of a single literal forces said literal to be true. This means we can remove all instances of the negated literal.
 
 \paragraph{Unit subsumption}
-Like clause subsumption but with a literal instead of a clause
+Like clause subsumption but with a literal instead of a clause.
+
+\paragraph{Unit propagation} Is just the combination of unit resolution and unit subsumption.
 
 These unit propagation rules can happen in a chain. After modifying the formula once we can create new unary clauses for example.
 
