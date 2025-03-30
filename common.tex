@@ -10,10 +10,29 @@
 \usepackage[most]{tcolorbox}
 \tcbuselibrary{skins,breakable}
 
-\newtcolorbox{callout}[2][]{breakable,sharp corners, skin=enhancedmiddle jigsaw,parbox=false,
-boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,
-after title={.\ }, coltitle=purple,colback=purple!10,colframe=purple, title={#2},
-fonttitle=\bfseries,#1}
+% \newtcolorbox{callout}[2][]{breakable,sharp corners, skin=enhancedmiddle jigsaw,parbox=false,
+% boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,
+% after title={.\ }, coltitle=purple,colback=purple!10,colframe=purple, title={#2},
+% fonttitle=\bfseries,#1}
+
+\NewTColorBox{callout}{O{purple} m}{
+  breakable,
+  sharp corners,
+  skin=enhancedmiddle jigsaw,
+  parbox=false,
+  boxrule=0mm,
+  leftrule=2mm,
+  boxsep=0mm,
+  arc=0mm,
+  outer arc=0mm,
+  attach title to upper,
+  after title={.\ },
+  coltitle=#1,
+  colback=#1!10,
+  colframe=#1,
+  title={#2},
+  fonttitle=\bfseries,
+}
 
 \newtcolorbox{warning}[2][]{breakable,sharp corners, skin=enhancedmiddle jigsaw,parbox=false,
 boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,

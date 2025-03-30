@@ -179,36 +179,73 @@ This algorithm is correct and complete, but operates in exponential memory and i
 
 \subsection{Tableaux}
 Search assignments satisfying $\varphi$ by applying \textit{elimination rules} on its connectors.\\
-Try to be clever and put put smaller clauses first in the branching order.
+Try to be clever and put put smaller clauses first in the branching order.\\
+The algorithm ends when we reach a leaf (SAT) or we get stuck in every branch (not SAT).\\
+A branch is "stuck" when the path to reach it contains both $l$ and $\neg l$.
 
-\section{LAB 1}
-\subsection{DIMACS}
-Dimacs is the standard format for representing SAT problems.
-\paragraph{File structure}
+Tableaux are handy because they only need the elimination rules to be defined and they can be done by hand.
+If the formula is in CNF we only really care about the $\vee$ and $\wedge$ elimination rules (respectively $\vee$ branches the formula and $\wedge$ stacks its parts on top of one another).
+
+This is not efficient but it's still better than the resolution-based algorithm. It's also interesting seeing Tableaux as \textit{semantic} resolution methods, since every step keeps memory of the previous ones.
+
+\subsection{DPLL - Davis-Putnam-Longeman-Loveland procedure}
+The DPLL procedure tries to build a truth assignment $\mu$ satisfying $\varphi$, and it does this by progressively assigning atoms.
+\begin{callout}[blue]{Terminology}
+    A literal $l$ is \textit{pure} if it occurs only positively if it occurs only positively
+\end{callout}
+The procedure relies on three rules:
+\begin{gather*}
+    \begin{array}{lcr}
+        \st[Unit]{\varphi [l|\top]}{\varphi \wedge (l)} &
+        \st[l pure]{\varphi [l|\top]}{\varphi} &
+        \st[split]{\varphi[l|\top]\quad \varphi[l|\bot]}{\varphi}
+    \end{array}
+\end{gather*}
+After setting $l$ to true, for example, remove all clauses containing $l$ and all instances of $\neg l$.
+
+For this technique it is important to find good heuristics when going to choose the next literal.
+
+\section{OBDD - Ordered Binary Decision Diagrams}
+The OBDD is a canonical representation of boolean formulas. It works as a binary directed acyclic graph, where each node branches setting a variable as $\top$ or $\bot$.\\
+The order of the variables is set a priori but it is important since it impacts the size of the OBDD.
+
+\subsection{Generating OBDD - naive}
+To generate an OBDD we start from an ordered decision tree (trivial binary tree where each variable is set to both values to explore all configuration).\\
+Then we repeatedly apply two reductions:
 \begin{itemize}
-    \item Comments start with 'c'
-    \item header of the form 'p cnf 7 8'
+    \item \textbf{Shared subnodes}: If a subtree occurs twice or more only keep one instance. All the nodes that pointed to the deleted occurrences now point to this one.
         \begin{itemize}
-            \item 7: number of variables
-            \item 8: number of clauses
+            \item We can use hash consing to identify identical subtrees.
         \end{itemize}
-    \item 1 clause for line of form "1 -2 0"
-        \begin{itemize}
-            \item trailing 0 is a constant
-            \item 1 first variable
-            \item -2 second variable, negated
-        \end{itemize}
+    \item \textbf{Redundancies}: nodes with the same left and right children can be eliminated.
 \end{itemize}
+Of course this method is extremely expensive, since it has to start from a decision tree.
 
-\paragraph{command}
-\texttt{mathsat -input=dimacs -model file.cnf}\\
-\texttt{-model} tells it to provide a model, otherwise it gives a yes/no answer
+\subsection{Incremental Building}
+\begin{callout}[blue]{if-then-else operator}
+    \begin{align*}
+        ite(\neg\phi,\varphi^\top,\varphi^\bot) &= ite(\phi,\varphi^\bot,\varphi^\top) \\
+        \neg ite\phi,\varphi^\top,\varphi^\bot) &= ite(\phi,\neg\varphi^\top,\neg\varphi^\bot) \\
+        ite(\phi,\varphi_1^\top,\varphi_1^\bot) \te{ op } ite(\phi,\varphi_2^\top,\varphi_2^\bot)
+                                                &= ite(\phi,\varphi_1^\top\te{ op }\varphi_2^\top,\varphi_1^\bot\te{ op }\varphi_2^\bot) \\
+    \end{align*}
+    $ite(\phi_1,\varphi_1^\top,\varphi_1^\bot) \te{ op } ite(\phi_2,\varphi_2^\top,\varphi_2^\bot)$ c'è del nesting che non ho voglia di scrivere.
+\end{callout}
 
-\section{19/03/202}
-(set-option :produce-models true) Generation of models \\
-(set-option :produce-unsat-cores true) Extraction of UNSAT cores \\
-(set-option :produce-proofs true) Building UNSAT proof \\
-(set-logic < logic >) Set background logic \\
+\begin{align*}
+    OBDD(\top,\{A_1,\dots,A_n\}) = 1 & \\
+    OBDD(\bot,\{A_1,\dots,A_n\}) = 0 & \\
+    OBDD(\varphi,\{A_1,\dots,A_n\}) = ite(& A_1, \\
+                                     & OBDD(\varphi[A_1|\top], \{A_2,\dots,A_n\}), \\
+                                     & OBDD(\varphi[A_1|\bot],\{A_2,\dots,A_n\}))
+\end{align*}
+Vedi le slide, le regole sono eterne.\\
+Key points are
+\begin{itemize}
+    \item OBDD è canonico. Se due formule sono equivalenti, e usi lo stesso ordinamento di variabili, l'OBDD dell'una e dell'altra sono uguali.
+    \item L'ordine delle variabili può fare la differenza tra space complexity lineare e esponenziale.
+    \item OBDD è efficiente perché è bottom up.
+\end{itemize}
 
 \section{Kripke Models}
 The semantic framework for a variety of logics like Modal Logics, Description Logics, and \textit{Temporal Logics}.
