@@ -1,3 +1,4 @@
+\usepackage{wrapfig}
 \usepackage{xfrac}
 \usepackage{marginnote}
 \usepackage{ulem}
@@ -12,10 +13,10 @@
 
 % \newtcolorbox{callout}[2][]{breakable,sharp corners, skin=enhancedmiddle jigsaw,parbox=false,
 % boxrule=0mm,leftrule=2mm,boxsep=0mm,arc=0mm,outer arc=0mm,attach title to upper,
-% after title={.\ }, coltitle=purple,colback=purple!10,colframe=purple, title={#2},
+% after title={.\ }, coltitle=violet,colback=violet!10,colframe=violet, title={#2},
 % fonttitle=\bfseries,#1}
 
-\NewTColorBox{callout}{O{purple} m}{
+\NewTColorBox{callout}{O{violet} m}{
   breakable,
   sharp corners,
   skin=enhancedmiddle jigsaw,
@@ -76,3 +77,7 @@ fonttitle=\bfseries,#1}
 \newcommand{\LET}[0]{\ensuremath{\text{ let }}}
 \newcommand{\TIN}[0]{\ensuremath{\text{ in }}}
 \newcommand{\NEW}[0]{\ensuremath{\text{ new }}}
+
+\RestyleAlgo{ruled}
+\normalem
+

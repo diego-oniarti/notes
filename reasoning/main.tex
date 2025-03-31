@@ -4,8 +4,6 @@
 \usepackage[utf8]{inputenc}
 \input{../common}
 \usepackage[parfill]{parskip}
-\usepackage{marginnote}
-\usepackage{ulem}
 
 \usepackage{graphicx}
 \usepackage{algorithm2e}
@@ -163,8 +161,7 @@ Like clause subsumption but with a literal instead of a clause.
 These unit propagation rules can happen in a chain. After modifying the formula once we can create new unary clauses for example.
 
 \subsection{Resolution algorithm}
-\RestyleAlgo{ruled}
-\begin{algorithm}
+\begin{algorithm}[h]
     \caption{Resolution algorithm}
     Assume input is in CNF\;
     $\varphi$ is a set of clauses\;
@@ -193,6 +190,10 @@ The DPLL procedure tries to build a truth assignment $\mu$ satisfying $\varphi$,
 \begin{callout}[blue]{Terminology}
     A literal $l$ is \textit{pure} if it occurs only positively if it occurs only positively
 \end{callout}
+\begin{wrapfigure}{r}{0.18\textwidth}
+    \includegraphics[width=0.18\textwidth]{images/PDLL_waste.png}
+    \caption{Example of backtracking wasted search-space}
+\end{wrapfigure}
 The procedure relies on three rules:
 \begin{gather*}
     \begin{array}{lcr}
@@ -204,6 +205,10 @@ The procedure relies on three rules:
 After setting $l$ to true, for example, remove all clauses containing $l$ and all instances of $\neg l$.
 
 For this technique it is important to find good heuristics when going to choose the next literal.
+
+\subsubsection{Backtracking problem}
+The main issue here is the "chronological" backtracking. A DPLL solver stores the assignments of literals on a stack, and once it reaches a dead branch it pops one element from this stack.\\
+The issue with this method is that, if the true element to be changed is far into the stack, it will take a long time before reaching it (since it has to explore the whole search space beneath it).
 
 \section{OBDD - Ordered Binary Decision Diagrams}
 The OBDD is a canonical representation of boolean formulas. It works as a binary directed acyclic graph, where each node branches setting a variable as $\top$ or $\bot$.\\
@@ -239,13 +244,136 @@ Of course this method is extremely expensive, since it has to start from a decis
                                      & OBDD(\varphi[A_1|\top], \{A_2,\dots,A_n\}), \\
                                      & OBDD(\varphi[A_1|\bot],\{A_2,\dots,A_n\}))
 \end{align*}
-Vedi le slide, le regole sono eterne.\\
-Key points are
+
+Vedi le slide, le regole sono eterne.
+
+Key points are:
 \begin{itemize}
     \item OBDD è canonico. Se due formule sono equivalenti, e usi lo stesso ordinamento di variabili, l'OBDD dell'una e dell'altra sono uguali.
     \item L'ordine delle variabili può fare la differenza tra space complexity lineare e esponenziale.
     \item OBDD è efficiente perché è bottom up.
 \end{itemize}
+
+\section{Modern SAT-solving techniques - CDCL}
+\textbf{Conflict-Driven Clause-Learning SAT solvers (CDCL)} are non-recursive and avoid the excessive backtracking that slowed PDLL solvers down.\\
+The main strengths are:
+\begin{itemize}
+    \item Conflict-Driven clause learning
+    \item random restarts
+    \item smart literal selection
+    \item smart preprocessing
+    \item smart indexing
+    \item incremental calls
+\end{itemize}
+
+\subsection{Stack representation of truth assignments}
+A truth assignment $\mu$ can be represented as a special stack partitioned into \textit{decision levels}.\\
+Each decision level contains \textit{one} decision literal and all its \textit{implied literals}.\\
+The implied literals keep track of their \textit{antecedent clause}, that is the clause that caused their unit-propagation.
+
+This representation of a truth assignment is equivalent to an \textit{implication graph}.
+
+\subsubsection{Implication graphs}
+Implication graphs are Directed Acyclic Graphs where
+\begin{itemize}
+    \item    each node is a literal, and each edge is labeled with a clause $l_a\overset{c}\mapsto l_b$. 
+    \item Decision literals have no incoming edges.
+    \item All edges incoming into the same node $l$ must be labeled with the same clause.
+    \item $l_1\overset{c}\mapsto l_2 \overset{c}\mapsto \cdots \overset{c}\mapsto l \iff c=(\neg l_1\vee\neg l_2\vee\dots\vee l)$
+    \item Conflicts are signaled by the presence of both $l$ and $\neg l$ in the graph.
+\end{itemize} 
+The intuitive meaning of these rules is that $l_1\overset{c}\mapsto l_2 \overset{c}\mapsto \cdots \overset{c}\mapsto l$ indicates $l$ has been obtained from $l_1,l_2,\dots$ by unit propagation on $c$.
+\begin{callout}[purple]{NB}
+    The clauses in the chain of implication don't need to be the same.
+\end{callout}
+\paragraph{UIP - Unique implication point}
+An unique implication point is a node $l$ such that \textit{every} path from the last decision to \textit{both} conflict nodes, passes through $l$.\\Trivially the most recent decision node is an UIP.
+
+\subsection{CDCL algorithm}
+\begin{algorithm}[h]
+    \caption{CDCL solver}
+    status := preprocess($\varphi$,$\mu$)\;
+    \While{true}{
+        \While{true}{
+            status := deduce($\varphi$,$\mu$)\;
+            \If{status==SAT}{
+                \Return sat\;
+            }
+            \uIf{status==conflict} {
+                \CommentSty{// Backtrack level and conflict set}\;
+                $\langle blevel, \eta \rangle$ := analyze\_conflict($\varphi$,$\mu$)\;
+                \uIf{blevel==0}{
+                    \Return unsat\;
+                }\Else{
+                    backtrack(blevel,$\varphi$,$\mu$)\;
+                }
+            }\Else{
+                break\;
+            }
+        }
+        decide\_next\_branch($\varphi$,$\mu$)\;
+    }
+\end{algorithm}
+\begin{itemize}
+    \item \textbf{preprocess($\varphi$, $\mu$)} simplifies $\varphi$ into an easier equisatisfiable formula, updating $\mu$.
+    \item \textbf{decide\_next\_branch($\varphi$, $\mu$)} chooses a new decision literal from $\varphi$ according to some heuristic, and adds it to $\mu$
+    \item \textbf{deduce($\varphi$, $\mu$)} performs all deterministic assignments (unit-propagations plus others), and updates $\varphi$, $\mu$ accordingly.
+    \item \textbf{analyze\_conflict($\varphi$, $\mu$)} Computes the subset $\eta$ of $\mu$ causing the conflict (conflict set), and returns the “wrong-decision” level suggested by $\eta$ (“0” means that $\eta$ is entirely assigned at level 0, i.e., a conflict exists even without branching)
+    \item \textbf{backtrack(blevel,$\varphi$, $\mu$)} undoes the branches up to blevel, and updates $\varphi$, $\mu$ accordingly
+\end{itemize}
+
+\subsection{Learning}
+We say that the algorithm is "\textit{conflict-driven}" and "\textit{clause-learning}" because whenever a branch fails, we find the conflict set $\eta$ and add $C\overset{def}=\neg\eta$ to the clause set to avoid doing the same mistake again.
+
+We also avoid the PDLL useless backtracking by using $\eta$ to decide the point where to backtrack.
+
+\subsection{Conflict analysis}
+\begin{algorithm}[h]
+    \caption{Conflict analysis}
+    $C$ := conflicting clause\;
+    \Repeat{$C$ meets some criteria}{
+        resolve $C$ with the antecedent clause of the last unit-propagated literal $l$ in $C$\;
+    }
+\end{algorithm}
+Some valid criteria are:
+\begin{itemize}
+    \item \textbf{decision}: $C$ contains only decision literals
+    \item \textbf{last UIP}: $C$ contains only one literal assigned at the current decision level and it is the decision literal (the last UIP)
+    \item \textbf{first UIP}: $C$ contains only one literal assigned at the current decision level, and it is the first UIP.
+\end{itemize}
+The first UIP is the better strategy used in modern solvers.
+
+\subsection{Backjumping}
+The original strategy for backjumping was to backtrack to the most recent branching point such that the stack did not \textit{fully} contain $\eta$, and then unit propagate the unassigned literal on the conflict clause.
+
+The modern strategy is to backtrack to the highest branching point such that the stack contains \textit{all but one} literals in $\eta$, and then unit propagate the conflict clause like before.
+
+\subsection{Problems with CDCL}
+One problem with clause learning is that the solver can generate \textit{a lot} of learned clauses. The solution to this is to remove clauses that are not being used for propagation in a while.\\
+A more "lazy" approach is to wait for the clauses to have become too many and to remove the least used ones.
+
+\subsection{Random restarts}
+Another technique implemented in CDCL is to randomly restart the search periodically or when some conditions are met. When restarting the learned clauses are kept, and this action can drastically reduce the search space.
+
+\subsection{SAT under assumptions}
+We can modify a SAT problem by introducing some assumptions $A\overset{def}=\{l_1,\dots,l_n\}$ and getting $SAT(\varphi,\{l_1,\dots,l_n\})$.
+
+To implement this variant of SAT it is sufficient to put the assumptions as decisions made before decision level 0. This means that whenever the backtrack tries to jump back to one of those, it hits 0 and returns unSAT.
+
+A strong use case for this is to verify the satisfiability of the same formula $\varphi$ repeatedly under different assumptions.
+
+\begin{callout}{property}
+    If the \textit{decision} strategy for conflict analysis is used, then $\eta$ is the subset of assumptions causing the inconsistency.
+\end{callout}
+
+\subsection{Selection of sub-formulas}
+Given a CNF formula $\varphi$ ($\varphi = \bigwedge_{i=1}^n C_i$) and a set of \textit{selectors} $S_1,\dots,S_n$ (fresh boolean atoms), we can use the selectors to "toggle" some clauses so that they may contribute or not to the SAT problem at hand.
+
+The selections are set as \textit{assumptions} and $\varphi$ is modified to make them interact with the rest of the clauses.
+
+\subsection{Incremental SAT solving}
+Many modern sat solvers allow to push and pop subformulas onto a base (possibly empty) formula and check the satisfiability at every step.\\
+By maintaining the state and the learned clauses from the previous steps we can drastically reduce the search space of each subsequent call.
 
 \section{Kripke Models}
 The semantic framework for a variety of logics like Modal Logics, Description Logics, and \textit{Temporal Logics}.
