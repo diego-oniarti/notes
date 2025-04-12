@@ -161,7 +161,7 @@ Like clause subsumption but with a literal instead of a clause.
 These unit propagation rules can happen in a chain. After modifying the formula once we can create new unary clauses for example.
 
 \subsection{Resolution algorithm}
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
     \caption{Resolution algorithm}
     Assume input is in CNF\;
     $\varphi$ is a set of clauses\;
@@ -290,7 +290,7 @@ The intuitive meaning of these rules is that $l_1\overset{c}\mapsto l_2 \overset
 An unique implication point is a node $l$ such that \textit{every} path from the last decision to \textit{both} conflict nodes, passes through $l$.\\Trivially the most recent decision node is an UIP.
 
 \subsection{CDCL algorithm}
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
     \caption{CDCL solver}
     status := preprocess($\varphi$,$\mu$)\;
     \While{true}{
@@ -328,7 +328,7 @@ We say that the algorithm is "\textit{conflict-driven}" and "\textit{clause-lear
 We also avoid the PDLL useless backtracking by using $\eta$ to decide the point where to backtrack.
 
 \subsection{Conflict analysis}
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
     \caption{Conflict analysis}
     $C$ := conflicting clause\;
     \Repeat{$C$ meets some criteria}{
@@ -374,6 +374,78 @@ The selections are set as \textit{assumptions} and $\varphi$ is modified to make
 \subsection{Incremental SAT solving}
 Many modern sat solvers allow to push and pop subformulas onto a base (possibly empty) formula and check the satisfiability at every step.\\
 By maintaining the state and the learned clauses from the previous steps we can drastically reduce the search space of each subsequent call.
+
+\section{First-Order Logic}
+Giunchiglia
+\subsection{Theories} 
+In formal logic a \textit{theory} is \textbf{a set of axioms}, where each axiom is a FOL closed formula. This is typical used to give a practical \textit{interpretation} to the symbols in the logic.
+
+Another, more practical definition of a theory is \textbf{a set of models} constraining the interpretation of the logic.
+
+\subsection{Satisfiability Modulo Theories - SMT}
+SMT is the problem of deciding if a formula is satisfiable under the constraint of some theory or set of theories.
+
+The theories we're most concerned with are:
+\begin{itemize}
+    \item Equality and uninterpreted functions
+    \item Difference logic
+    \item Linear arithmetic over the rationals (LRA)
+    \item Linear arithmetic over the integers (LIA)
+    \item Arrays
+    \item Bit Vectors
+    \item Non-linear arithmetic over the reals
+\end{itemize}
+
+\subsection{SMT Solvers}
+We can solve problems of Satisfiability Modulo Theory by expanding on the CDCL solver we've seen already. The high level workflow is:
+\begin{enumerate}
+    \item Theory atoms are substituted with fresh boolean variables.
+    \item A CDCL solver is used to enumerate truth assignments $\mu_i$ on the modified formula
+    \item The set of theory atoms is extracted from the assignment
+    \item A \textit{theory specific solver} checks only the satisfiability of the theory atoms
+    \item If they're sat, good, otherwise return to 2
+\end{enumerate}
+
+For this method a couple important things are
+\begin{itemize}
+    \item The interleaving between CDCL solver and Theory solver
+    \item The Theory solver must offer incremental calling
+    \item The $\mathcal T$-solver should provide good conflict sets
+    \item Semantically equivalent but syntactically different clauses should be merged into one
+    \item Early pruning
+\end{itemize}
+
+\subsection*{EUF - Equality and Uninterpreted Functions}
+Solvers for EUF are based on merge-sets and E-Graphs.
+\begin{callout}{E-Graphs}
+    Given the set of terms occurring in the formula represented as nodes in a DAG (or term bank):
+    \begin{itemize}
+        \item if $(t=s)$ then merge the eq classes of $t$ and $s$
+        \item if $\forall i\in 1...k. class(t_i)=class(s_i)$ then merge the eq classes of $f(t_1,...,t_k)$ and $f(s_1,...,s_k)$
+        \item if $t\neq s$ and $t$ and $s$ belong to the same class, conflict
+    \end{itemize}
+\end{callout}
+
+\subsection*{DL - Difference logic}
+For difference logic we use a variant of the Bellman-Ford algorithm, where conflicts are revealed by negative cycles.
+
+\subsection*{LRA - Linear Arithmetic over the rationals}
+For this a variant of the simplex LP algorithm is used. No idea what that is.
+
+\subsection*{LIA - Linear arithmetic over the integers}
+This is an NP-complete problem, and is tackled with a mix of various techniques like simples, branch&bound, and cutting planes.
+
+\subsection*{AR - Arrays}
+This also is a NP-complete problem.\\
+Solvers usually use EUF combined with the array axioms:
+\begin{enumerate}
+    \item $\forall a.\forall i.\forall e (read(write(a,i,e), i) = e)$ \\
+        If I write $e$ to a location and then read that same location, I should get $e$
+    \item $\forall a. \forall i. \forall j. \forall e. ((i\neq j) \to read(write(a,i,e),j)=read(a,j))$ \\
+        If I write in a location $i$, the values in the rest of the array don't change
+    \item $\forall a.\forall b. (\forall i.read(a,i)=read(b,i)) \to (a=b))$ \\
+        If all the elements in two arrays are equal, the arrays are equal
+\end{enumerate}
 
 \section{Kripke Models}
 The semantic framework for a variety of logics like Modal Logics, Description Logics, and \textit{Temporal Logics}.
@@ -455,5 +527,203 @@ Given a Kripke structure it's execution can be seen as an infinite set of comput
 
 \section{Temporal Logics}
 They are divided in \textit{Linear Temporal Logic (LTL)} and \textit{Computation Tree Logic (CTL)}
+
+\subsection{LTL - Linear Temporal Logic}
+An atomic proposition is a LTL formula.\\
+Given $\varphi_1, \varphi_2$ LTL, $\neg\varphi_1,\varphi_1\wedge\varphi_2,\dots$ are LTL.\\
+$X{\varphi_1}, G{\varphi_1}, F{\varphi_1},\varphi_2 U\varphi_1,\varphi_2 R\varphi_1$ are new operators.
+\begin{itemize}
+    \item Next \textbf{X}: $X_\varphi$ holds in $s_t$ iff $\varphi$ is true in $s_{t+1}$
+    \item Finally (or eventually) \textbf{F}: Is true if $\varphi$ will eventually be true down the path.
+\item Globally \textbf{G}: $G\varphi$ is true in $s_t$ iff $\varphi$ is true in all $s_{t'}\geq s_t$
+    \item Until $\varphi_1 U \varphi_2$: There is a state in which $\varphi_2$ is true, and up to that state $\varphi_1$ is true
+    \item Release $\varphi_1 R \varphi_2$: $\varphi_2$ can become false only if $\varphi_1$ does first
+\end{itemize}
+
+\begin{callout}{Fairness}
+    \textbf{GF}$\varphi$ is a way to represent fairness, since it indicates that something is gonna happen (F) and that things are always gonna happen (G)
+\end{callout}
+
+\paragraph*{Kripke models}
+These properties are evaluated over paths (infinite, linear sequences of states) so we can go back to the Kripke model's paths. A model $M$ models $\phi$ if for all paths $\pi$ in $M$, $\pi\models\phi$.
+
+\begin{callout}[red]{NB}
+    $M\cancel\models \cancel\implies M\models\neg\phi$
+\end{callout}
+
+\subsubsection{Negation Properties}
+\begin{wrapfigure}[3]{r}{0.2\textwidth}
+    \includegraphics[width=0.2\textwidth]{images/LTLneg.png}
+\end{wrapfigure}
+From this properties we can see that we only really need $\wedge,\neg,X,U$ to simulate every other connector
+
+\subsubsection{LTL Tableaux rules}
+We say that a temporal subformula occurs at top level in $\varphi$ if it occurs in $\varphi$ under the scope of no temporal operator
+
+\begin{callout}[red]{NB}
+    $M\models\varphi$ where $\varphi$ does not contain temporal operators, $\varphi$ is only evaluated at the \textbf{initial state}.
+\end{callout}
+
+\subsection{CTL - Computation Tree Logic}
+As in LTL, we keep the boolean operators and extend them with new ones.
+\begin{itemize}
+    \item $AX\varphi$
+    \item $A(\varphi U \varphi)$
+    \item $AG\varphi$
+    \item $AF\varphi$
+    \item $EX\varphi$
+    \item $E(\varphi U \varphi)$
+    \item $EG\varphi$
+    \item $EF\varphi$
+    \item $E(\varphi U \varphi)$
+\end{itemize}
+
+The new operators work as "extensions" of the LTL ones:
+\begin{itemize}
+    \item \textbf{AX}: Necessary next
+    \item \textbf{EX}: possible next
+    \item \textbf{AF}: necessarily in the future
+    \item \textbf{EF}: possible in the future
+    \item \textbf{AG}: globally
+    \item \textbf{EG}: possible henceforth
+    \item \textbf{AU}: necessarily until
+    \item \textbf{EU}: possible Until
+\end{itemize} 
+The \textbf{A} can be seen as "all", so the property holds in all branches.\\
+The \textbf{E} can be seen as "exists", so there is at least one branch where the property holds.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/CTLtrees.png}
+    \caption{Visual representation of the operators}
+\end{figure}
+
+\begin{callout}[red]{Watch out!}
+    LTL and CTL are \textbf{NOT} equivalent and none of them is strictly more expressive than the other.\\
+    There are LTL formulas that cannot be expressed in CTL and vice versa.
+    \begin{center}
+        \includegraphics[width=0.5\linewidth]{images/AFAGvsFG.png}
+    \end{center}
+    There are obviously some formulas that can be expressed in both.
+\end{callout}
+
+\subsection{CTL*}
+CTL* divides formulas into \textit{state formulae} and \textit{path formulae}.
+\paragraph{State formulas} boolean operations and boolean connections of smaller state formulas are state formulas. If $\psi$ is a \textit{path} formula, $A\psi$ and $E\psi$ are state formulas.
+\paragraph{Path formulas} State formulas are path formulas. Boolean combinations of path formulas are path formulas. Path/time quantifiers on path formulas are path formulas.
+
+CTL* subsumes both LTL and CTL.
+\begin{itemize}
+    \item $\varphi$ in CTL $\implies$ $\varphi$ in CTL*
+    \item $\varphi$ in LTL $\implies$ A$\varphi$ in CTL*
+    \item $LTL \cup CTL \subset CTL*$
+\end{itemize}
+So CTL* gives us the tools to compare CTL and LTL in one framework.
+
+\section{Automata-Theoretic LTL Reasoning}
+\subsection{Infinite word languages}
+Given an alphabet $\Sigma$ a $\omega$-word $\alpha$ over $\Sigma$ is an infinite sequence of elements from $\Sigma$.\\
+The set of all infinite words is $\Sigma^\omega$\\
+A $\Omega$-language $L$ is a collection of $\omega$-words $L\subseteq\Sigma^\omega$.
+
+\subsection{Omega-Automata}
+We consider automaton running over infinite words. A word is \textit{accepted} if there is at least one state which is repeated \textit{infinitely} many times.
+
+\subsection{Buchi automata}
+A non-deterministic Buchi automaton (NBA) is $(Q,\Sigma,\delta,I,F)$
+\begin{itemize}
+    \item $Q$ finite set of states
+    \item $\Sigma$ finite alphabet
+    \item $I\subseteq Q$ set of initial states
+    \item $F\subseteq Q$ set of accepting states
+    \item $\delta\subset Q\times\Sigma\times Q$ transition relation
+\end{itemize}
+A deterministic Buchi automaton (DBA) has the same definition except $\delta$ is a function instead of a relation $\delta:Q\times\Sigma\mapsto Q$
+
+\paragraph{Runs and Languages} A run $\rho$ of $A$ on $\omega$-word $\alpha=a_0,a_1,...$ is an infinite sequence $\rho=q_0,q_1,...$ st $q_0\in I$ and $q_i\overset{a_i}\rightarrow q_{i+1}$ for $0\leq i$.
+
+A run $\rho$ is \textit{accepting} if $inf(\rho)\cap F \neq \emptyset$.
+
+The \textit{language} accepted by $A$ is the set of all $\alpha$ accepted by $A$.
+
+\paragraph{DBA vs NBA}
+DBAs are strictly \textbf{less} powerful than NBAs.
+
+\subsection{Operations on Buchi Automata}
+For the NBAs $A_1, A_2$ we can construct the NBAs for the union of their languages and for their intersection.\\
+It is also possible to do complementation but it's hard and out of the scope of this course.
+
+\paragraph{Union}
+The size of the union of two automata is $|A| = |A_1| + |A_2|$.\\
+To build it we just take the two graphs and consider them together. A graph does not need to be connected, so we can leave them like that.
+
+\paragraph{Intersection}
+The size of the intersection of two automata is $|A| \leq |A_1|\cdot|A_2|\cdot 2$.\\
+To build the intersection we consider the combination of each state and we add a flag $Q=Q_1\times Q_2 \times \{1,2\}$. The initial states are $I=I_1\times I_2\times \{1\}$ and the final ones are $F=F_1\times F_2\times \{1\}$.
+
+\subsection{LTL and Buchi}
+\paragraph{validity and satisfiability}
+Let $\psi$ be an LTL formula ($\models \psi$, $\neg\psi$ unsat, $L(A_{\neg\psi})=\emptyset$).\\
+$A_{\neg\psi}$ is a Buchi Automatons which represents all and only the paths that satisfy $\neg\psi$ (do not satisfy $\psi$).
+
+\paragraph{Entailment}
+Let $\varphi,\psi$ LTL formulas. ($\varphi\models\psi$, $\models\varphi\to\psi$\\
+blah blah
+
+\paragraph{LTL model checking}
+
+\subsection{Language emptiness checking}
+To check that a language is \textit{not empty} we just need to find and accepting cycle reachable from an initial state. If we find a loop we know we can follow it forever and touch the final state infinite many times.
+
+\subsubsection{Naive Double Nested DFS algorithm}
+The easy approach to find such loops is to run two nested DFS over the graph. Whenever the outer DFS finds a final state $f$, the inner one is started. If the inner DFS gets back to $f$, there is a loop.
+
+This method is $O(n^2)$ and is not very good.
+
+\subsubsection{SCC-based algorithm}
+We can use the \textit{Strongly Connected Components} of a graph to make the naive implementation run in linear time.
+
+\subsubsection{Smart Double Nested DFS}
+The naive method can be improved drastically with two modifications:
+\begin{enumerate}
+    \item The inner DFS is not started when a final state is encountered, but only when it is popped.
+    \item Keep two hash tables and two stacks.
+\end{enumerate}
+
+The algorithm is explained better in the slides, the complexity becomes $O(n)$.
+
+\subsection{Kripke Models to Buchi Automata}
+We can transform a Kripke model $M=\langle S, S_0, R, L, AP\langle$ into an NBA $A_M=\langle Q,\Sigma,\delta,I,F\rangle$ such that
+\begin{itemize}
+    \item $Q := S\cup \{init\}$, $init$ being a new initial state
+    \item $\Sigma := 2^{AP}$ total truth-assignments as alphabet symbols
+    \item $I := \{init\}$
+    \item $F:=Q$
+    \item $\begin{array}{rl}\delta: & q\xrightarrow{a} q' \iff (q,q')\in R \AND L(q')=a\\
+        & init\overset a \rightarrow q \iff q\in S_0 \AND L(q)=a\end{array}$
+\end{itemize}
+
+The labels are effectively moved from the nodes to the incoming edges of said nodes.
+
+\subsection{From LTL formulas to Buchi Automata}
+\paragraph{LTL Negative Normal Form}
+Every LTL formula can be converted into its negative normal form which only uses $\wedge,\vee,X,U,R$ on propositional literals.
+
+\begin{callout}{Reminder}
+    A property of NNF is that every non atom in $\varphi$ occurs positively.
+\end{callout}
+
+\paragraph{On-the-fly construction of $A_\varphi$}
+\begin{enumerate}
+    \item Apply the tableau expansion rules to $\varphi$
+        \begin{gather*}
+            \psi_1 U \psi_2 \implies \psi_2 \vee (\psi_1\wedge X(\psi_1 U \psi_2)) [\AND F\psi\implies\psi \vee XF\psi] \\
+            \psi_1 R \psi_2 \implies \psi_2 \wedge (\psi_1\vee X(\psi_1 R \psi_2)) [\AND G\psi\implies\psi \wedge XG\psi] 
+        \end{gather*}
+    \item Convert all formulas into \textit{disjunctive normal form}\\
+        This is the counterpart to the conjunctive normal form, where $\wedge$ and $\vee$ are inverted
+    \item huh?
+\end{enumerate}
+
 
 \end{document}
