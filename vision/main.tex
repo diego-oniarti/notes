@@ -386,4 +386,46 @@ $\rho$-bust
 \subsection{Bayesian tracking}
 \subsection{Kalman filter}
 
+\section{Camera Geometry and Multi-View}
+\subsection{Affine Transformations}
+An transformation is called \textit{affine} if it can be described as the product between a matrix and the original coordinates.\\
+The three main affine transformations are:
+\begin{itemize}
+    \item Scaling
+    \item Rotation
+    \item Translation
+\end{itemize}
+But we can combine multiple of these in a single matrix.
+
+\paragraph{Scaling}
+\begin{align*}
+    \left[\begin{array}{c}x'\\y'\end{array}\right] = \left[\begin{array}{cc}c & 0 \\ 0 & c\end{array}\right]\left[\begin{array}{c}x\\y\end{array}\right]
+\end{align*}
+
+\paragraph{Rotation}
+\begin{align*}
+    \left[\begin{array}{c}x'\\y'\end{array}\right] = \left[\begin{array}{cc}\cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta)\end{array}\right]\left[\begin{array}{c}x\\y\end{array}\right] = \left[\begin{array}{cc}x\cos(\theta) & -y\sin(\theta) \\ x\sin(\theta) & y\cos(\theta)\end{array}\right]
+\end{align*}
+
+\paragraph{Translation}
+\begin{align*}
+    \left[\begin{array}{c}x'\\y'\\ 1\end{array}\right] = \left[\begin{array}{ccc}1 & 0 & x_0 \\ 0 & 1 & y_0 \\ 0&0&1\end{array}\right]\left[\begin{array}{c}x\\y\\1\end{array}\right] = \left[\begin{array}{c}x + x_0\\y+y_0\\1\end{array}\right]
+\end{align*}
+
+For the translation we introduce one more dimension to the array, and this is called \textit{"homogeneous coordinates"}.
+
+Putting these all together we can define a transformation matrix with 4 parameters $c,\theta, x_0, y_0$
+\begin{align*}
+    \left[\begin{array}{c}x_w\\y_w\\ 1\end{array}\right] &= \left[\begin{array}{ccc}1 & 0 & x_0 \\ 0 & 1 & y_0 \\ 0&0&1\end{array}\right]\left[\begin{array}{ccc}s & 0 & x_0 \\ 0 & s & 0 \\ 0&0&1\end{array}\right]\left[\begin{array}{ccc}\cos(\theta) & -\sin(\theta) & 0 \\ \sin(\theta) & \cos(\theta) & 0 \\ 0&0&1\end{array}\right]\left[\begin{array}{c}x_1\\y_1\\1\end{array}\right]
+    \\
+    \left[\begin{array}{c}u \\ v \\ 1\end{array}\right] &= \left[\begin{array}{ccc}a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ 0&0&1 \end{array}\right]\left[\begin{array}{c}x\\y\\1\end{array}\right]
+\end{align*}
+
+We ended up with 6 parameters to determine and we can find them using 3 matching pairs.\\
+What is usually done is putting a known pattern in some part of a video or a camera setup. The pattern is then used to calibrate the camera matrix for the entire image.
+
+This technique can be effected by errors, as any imprecision on the capture of the known pattern is then reflected on the rest of the image.\\
+It is hence better to take a large amount of samples and use the least-square method to minimize the error deviation.
+
+
 \end{document}

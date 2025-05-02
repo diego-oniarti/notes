@@ -433,7 +433,7 @@ For difference logic we use a variant of the Bellman-Ford algorithm, where confl
 For this a variant of the simplex LP algorithm is used. No idea what that is.
 
 \subsection*{LIA - Linear arithmetic over the integers}
-This is an NP-complete problem, and is tackled with a mix of various techniques like simples, branch&bound, and cutting planes.
+This is an NP-complete problem, and is tackled with a mix of various techniques like simples, branch\&bound, and cutting planes.
 
 \subsection*{AR - Arrays}
 This also is a NP-complete problem.\\
@@ -446,6 +446,9 @@ Solvers usually use EUF combined with the array axioms:
     \item $\forall a.\forall b. (\forall i.read(a,i)=read(b,i)) \to (a=b))$ \\
         If all the elements in two arrays are equal, the arrays are equal
 \end{enumerate}
+
+\subsection{Combination of theories}
+WTF
 
 \section{Kripke Models}
 The semantic framework for a variety of logics like Modal Logics, Description Logics, and \textit{Temporal Logics}.
@@ -724,6 +727,8 @@ Every LTL formula can be converted into its negative normal form which only uses
         This is the counterpart to the conjunctive normal form, where $\wedge$ and $\vee$ are inverted
     \item huh?
 \end{enumerate}
+
+\section{CTL Model Checking}
 
 
 \end{document}
