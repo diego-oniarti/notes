@@ -33,18 +33,18 @@ The matrix will be read from a \texttt{.mtx} file and be converted into CSR form
 
 The repository with the code can be found at \url{https://github.com/diego-oniarti/GPU_homework}.
 
-\subsection{Abstractions}
-In the code the type of the elements in the matrix and the vector will be \texttt{data\_t}, defined in a macro, and the matrix will be passed to the functions as a struct of this form:
-\begin{verbatim}
-typedef struct {
-    data_t *vals;   // Vector containing the nonzero values
-    int *xs;        // Vector containing the x indices of the nonzero elements
-    int *ys;        // Vector containing the row pointer
-    int nvals;      // Number of nonzero values
-    int nrows;      // Number of rows
-    int ncols;      // Number of columns
-} MAT_CSR;
-\end{verbatim}
+% \subsection{Abstractions}
+% In the code the type of the elements in the matrix and the vector will be \texttt{data\_t}, defined in a macro, and the matrix will be passed to the functions as a struct of this form:
+% \begin{verbatim}
+% typedef struct {
+%     data_t *vals;   // Vector containing the nonzero values
+%     int *xs;        // Vector containing the x indices of the nonzero elements
+%     int *ys;        // Vector containing the row pointer
+%     int nvals;      // Number of nonzero values
+%     int nrows;      // Number of rows
+%     int ncols;      // Number of columns
+% } MAT_CSR;
+% \end{verbatim}
 
 \section{CPU algorithm}
 I started with a sequential implementation on the CPU as a baseline. The result of this implementation will be used to assess the correctness of the following ones.
@@ -69,9 +69,9 @@ I started with a sequential implementation on the CPU as a baseline. The result 
         result[y] = row\_acc\;
     }
 \end{algorithm}
-\begin{callout}{Remark}
-    In this and other pseudocodes, trivial allocations and freeing of memory will be omitted for the sake of clarity and to center focus on the algorithm.
-\end{callout}
+% \begin{callout}{Remark}
+%     In this and other pseudocodes, trivial allocations and freeing of memory will be omitted for the sake of clarity and to center focus on the algorithm.
+% \end{callout}
 The values in the arrays \texttt{ys}, \texttt{xs}, \texttt{vals}, and \texttt{ret} are all accessed sequentially, making good use of caching.\\
 The slight exception to this is \texttt{ys}, where each element is read along with its successor (in the halt check of the inner loop). The values being accessed are however close together, so locality of reference is still taken advantage of.
 
@@ -80,24 +80,24 @@ The worst use of cache in this access pattern happens when accessing the vector,
 \section{GPU algorithms}
 I implemented 4 different kernels to run on the GPU, each one improving in some aspect on the previous ones.
 
-\subsection{Thread Per Row}
+\subsection{1 Thread Per Row}
 This first implementation mirrors the one done on the CPU, but instead of rows being accessed sequentially, a thread is generated to handle each of them individually.
-\begin{algorithm}[ht]
-    \caption{Thread Per Row}
-    \Input{data\_t *ret, *vals, *vec \\int rows, *xs, *ys}
-    int tid = blockIdx.x*blockDim.x + threadIdx.x;
-    \If {(tid $<$ rows)} {
-        \Comment{The elements in the row are summed linearly and sequentially}
-        data\_t acc = 0\;
-        \For {(int i=ys[tid]; i$<$ys[tid+1]; i++)} {
-            acc += vals[i] * vec[xs[i]]\;
-        }
-        ret[tid] = acc\;
-    }
-\end{algorithm}
+% \begin{algorithm}[ht]
+%     \caption{Thread Per Row}
+%     \Input{data\_t *ret, *vals, *vec \\int rows, *xs, *ys}
+%     int tid = blockIdx.x*blockDim.x + threadIdx.x;
+%     \If {(tid $<$ rows)} {
+%         \Comment{The elements in the row are summed linearly and sequentially}
+%         data\_t acc = 0\;
+%         \For {(int i=ys[tid]; i$<$ys[tid+1]; i++)} {
+%             acc += vals[i] * vec[xs[i]]\;
+%         }
+%         ret[tid] = acc\;
+%     }
+% \end{algorithm}
 This implementation retains the locality of access advantages from its fully sequential counterpart, but its made much faster through parallelization.
 
-\subsection{Warp Per Row}
+\subsection{1 Warp Per Row}
 The logical progression from the algorithm using one thread per row would be to use one thread per nonzero value. Using this solution it is quite easy to get the product of each element in the matrix with the corresponding one in the vector.\\
 When summing the elements in a row, however, the synchronization is much harder. Having one thread sum up all the elements in the row would be inefficient, while doing a reduction in parallel requires the thread to synchronize possible across blocks.
 
@@ -105,14 +105,20 @@ My solution to this was to dedicate a whole warp of threads to each row. This wa
 
 To allow the sum of the elements in a row to be performed by multiple threads, the individual values are stored into a buffer. Parts of the buffer are then reduced and the result is put in the return array.
 
+\subsection{Adding shared memory}
+The final improvement I made to the algorithm was that of removing the buffer used for the reduction and perform that in shared memory instead.
+
+% \begin{callout}[red]{}
+%     A different approach would be that of targeting temporal locality. The 
+% \end{callout}
 \begin{algorithm}[ht]
     \caption{Warp Per Row}
-    \Input{data\_t *vals, *vec, *ret, *buffer,\\
-    int *xs, *ys, cols, rows}
-    int tid = blockIdx.x*blockDim.x + threadIdx.x\;
-    int wid = threadIdx.x / 32\;
+    % \Input{data\_t *vals, *vec, *ret, *buffer,\\
+    % int *xs, *ys, cols, rows}
+    int tid = blockIdx.x*blockDim.x + threadIdx.x \Comment*[r]{Thread ID}
+    int wid = threadIdx.x / 32 \Comment*[r]{Warp ID}
     int friend\_id = threadIdx.x \% 32 \Comment*[r]{Thread's place in the warp}
-    int row = blockIdx.x * (blockDim.x / 32) + wid\;
+    int row = blockIdx.x * (blockDim.x / 32) + wid \Comment*[r]{Row in the matrix}
 
     buffer[tid] = 0 \Comment*{Set to zero to avoid breaking the reduction}
     \If {(row $<$ rows)} {
@@ -141,12 +147,6 @@ To allow the sum of the elements in a row to be performed by multiple threads, t
     }
 \end{algorithm}
 
-\subsection{Adding shared memory}
-The final improvement I made to the algorithm was that of removing the buffer used for the reduction and perform that in shared memory instead.
-
-% \begin{callout}[red]{}
-%     A different approach would be that of targeting temporal locality. The 
-% \end{callout}
 
 \section{Mode of testing}
 \subsection{Output validity}
