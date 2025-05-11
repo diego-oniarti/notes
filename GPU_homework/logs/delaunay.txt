@@ -27,7 +27,7 @@ Threads per block: 128
 Standard derivation: 0.001 ms
               FLOPs: 67973894.468
           Bandwidth: 634.423 GB/s
-Threads per block: 256
+Threads per block: 256                  !
                Mean: 0.676 ms
 Standard derivation: 0.001 ms
               FLOPs: 74472606.678
@@ -53,7 +53,7 @@ Threads per block: 64
 Standard derivation: 0.005 ms
               FLOPs: 3677687.243
           Bandwidth: 34.325 GB/s
-Threads per block: 128
+Threads per block: 128                  !
                Mean: 13.624 ms
 Standard derivation: 0.006 ms
               FLOPs: 3694383.270
@@ -90,7 +90,7 @@ Standard derivation: 0.003 ms
               FLOPs: 8682857.903
           Bandwidth: 81.040 GB/s
 Threads per block: 256
-               Mean: 5.732 ms
+               Mean: 5.732 ms           !
 Standard derivation: 0.001 ms
               FLOPs: 8781519.721
           Bandwidth: 81.961 GB/s
