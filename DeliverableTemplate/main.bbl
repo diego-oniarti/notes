@@ -7,8 +7,7 @@
 \providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
 \providecommand{\BIBentryALTinterwordstretchfactor}{4}
 \providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
-\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
-  \fontdimen4\font\relax}
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus \fontdimen4\font\relax}
 \providecommand{\BIBforeignlanguage}[2]{{%
 \expandafter\ifx\csname l@#1\endcsname\relax
 \typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
@@ -21,16 +20,9 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{asimov1950irobot}
-I.~Asimov, \emph{I, Robot}.\hskip 1em plus 0.5em minus 0.4em\relax New York:
-  Gnome Press, 1950.
-
-\bibitem{svevo1923coscienza}
-I.~Svevo, \emph{La coscienza di Zeno}.\hskip 1em plus 0.5em minus 0.4em\relax
-  Bologna: L. Cappelli Editore, 1923.
-
-\bibitem{pirandello1926uno}
-L.~Pirandello, \emph{Uno, nessuno e centomila}.\hskip 1em plus 0.5em minus
-  0.4em\relax Firenze: R. Bemporad e Figli, 1926.
+\bibitem{ZHUO2011709}
+\BIBentryALTinterwordspacing
+Y.~Zhuo, X.-L. Wu, J.~P. Haldar, T.~Marin, W.~mei W.~Hwu, Z.-P. Liang, and B.~P. Sutton, ``Chapter 44 - using gpus to accelerate advanced mri reconstruction with field inhomogeneity compensation,'' in \emph{GPU Computing Gems Emerald Edition}, ser. Applications of GPU Computing Series, W.~mei W.~Hwu, Ed.\hskip 1em plus 0.5em minus 0.4em\relax Boston: Morgan Kaufmann, 2011, pp. 709--722. [Online]. Available: \url{https://www.sciencedirect.com/science/article/pii/B9780123849885000449}
+\BIBentrySTDinterwordspacing
 
 \end{thebibliography}

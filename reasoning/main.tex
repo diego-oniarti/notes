@@ -1,6 +1,5 @@
 \documentclass{article}
 \usepackage[top=2cm,bottom=2cm,left=2cm,right=3.5cm]{geometry}
-
 \usepackage[utf8]{inputenc}
 \input{../common}
 \usepackage[parfill]{parskip}
@@ -500,11 +499,17 @@ It is a typical formalization for circuits, since it models nicely the behaviour
     \includegraphics[width=1\linewidth]{images/sync_prod.png}
 \end{center}
 
-\subsection{Descriptor languages}
+\subsection{Description languages}
 most often a Kripke model is not given explicitly but represented in a structured language (like SMV, VHDL, etc...)
 
 \subsubsection{The SMV Language}
-\begin{callout}{riprendere}\end{callout}
+SMV is one of many description languages. It specifically allows for the definition of models through:
+\begin{itemize}
+    \item variables with one of many types
+    \item initial states for these variables
+    \item functions that dictate the evolution of the variables
+    \item sync and async combinations of different models
+\end{itemize}
 
 \subsection{Standard Programming Languages}
 Standard programming languages can be seen as a transition relation in terms also of the program counter.
@@ -595,7 +600,7 @@ The new operators work as "extensions" of the LTL ones:
 The \textbf{A} can be seen as "all", so the property holds in all branches.\\
 The \textbf{E} can be seen as "exists", so there is at least one branch where the property holds.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{images/CTLtrees.png}
     \caption{Visual representation of the operators}
@@ -696,7 +701,7 @@ The naive method can be improved drastically with two modifications:
 The algorithm is explained better in the slides, the complexity becomes $O(n)$.
 
 \subsection{Kripke Models to Buchi Automata}
-We can transform a Kripke model $M=\langle S, S_0, R, L, AP\langle$ into an NBA $A_M=\langle Q,\Sigma,\delta,I,F\rangle$ such that
+We can transform a Kripke model $M=\langle S, S_0, R, L, AP\rangle$ into an NBA $A_M=\langle Q,\Sigma,\delta,I,F\rangle$ such that
 \begin{itemize}
     \item $Q := S\cup \{init\}$, $init$ being a new initial state
     \item $\Sigma := 2^{AP}$ total truth-assignments as alphabet symbols
