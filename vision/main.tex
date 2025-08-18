@@ -10,85 +10,20 @@
 \date{Anno 2024-2025}
 
 \begin{document}
-
 \maketitle
 \tableofcontents
 
 \newpage
-\section{24-02-2025}
-\subsection*{Main topics of the course}
-\begin{enumerate}
-    \item acquisition
-    \item motion detection
-    \item motion analysis
-    \item stereo/multi -view
-    \item 3D point cloud
-    \item feature extraction / classification
-\end{enumerate}
 
-\subsection*{Evaluation}
-The written exam will be 40\% of the vote.\\
-You can choose between a project and an oral exam. If you're not satisfied with the result of the written you can take an oral later.
-
-Reading groups are also a thing.
-
-\begin{itemize}
-    \item 24 mar: teams + project ideas
-    \item 31 mar project titles assignment for those who haven't chosen one
-\end{itemize}
-
-For the project we'll use python, openCV, and ffmpeg.
-
-You can deliver the project and written exam in different sessions. But the written exam expires in 1 year.
-
-\newpage
-\section{28-02-2025}
-\subsection*{Bayer Pattern} is a pattern used in camera sensors to optimize the distribution of colors. Since the human eye is more sensitive to green light, the pattern is composed of a checkerboard pattern where one color is green and the other is divided between red and blue.
-
-\subsection*{Quantization} Usually we use 8bpp (bits per pixel) because it is byte aligned and because it's plenty enough for the human eye. At lower bpp, contouring appears.
-
-\subsection*{Video} Static images loose the temporal and movement information, so we need videos.\\
-The frame rate of an image must be compliant with the thing that is being captured. With an high enough rate we can ensure a smooth transition between frames without loosing information.
-
-This is the reason video-cameras usually have a lower resolution that photo-cameras. With too high of a resolution, there is too much information that needs to be processed and it can't be done at a fast enough rate.
-
-Humans also focus less on image quality while watching a video, as they're more captivated by the evolution of events than the single frames.
-
-\subsection*{Relevant features} The relevant features in an image are color, edges, and contrast.
-In a video the features are the same but also their progression through time.
-
-\subsection*{Image compression} Image take up a lot of space and videos take up even more. Compression standards exist to reduce the amount of data required.\\
-Compression requires there to be an \textbf{encoder} and a \textbf{decoder}. Some examples are JPEG, MPEG, and DIVX.
-Both visualization and processing are executed on the uncompressed image, since humans can't visualize raw compressed data, and filters can't work on the compressed image.
-
-Some compression algorithms are lossy while some other are lossless.
-
-\subsection*{Histogram} is a simple way to describe the color distribution of a picture by approximating a probability function.
-\begin{align*}
-    hist(p) = \frac{\# pixels: I(x,y)=p}{N\cdot M} \approx f(p)
-\end{align*}
-Where $N,M$ are the size of the picture in pixels.
-
-Various filters can be applied to an image by manipulating the histogram with operations like stretching and thresholding.
-
-We can equalize an histogram defining a partial sum $CHist_I(p) = \sum_{k=0}^p hist(k)$ e assegnando $hist_{eq}(p) = \frac{CHist(p) - CHist_{min}}{M\cdot N -1} \cdot 255$.\\
-Even equalizing we can not get to a flat histogram, but we can do our best to get to that point.
-
-\subsection*{Edge extraction} Usual Sobel su X, Y, thresholding, etc. Convolution in 1D and its natural translation in two dimensions.\\
-A convolution in the space domain is equivalent to a product in the frequency domain and vice versa.
-
-\subsection*{Low-pass filtering}
-The easiest way to implement a discrete low pass filter is to design a kernel that takes the average of the values surrounding a pixel.\\
-A better visual result is given by a Gaussian filter. Funnily enough, the Fourier transform of a gaussian curve is still a gaussian curve.
-
-\subsection*{Low Pass vs Median}
+\section{Miscellaneous}
+\subsection{Low Pass vs Median}
 Low pass filtering can reduce noise in an image, but it also spreads the noise over the image. In some cases this may be undesirable. The common approach would be to threshold the filtered image, but finding the threshold value can be cumbersome.
 
-Some other filters to denoise is the \textbf{median filter}. It's not \textit{isotropic} and it doesn't work with a normal convolution, but it requires a \textit{sorting} operator.
+One other filters to de-noise is the \textbf{median filter}. It's not \textit{isotropic} and it doesn't work with a normal convolution, but it requires a \textit{sorting} operator.
 
 Gaussian and averaging filters introduce in the image values that were not in the original image. The median filter, instead, only "selects" values from the image, not inventing new ones.
 
-\section{Morphology}
+\subsection{Morphology}
 A form of non linear filtering that refers to the shape of a region.
 
 Goals:
@@ -98,7 +33,7 @@ Goals:
     \item remove areas smaller than a threshold
 \end{itemize}
 
-\section*{Binary morphology}
+\subsection*{Binary morphology}
 We need a \textbf{binary image}\footnote{A binary image is not grayscale but an image composed only of true and false} and \textbf{structuring elements} and implement four main operations:
 \begin{itemize}
     \item erosion
@@ -110,7 +45,7 @@ Erosion and dilation are intuitive, enlarging or reducing the size of a region. 
 
 Structuring elements can be squares, circles, other primitives, or custom shapes. For every structuring element we need to define a "center". It is usually the geometric center of the image but it doesn't have to be.
 
-\subsection{Dilation}
+\subsubsection{Dilation}
 Dilation performs an $\oplus$ (or) operation between the image and the element. More specifically:
 \begin{itemize}
     \item sweep the element over the image
@@ -121,311 +56,16 @@ Dilation performs an $\oplus$ (or) operation between the image and the element. 
 \end{itemize}
 It is important to note that the output of the filter has to be stored in a separate image, to avoid it recursively dilating a pixel across the whole image.
 
-\subsection{Erosion}
+\subsubsection{Erosion}
 Erosion works in a similar way by scanning the element over the image: We don't check with the center of the element anymore but we "activate" the filter when every $1$ in the filter overlaps a $1$ in the image.
 
 Question: In the output image, do we only put the center of the element or the whole element?
 
-\subsection{Closing and Opening}
+\subsubsection{Closing and Opening}
 Closing: dilate and then erode \\
 Opening: erode and then dilate.
 
 Closing fills the holes in the image with the dilation, and then removes the excess added by the first operation with erosion.\\
 Similar but inverse result is gotten by opening. The holes are enlarged, eating away at the shape. Then the remaining bits are consolidated.
-
-\section{Models}
-\subsection{Pinhole camera model}
-It consists of a box with a small hole on one of the walls. The light that passes through that hole projects a reflected image of the outside world onto the opposite wall.\\
-One clear problem is that only a small amount of light can pass through the hole, making the projection very dim. We can fix this by making the hole bigger but this also makes the image blurry.
-
-If the \textit{image plane} is the plane opposite to the camera, the \textit{virtual image plane} is an imaginary plane parallel to the image plane and equally spaced with the pinhole in the other direction.
-
-\paragraph{Model to reality} How do we map the pixel location to a location in space? Following the pinhole camera model we would also need the focal length $f$ of the camera.\\
-Then we know the point in space is somewhere on the line that passes through the pixel and the origin shifted by the focal length.
-\begin{center}
-    \includegraphics[width=0.8\linewidth]{images/focal.png}
-\end{center}
-\begin{align*}
-    \begin{array}{cc}
-        \te{new coordinates} & \te{From the camera}\\
-        \begin{cases}
-            Z' = -f \\
-            X' = -f\frac{X}{Z} \\
-            Y' = -f\frac YZ
-        \end{cases} 
-                             &
-        (X,Y,Z) \to (x,y,f) = (f\frac XZ, f\frac YZ, f)
-    \end{array}
-\end{align*}
-
-It's easy to see that we loose some information, since a point in the camera plane is mapped to a whole line in the real world, loosing the distance.\\
-We can approximate the distance with context clues, knowing additional information about the space etc. but these are not means of \textbf{measuring} the distance, only approximating it.
-
-\paragraph{Multiple cameras} To solve the problem of the loss of information we can use \textit{two cameras}, or even more, to measure depth.
-
-Properties of the pinhole model
-\begin{itemize}
-    \item Parallel lines converge to a single vanishing point
-    \item Parallel lines on the same plane lead to collinear vanishing points
-    \item The line is called the horizon for a plane
-    \item Vertical lines are perpendicular to the horizon
-\end{itemize}
-
-\subsection{Orthographic projection model}
-The \textit{orthographic projection model} assumes that all rays originated from the 3D object and from the scene are parallel among each other.
-The image plane is parallel to $(X, Y)$
-
-Mathematically we're just taking the $x$ and $y$ of the point we're capturing, completely disregarding the depth component. This works since the model assumes object behave the same way regardless of distance.
-\begin{align*}
-    \left[
-    \begin{array}{c}
-        x\\ y
-    \end{array}
-\right] 
-    = 
-    \left[
-    \begin{array}{ccc}
-        1 &0&0\\0&1&0
-    \end{array}
-\right] 
-    \left[
-    \begin{array}{c}
-        X\\ Y\\ Z
-    \end{array}
-\right] 
-\end{align*}
-
-\subsection{Illumination models}
-Illumination is an important component in understanding the content of an image. Different lighting can change the colors perceived in the image, change the shape of perceived edges, etc.
-
-Some materials and surfaces respond to light in different manners, depending how much they \textbf{absorb}, \textbf{reflect}, and \textbf{transmit} it.
-
-Reflections can be
-\begin{itemize}
-    \item Specular: more energy is concentrated in the light source direction
-    \item Diffuse: constant in all directions
-\end{itemize}
-Surfaces vary in \textit{specularity}, going from matte to glossy. Glossy materials are harder to work with, because they introduce things in the image that are not "real".
-
-\paragraph{Illumination from one light source}
-Problem: determine how the surface is irradiated by the light source
-assumption: light is far, we can assume all rays can be represented by a single unit vector $s$ (ortho projection)
-
-For each surface element the light is irradiated considering the cosine of the angle between the surface normal and the light direction
-
-\subsubsection{Lambertian surface}
-Model for diffuse reflection, so the specular reflections are ignored. It is possible to make this assumption when the surface is rough enough.
-
-The luminance of a surface in this model is the same regardless of the viewing angle.
-
-This model assumes every surface has a property $\rho$ (\textit{albedo}) that describes how much of the light is reflected by the object.
-
-\subsection{Lenses}
-The problem with the amount of light being allowed through a pinhole camera can be solved through the use of lenses.
-\begin{center}
-    \includegraphics[width=1\linewidth]{images/lense.png}
-\end{center}
-
-\subsection{resolving power}
-The \textbf{resolving power} is a property of a lens
-\begin{align*}
-    R_p = \frac{1}{2\Delta}
-\end{align*}
-Where $\Delta$ is the pixel spacing [in inches or millimeters].
-\begin{callout}{Esercizio}
-    Non stavo seguendo
-\end{callout}
-
-\subsection{Autofocus}
-There are \textit{active}, \textit{passive}, and fibred autofocus systems.
-
-\paragraph{Active}
-An infrared signal is sent and the time between sending and receiving is measured to compute distance. The distance is then used to focus.
-
-This method has problems with obstacles and glossy/bright surfaces scattering and distorting the signal.
-
-\paragraph{Passive}
-Checks the contrast of the pixels for a row of pixels. If the contrast is the lens is adjusted until the image is sharp enough.
-
-This method struggles with flat surfaces.
-
-Cameras can switch between these two systems to achieve better results when one of them struggles.
-
-\section{Motion Detection}
-In video analysis and processing motion is a fundamental feature.
-
-Projection of 3D motion onto the 2D image plane:
-\begin{gather*}
-3D: D(X; t_1; t_2) = X' - X = [Dx,Dy,Dz] \\
-2D: d(x; t_1; t_2) = x' - x = [dx, dy] 
-\end{gather*}
-
-Once again, we cannot capture motion in 3D space on a 2D plane because of the dimensional mismatch. This results in the fact that the camera cannot perceive the motion of an object coming straight at it or moving straight away from it.\\
-Moreover, the points appear to be moving \textit{outwards} as the object gets closer and the perspective makes it larger.
-
-\subsection{Motion Fields}
-Each frame is divided in 16x16 pixels macro blocks. Between a frame and the next, each block in frame $a$ is compared with every other block in frame $b$ and the best match is taken. The vector $a\to b$ is taken as the motion vector for that specific block.
-
-This method is costly and makes a lot of assumptions:
-\begin{itemize}
-    \item static lighting
-    \item rigid movement
-    \item no occlusion
-    \item etc...
-\end{itemize}
-on top of this it also struggles with flat surfaces.
-
-\paragraph{Occlusion} The surface is covered/revealed by the movement of an object in front of it.
-
-\paragraph{Aperture} The movement of an object can only be observed in the edges. Moreover, we can see only a component of the movement, since the one parallel to the edge is lost
-\begin{center}
-    \includegraphics[width=0.9\linewidth]{images/aperture.png}
-\end{center}
-
-\subsection{Optical flow / image flow}
-To calculate the optical flow we make some assumptions:
-\begin{itemize}
-    \item object illumination does not change in [$t, t+dt$]
-    \item distances do not change significantly
-    \item each point [x,y] is shifted in [$x+dx, y+dy$]
-\end{itemize}
-
-This is a translational model. It's not perfect but it's sufficient in a small enough time interval.
-
-\paragraph{Optical Flow Equation} Blah Blah Taylor expansion
-\begin{gather*}
-    \frac{\delta\psi}{\delta x}v_x +
-    \frac{\delta\psi}{\delta y}v_x +
-    \frac{\delta\psi}{\delta t}v_x = 0
-    \\ or \\
-    \triangledown \psi^T v + \frac{\delta\psi}{\delta t} = 0
-\end{gather*}
-
-This equation still only captures the projection of the motion along the perpendicular axis to the edge.
-
-\subsection{Motion detection in practice}
-Motion detectors can be \textit{intensity based} or \textit{feature based}, with the latter one taking into considerations corners (because of aperture) etc
-
-Two problems with motion detection are:
-\begin{itemize}
-    \item how to rappresenta the motion field
-    \item what do choose as a discrimination parameter?
-\end{itemize}
-
-\paragraph{Change detection - image differencing}
-The most trivial method to perform motion detection is to calculate the difference between each frame and the previous one.\\
-This method only highlights edges of moving objects, and only the edges perpendicular to the motion direction
-
-\paragraph{Background subtraction}
-Similar to change detection. You take the first frame as the \textit{background}. Then every subsequent frame is compared to that original background.
-
-Of course the background image must be taken in a "neutral" moment. An object that was captured in the background image and then moved will be shown in \textbf{every} frame, and it's called a "ghost".
-
-This model is \textbf{VERY} susceptible to scene change, lighting difference, camera motion, and weather condition.
-
-\paragraph{Adaptive background subtraction}
-Introduce a learning rate $\alpha$ to update the background as the video goes on
-\begin{align*}
-    B_t = \alpha I_t + (1-\alpha) B_{t-1}
-\end{align*}
-\begin{itemize}
-    \item $\alpha=0$ background subtraction
-    \item $\alpha=1$ frame differencing
-    \item $\alpha\in(0,1)$ something in between. To be tuned for the specific application.
-\end{itemize}
-The background is constantly updated, so that objects that stop moving get absorbed into the background and gradually fade from the change detector.
-
-\subsection{Gaussian average}
-\begin{align*}
-    \mu_t = \alpha I_t + (1-\alpha)\mu_{t-1}
-\end{align*}
-Build a probability density function for the value of a pixel and update it through time. If the pixel value exceeds the mean by a certain amount count it as movement.
-
-We put a pixel "in the foreground" if $|I_t - \mu_t| > k\sigma_t$ where $k$ is a constant (chosen by heart)
-
-This technique requires to "train" the model at the start, giving it some frames to calculate the gaussiana and adjust their initial values.
-
-\paragraph{Improved Gaussian average} The technique can be improved with a binary $M$ that decides if something will be added to the background or not $\mu_t = M\mu_t + (1-M)(\alpha I_t + (1-\alpha)\mu_{t-1})$. Even then this method is quite finicky.
-
-\subparagraph{Mixture of Gaussian distributions}
-To make the method more robust we can use $k$ Gaussian distributions instead of 1.
-\begin{align*}
-    P(x_t) = \sum_{i=0}^k \omega_{i,t}\eta(x_t,\mu_{i,t},\Sigma_{i,t})
-\end{align*}
-
-This is also called "\textit{multimodal}" Gaussian average, since it takes into account multiple "models" of motions that may affect the image.\\
-Take the example of movement that may be induced by \textit{rain}, \textit{wind}, and \textit{clouds}. Each one will induce some fake movement in the image, which can be accounted by a mixture of gaussiana.
-
-We then rank the Gaussians on their weight (decreasing) and select a threshold $T$. We take the first $B$ Gaussians until the sum of their weights reaches $T$.\\
-The first $B$ Gaussians model the background, while the remaining ones model the foreground.
-
-\section{Tracking}
-Identify moving objects and track their motion through time.
-
-We're tracking the path of moving objects on a 2D image gotten from the 3D world. We either get a projection of the motion, or we use stereo-cameras/lidar/other methods to capture a 3D path.
-
-\subsection{Region based}
-Tracking regions. It is good for real-time applications.
-
-\begin{callout}{wow}
-    By encoding an image in HSB colorspace we can ignore the B component and automatically filter out the shadows
-\end{callout}
-
-\begin{itemize}
-    \item Get regions
-    \item Calculate the histogram for each region
-    \item Use the histogram to ID the regions and track them through video
-\end{itemize}
-This method can be tricked by changes in illumination or color of the moving objects
-
-To make this method more robust we can further subdivide objects into smaller regions (like subdividing people in head-legs-torso). Each region has its own histogram and color vector
-
-\subsection{Lucas-Kanade optical flow}
-$\rho$-bust
-
-\subsection{Bayesian tracking}
-\subsection{Kalman filter}
-
-\section{Camera Geometry and Multi-View}
-\subsection{Affine Transformations}
-An transformation is called \textit{affine} if it can be described as the product between a matrix and the original coordinates.\\
-The three main affine transformations are:
-\begin{itemize}
-    \item Scaling
-    \item Rotation
-    \item Translation
-\end{itemize}
-But we can combine multiple of these in a single matrix.
-
-\paragraph{Scaling}
-\begin{align*}
-    \left[\begin{array}{c}x'\\y'\end{array}\right] = \left[\begin{array}{cc}c & 0 \\ 0 & c\end{array}\right]\left[\begin{array}{c}x\\y\end{array}\right]
-\end{align*}
-
-\paragraph{Rotation}
-\begin{align*}
-    \left[\begin{array}{c}x'\\y'\end{array}\right] = \left[\begin{array}{cc}\cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta)\end{array}\right]\left[\begin{array}{c}x\\y\end{array}\right] = \left[\begin{array}{cc}x\cos(\theta) & -y\sin(\theta) \\ x\sin(\theta) & y\cos(\theta)\end{array}\right]
-\end{align*}
-
-\paragraph{Translation}
-\begin{align*}
-    \left[\begin{array}{c}x'\\y'\\ 1\end{array}\right] = \left[\begin{array}{ccc}1 & 0 & x_0 \\ 0 & 1 & y_0 \\ 0&0&1\end{array}\right]\left[\begin{array}{c}x\\y\\1\end{array}\right] = \left[\begin{array}{c}x + x_0\\y+y_0\\1\end{array}\right]
-\end{align*}
-
-For the translation we introduce one more dimension to the array, and this is called \textit{"homogeneous coordinates"}.
-
-Putting these all together we can define a transformation matrix with 4 parameters $c,\theta, x_0, y_0$
-\begin{align*}
-    \left[\begin{array}{c}x_w\\y_w\\ 1\end{array}\right] &= \left[\begin{array}{ccc}1 & 0 & x_0 \\ 0 & 1 & y_0 \\ 0&0&1\end{array}\right]\left[\begin{array}{ccc}s & 0 & x_0 \\ 0 & s & 0 \\ 0&0&1\end{array}\right]\left[\begin{array}{ccc}\cos(\theta) & -\sin(\theta) & 0 \\ \sin(\theta) & \cos(\theta) & 0 \\ 0&0&1\end{array}\right]\left[\begin{array}{c}x_1\\y_1\\1\end{array}\right]
-    \\
-    \left[\begin{array}{c}u \\ v \\ 1\end{array}\right] &= \left[\begin{array}{ccc}a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ 0&0&1 \end{array}\right]\left[\begin{array}{c}x\\y\\1\end{array}\right]
-\end{align*}
-
-We ended up with 6 parameters to determine and we can find them using 3 matching pairs.\\
-What is usually done is putting a known pattern in some part of a video or a camera setup. The pattern is then used to calibrate the camera matrix for the entire image.
-
-This technique can be effected by errors, as any imprecision on the capture of the known pattern is then reflected on the rest of the image.\\
-It is hence better to take a large amount of samples and use the least-square method to minimize the error deviation.
-
 
 \end{document}
