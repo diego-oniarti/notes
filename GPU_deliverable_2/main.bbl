@@ -30,7 +30,19 @@ M.~Harris. Using shared memory in cuda c/c++. [Online]. Available:
 \bibitem{shuffleOps}
 \BIBentryALTinterwordspacing
 Warp shuffle functions. [Online]. Available:
-  \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/}
+  \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html\#warp-shuffle-functions}
+\BIBentrySTDinterwordspacing
+
+\bibitem{cuda_ldg}
+\BIBentryALTinterwordspacing
+Read-only data cache load function. [Online]. Available:
+  \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html\#read-only-data-cache-load-function}
+\BIBentrySTDinterwordspacing
+
+\bibitem{cuda_restrict}
+\BIBentryALTinterwordspacing
+Cuda programming guide: \_\_restrict\_\_. [Online]. Available:
+  \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/\#restrict}
 \BIBentrySTDinterwordspacing
 
 \end{thebibliography}
