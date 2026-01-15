@@ -1,0 +1,36 @@
+\documentclass{article}
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=3.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\input{../common}
+\usepackage[parfill]{parskip}
+
+\usepackage{graphicx}
+\usepackage{algorithm2e}
+
+\title{Robot planning and its applications}
+\author{Diego Oniarti}
+\date{Anno 2025-2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{10-09-2025}
+The deliberative paradigm is a top-down philosophy where the robot:
+\begin{itemize}
+    \item Senses the world
+    \item plans a course of action
+    \item implements the plan
+\end{itemize}
+This paradigm, for as simple as it is, makes some assumptions. It assumes for 
+example that the environment does not change while the plan is being implemented.
+
+The reactive paradigm simply senses the state of the system and performs an action
+informed by it. This is a much more simplistic approach on a technical level but
+has more limited application. Complex actions are formed by emerging behaviours.
+
+The hybrid paradigm makes a mix of both. It creates a long term plan (deliberate)
+and reacts to the environment in real time (reactive) while performing it.
+
+\end{document}

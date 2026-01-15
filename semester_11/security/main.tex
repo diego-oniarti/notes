@@ -1,0 +1,310 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\input{../common}
+
+\title{Appunti Security Testing}
+\author{Diego Oniarti}
+\date{Anno 2024-2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Heap vs Stack}
+Ciò che allochi sulla heap non viene deallocato quando la funzione finisce. Quello che viene allocato dalla stack viene distrutto a fine lezione. Questo lo ha detto anche Roveri nel primo semestre di triennio.
+
+\section{Classification and groups of bugs / errors}
+There are many ways of dividing errors into taxonomies. The major ones consist in ranking them on a certain metric. This can be:
+\begin{itemize}
+    \item \textbf{severity:} how much of an impact the bug can have on the system
+    \item \textbf{priority:} how quickly the issue should be resolved, based on the business impact and the prihect imeline.
+    \item \textbf{nature:} it refers to technical characteristics of the bug/error (es: functional or security, design or code specific, etc..)
+\end{itemize}
+Some of these chriteria are objective and measurable while some other are more subective and require some informed evaluation.
+
+\subsection{Why classify bugs?}
+The classification can be the first step of investiation for:
+\begin {itemize}
+    \item conducinf an \textbf{effective} (more targetted) testing acrivity
+    \item improving the development process. \\ 
+        Some development techniques are more suited for different kinds of task
+    \item driving bug-fixing \\
+        By knowing the common vulnerabilities of my kind of application I can test those more thoroughly. Like testing SQL injections when we write a webapp.
+\end {itemize}
+
+\section{Injection}
+An application if vulnerable to attack when user supplied data is not validated, filtered, or sanitized.
+
+\section{SQL injection}
+\subsection{Error-based SQL injection}
+Un tipo di injection che mira a causare un errore serverside. L'attaccante piò usare l'errore per estrapolare informazioni utili riguardo il sistema.
+
+\subsection{Union-based SQL injection}
+Injection che compie delle union SQL per ottenere più dati di quanti sarebbero normalmente accessibili all'utente.
+
+\subsection{Boolean-based Blind SQL injection}
+Non si ottiene un messaggio dal server ma si mandano query contenenti operatori booleani per inferire informazioni sulle tabelle.
+
+\subsection{Prevenzione}
+Usa i prepared-statement.
+
+\section{Cross-Site Scripting (XSS)}
+Attacchi XSS consistono nell'iniezione di codice "maliziono" in siti fidati. \\
+Questo è un tipo di attacco \textit{client side}. Quindi l'attaccante ha accesso a dati client side come cookie, token di sessione, etc..
+Questo rende l'attacco meno dannoso di una SQL-injection. Ma piò comunque essere molto pericoloso.
+
+% \begin{lstlisting}
+% <?php
+%     $query = $_GET["query"];
+%     if (isset($query)) {
+%         echo "Search results for: ".$query;
+%     }
+% ?>
+% \end{lstlisting}
+
+Ci sono molti tag html che possono portare all'esecuzione di codice javascript. Per esempio: script, body, img, ifreame, input, etc..
+
+\paragraph{Possibili soluzioni}
+\begin{itemize}
+    \item Non fidarsi mai degli input utente
+    \item Disattivare i cookie con la flag "htmlonly" se il sito non ne necessita
+\end{itemize}
+
+\section{Command Injection}
+Command Injection è un tipo di attacco in cui un programma esegue dei comandi. Un utente malintenzionato può manipolare il programma in maniera che i comandi eseguiti siano dannosi o forniscano informazioni. \\
+Questo è un tipo di attacco pericoloso in quanto l'esecuzione arbitraria di comandi piò portare a danni ingenti alla macchina o perdita di dati importanti.
+\paragraph{Requisiti per l'attacco}
+\begin{itemize}
+    \item The app shold have privileges/permissions to execute system commands
+    \item The app should use user-provided data as part of system commands
+    \item The user-procided data should not be escaped/sanitized before use
+\end{itemize}
+
+\paragraph{Mitigazione}
+\begin{itemize}
+    \item Non usare funzioni di esecuzione shell/SO
+    \item Non usare input utente nei comandi shell/SO
+    \item Sanatizzare l'input
+        \begin{itemize}
+            \item Whitelist di caratteri/keyword non pericolosi
+            \item Blacklist di caratteri/keyword pericolosi
+            \item Escaping dell'input
+        \end{itemize}
+    \item Parapetrizzare i comandi (simile a prepared statements)
+    \item Principio di \textit{Least Provilege}
+\end{itemize}
+
+Bisogna anche scegliere saggiamente il metodo in cui il programma invia i comandi al sistema operativo. Ad esempio in C c'è il comando \texttt{execvp} che è più sicuro di \texttt{system}. In Java ci sono \texttt{Runtime.exec} e il più sicuro \texttt{ProcessBuilder}.
+
+\section{File Inclusion Attack}
+Un attacco di file inclusion mira a programmi che fanno utilizzo di dati salvati su file a runtime. Se l'attaccante può modificare i file (o aggiungerne di nuovi) prima che vengano inclusi può affliggere il programma.
+
+Questo tipo di attacco si suddivide in \textit{Local File Inclusion (LFI)} e \textit{Remote File Inclusion (RFI)}.
+Il principale rischio nel primo caso è la trapelazione di informazioni (esponendo file locali all'attaccante), mentre nel secondo caso è più probabile che l'attaccante carichi file dannosi verso il sistema.
+
+\subsection{File access: directory traversal}
+L'attaccante usa una serie di "\textit{../}" per esplorare il file system del sistema target. \\
+Invece che sanatizzare l'input, questi casi possono essere affrontati configurando permessi adeguati all'applicazione.
+
+\section{Error Handling}
+L'error handling è un meccanismo usato per risolvere o gestire errori che si verificano durante l'esecuzione di un pogramma. La gestione degli errori è una parte integrante della sicurezza di un sistema.
+
+Un attaccante inizia dalla fase di ricognizione, in cui deve ottenere informazioni riguardo il sistema che sta attaccando. Queste informazioni possono essere fatte trapelare da messaggi d'errore, stack trace, e altre forme di error handling.
+
+Anche il modo in cui viene implementato il codice piò portare a far trapelare informazioni. Un errore che porta il sistema a crashare può fornire all'attaccante un'intera stack trace dell'errore che include altri dati.
+
+\paragraph{Mitigazione} Vulnerabilità di questo tipo possono essere mitigate filtrando i messaggi di errore che vengono mandati all'utente o gestendo i casi d'errore in modo che non vengano sollevate exception / crash.
+
+\section{Insecure Direct Object Reference (IDOR)}
+IDOR is a type of access control vulnerability that arises when an application uses usersupplied input to access objects directly.
+A direct object reference occurs when a developer exposes a reference to internal
+implementation objects (e.g., files, directories, database keys, session ids, query
+parameters) without appropriate validation mechanisms, thus allowing attackers to
+manipulate these references to access unauthorized data.
+
+\section{Client-Side Validation}
+La validazione di input dal lato del client è utile per alleviare lo stress sul server (evitando un avanti e indietro), ma i controlli vanno sempre replicati sul server alla fine.
+
+\section{Client-Side Filtering}
+Certe volte il server manda più informazioni del dovuto al client, fidandosi che sia quest'ultimo a filtrare queste informazioni prima di mostrarle all'utente. Questa è una bad practice per ovvi motivi.
+
+\section{Phases of testing}
+\subsection{Verification vs Validation}
+\textit{Verification} asks the question "are you building it right?" while \textit{Validation} checks "Are you building the right thing".\\
+We do both to ensure that the system does the right thing and that it does so safely
+
+\subsection{Static vs Dynamic Analysis}
+L'analisi statica viene svolta sul codice effettivo, mantre quella dinamica è svolta sul processo in esecuzione.
+
+\subsection{Test cases - dynamic}
+Un test case descrive una procedura che mette alla prova il sistema
+\paragraph{Oracle} "l'oracolo" è l'output atteso del programma nel caso il test case vada a buon fine. Deve essere stabilito manualmente dallo sviluppatore.
+
+\subsection{Test cases - static}
+???
+
+\section{Tainted Variable}
+Una variabile è detta \textit{"tainted"} quando non è checkata. \\ 
+Quando il vaore di una tainted variable è checkato, diventa \textit{untainted}.
+
+L'analisi di queste variabili nel codice è detta \textit{"taint analysis"}, è può essere di tipo statico o dinamico.
+
+\section{Testing}
+A \textit{Test Suite} is a set of test cases. When defining a test suit there are some generic problems:
+\begin{enumerate}
+    \item How to identify the required test inputs \\
+        It is not possible to test EVERY input. One approach is to test with random inputs, but various approaches depend on the type of problem.
+    \item How to identify the right test oracle to be used
+    \item When to stop testing \\
+        Testing could end when some coverage criteria is met, or when some resource (like time) runs out. There is also Mutation testing.
+\end{enumerate}
+
+\subsection{test coverage}
+Test coverage aims at ensuring that a test suite is comprehensive enough and that all relevant and critical applications aspects and functionalities are covered. It is based on "coverage measures or criteria"
+
+\subsection{integration testing}
+
+\subsection{test coverage criteria}
+There are many criteria that can be used to valuate test coverage. Some of these are
+\begin{itemize}
+    \item Code coverage
+    \item data flow code coverage
+    \item Boundary value coverage
+    \item risk coverage
+    \item requirements coverage
+    \item type of bugs
+\end{itemize}
+But there are many more.
+
+Different criteria are better suited for different kinds of applications. Code coverage is the easiest to use (especially if the code can be easily instrumented) but it gives little guarantee about the security of the code.
+
+\subsection{Statement Coverage}
+Statement coverage aims at involving the execution of all the executable statements at least once.
+\begin{callout}{}
+    Vedi slide 14 per l'esempio con la tabellina fatta bene.
+\end{callout}
+
+Un test case è detto \textit{ridondante} se testa degli statement che sono già testati da altri casi.\\
+Un test che è completamente ridondante può essere eliminato dalle test suit.
+
+\subsection{Decision Coverage}
+Decision coverage reports the true or false outcomes of each boolean expression (or code decision point)
+
+\subsection{Condition Coverage}
+Condition coverage reveals how the (atomic) logical operands in the conditional statement are evaluated. This is similar to the decision coverage, but instead of evaluating the `IF` statement as either true or false, we do the evaluation on the atomic parts of the boolean conditions.
+
+\subsection{Branch coverage.}
+Branch coverage tests every outcome from the code to ensure that every branch (CFG edge) es executed at least once
+
+\subsection{Code coverage testing tools}
+\begin{itemize}
+    \item Emma: java eclipse plugin
+    \item JacCoCo: Specializzato per le servlet
+\end{itemize}
+
+\section{mutation testing}
+Una tecnica usata per valutare la qualità di una test suite. Introduciamo un bug noto nel programma e verifichiamo che la test suite rilevi questo bug.\\
+In caso contrario c'è una mancanza nella suite.
+
+Alcune assunzioni sono:\begin{itemize}
+    \item solo un cambiamento è introdotto alla volta
+    \item l'obbiettivo può essere raggiunto misurando \textit{quanto bene trova il bug introdotto}
+    \item il bug introdotto è indicativo delle problematiche effettive che potrebbero essere nel codice.
+    \item errori veri e introdotti artificialmente non devono essere identici, ma le differenze non dovrebbero affliggere l'obbiettivo.
+\end{itemize}
+
+\subsection{Mutanti}
+\begin{itemize}
+    \item Un \textbf{Mutant} è il programma modificato
+    \item Un mutant è \textbf{Killed} quando è rilevato dalla test suite
+    \item Un \textbf{Mutant Score} è $\frac{killed mutants}{total mutants}*100$
+    \item Una test suite è \textbf{mutation-adequate} se il mutant score è $100$
+\end{itemize}
+
+\subsection{Common mutation}
+Ci sono dei mutant che vengono comunemente usati
+\paragraph{operand replacement}
+Cambiare operatori o operandi in una espressione. $(x>y)$ può diventare $(x<y)$ o $(x>3)$ 
+
+Rimuovere l'\textit{else} in un blocco condizionale, rimuovere l'intero \textit{if-else}, aggiungere un return
+
+Queste modifiche non devono causare errori a compile time ma solo runtime (deve compilare).
+
+Altri mutanti comuni:
+\begin{itemize}
+    \item remove regex sanitization
+    \item remove path traversal sanitization
+    \item remove http-only flag from cookie
+    \item permit sql injection
+    \item sql 
+    \begin{itemize}
+        \item add or/and clauses
+        \item add ";"
+        \item change the encoding of whitespaces
+    \end{itemize}
+\end{itemize}
+
+\subsection{tools}
+Two tools for mutation testing are \textit{stryker mutator} e \textit{PITest (eclipse plugin)}
+
+\section{fuzzing}
+Fuzzing è la generazione automatica di input con l'obbiettivo di crashare \\ l'applicazione.
+
+Gli input sono "casuali" ma tipicamente sono stringhe molto lunghe, numeri grandi, input "strani" in generale, e altri input che possano metter alla prova l'applicazione.\\
+Questo include numeri ai limiti dei range rappresentabili, stringhe composte da caratteri particolari, etc..
+
+L'oracolo di un fuzzer quindi è un crash.
+
+Tecniche più sofisticate non mirano a un crash ma a altre metriche come memory leak, stati non validi dell'applicazione, accessi invalidi a memoria, etc.. Questi test sono molto più difficili da progettare.
+
+Il fuzzing ha il vantaggio di essere molto semplice, in quanto ci sono tools che possono dare molti input automaticamente a un app, ma non è molto efficace per alcuni tipi di applicazione.
+
+\section{Blackbox vs graybox}
+
+\section{Esecuzione simbolica}
+Esecuzione del software non con valori effettivi ma con simboli che rappresentano la classe di tutti i valori che i simboli potrebbero avere. Poi vengono generati dei \textit{path constraint}, delle limitazioni e relazioni tra i simboli che sono valide globalmente o in determinati branch di codice.
+
+La path condition ci dice quale relazione deve essere presente tra gli input per far si che il programma segua un certo path.
+
+Possiamo definire degli input validi e tenere tracci della esecuzione simbolica durante quella effettiva. La condition ci permette poi di definire nuovi input che non matchino la path condition e ripetere il processo.
+
+Durante la symbolic execution potremmo imbatterci in chiamate a funzioni private. In questo caso il simbolo prende il valore di ritorno della funzione.
+
+\section{Dipendenze}
+\subsection{Supply Chain Attack}
+\subsection{Zero-Day vulnerability}
+\subsection{typosquatting, repo confusion, dependency confusion}
+
+\section{Vulnerability Detection with Neutral Networks}
+3 tipi di NN: \begin{enumerate}
+    \item feed forward: A glorified statistical model
+    \item recurring: good in handling sequential or time based data (mainly text and audio)
+    \item convolutional: good in handling image data
+\end{enumerate}
+
+\section{Adversarial attacks}
+\subsection{Evasion attacks}
+Fooling the model during inference by lightly altering inputs (common in classification tasks).\\
+Some common evasion attack types are:
+\begin{itemize}
+    \item input perturbation
+    \item feature-space attacks
+    \item model inversion attacks
+\end{itemize}
+
+\subsubsection{Model Inversion}
+un tipo di attacco in cui l'attaccante tenta di utilizzare il modello per esporre i dati che sono stati usati in fase di training. Questo è utile in case in cui il modello è stato allenato su dati confidenziali.
+
+\subsection{Poisoning attack}
+Evasion attacks are performed on the already trained (black box) model. Poisoning attacks are performed on the model during training. Manipulating training data to introduce biases or vulnerabilities into the model. Data poisoning attacks occur when an adversity intentionally injects harmful data into the training data.
+
+\subsection{System and model level}
+Un attacco a livello di modello mira solo a compromettere o sfruttare falle nel modello di IA, ma non si spinge oltre. \\
+Un attacco a livello di sistema, invece, sfrutta una falla nel modello per condurre l'intero sistema a una condizione indesiderata. Convincere una self-driving car a schiantarsi è system level.
+
+\end{document}
+
+

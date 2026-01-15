@@ -1,0 +1,354 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{semantic}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{nicefrac, xfrac}
+\usepackage[a4paper, margin=0.5in]{geometry}
+\usepackage{setspace}
+\usepackage{tikzsymbols}
+\usepackage[parfill]{parskip}
+
+\input{../../common.tex}
+\newcommand{\execs}[0]{\ensuremath{\rightrightarrows}}
+\newcommand{\fold}[0]{\ensuremath{\text{fold}}}
+\newcommand{\unfold}[0]{\ensuremath{\text{unfold}}}
+\newcommand{\mR}[0]{\ensuremath{\mathbb R}}
+\newcommand{\mM}[0]{\ensuremath{\mathbb M}}
+\newcommand{\mF}[0]{\ensuremath{\mathbb F}}
+\newcommand{\mJ}[0]{\ensuremath{\mathbb J}}
+\newcommand{\mC}[0]{\ensuremath{\mathbb C}}
+
+\usepackage{pdflscape}
+
+\title{Assignment \#5}
+\author{Diego Oniarti - 257835}
+\date{}
+\begin{document}
+\maketitle
+
+\section{Encoding ULC into System F using recursive types}
+Try to define type $\tau_u$, which is the type that any ULC term can be given in F+isorecursive types. If you can define $\tau_u$, define a function inductively on ULC terms so that it maps any ULC term to a term of F+isorecursive types whose type is $\tau_u$ and that has the same behaviour as the original ULC term (i.e., if you map an ULC application, you get something that eventually behaves like an application).
+
+If you cannot define $\tau_u$, argue why it cannot exist.
+
+In this case, consider ULC terms to be: $t ::= n | x | \lam{x}{t} | t\ t | \langle t, t\rangle | t.1 | t.2 | \inl t | \inr t | \case{\ t}{\inl x_1 \to t}{\inr x_2 \to t}$ \\
+Encoding these terms into lambdas is not an option.
+
+\hline
+
+\begin{align*}
+    \tau_u \triangleq \mu\alpha. (\N \uplus (\alpha\to\alpha)) \uplus ((\alpha\uplus\alpha) \uplus (\alpha\times\alpha))
+\end{align*}
+
+\paragraph{Base cases}
+\begin{align*}
+        & F(n) = \fold_{\mu_U}(\inl(\inl n)) \\
+        & F(\lam{x}{t}) = \fold_{\mu_U}(\inl(\inr \lam{x:\mu_U}{F(t)})) \\
+        & F(\langle t_1,t_2 \rangle) = \fold_{\mu_U}(\inr(\inr(F(t_1),F(t_2)))) \\
+        & F(\inl t) = \fold_{\mu_U}(\inr (\inl (\inl(F(t))))) \\
+        & F(\inr t) = \fold_{\mu_U}(\inr (\inl (\inr(F(t))))) \\
+\end{align*}
+\paragraph{Inductive cases}
+\begin{align*}
+        & F(t_1\ t_2) = \case{\ \unfold(F(t_1))}{\inl x_1 \mapsto \case{\ x_1}{\inl x_{11}\mapsto \Omega}{\inr x_{12}\mapsto x_{12}\ F(t_2)}}{\inr x_2 \mapsto \Omega} \\
+        & F(t.1) = \case{\ \unfold(F(t))}{\inl x_1 \mapsto \Omega}{\inr x_2 \mapsto \case{\ x_2}{\inl x_{21}\mapsto \Omega}{\inr x_{22}\mapsto x_{22}.1}} \\
+        & F(t.2) = \case{\ \unfold(F(t))}{\inl x_1 \mapsto \Omega}{\inr x_2 \mapsto \case{\ x_2}{\inl x_{21}\mapsto \Omega}{\inr x_{22}\mapsto x_{22}.2}} \\
+        & F\left(\case{\ t_0}{\inl x_1 \mapsto t_1}{\inr x_2 \mapsto t_2}\right) = \case{\ \unfold(F(t_0))}{\inl x_1 \mapsto \Omega}{\inr x_2 \mapsto \case{\ x_2}{\inl x_{2_1}\mapsto \case{\ x_{2_1}}{\inl x_{211}\mapsto F(t_1)}{\inr x_{212}\mapsto F(t_2)} }{\inr x_{2_2}\mapsto \Omega}}
+\end{align*}
+
+\newpage
+\section{Formalising ASM capability machines}
+Capability machines extend assembly instructions with explicit capabilities such that reading and writing on memory is only allowed if a capability is provided.
+
+Take ASM without the private heap and extend the language with capabilities and formalise their semantics: call this CASM. You choose how to model them, choose wisely according to their behaviour as described below.
+
+Capabilities are unforgeable and unobservable tokens which the program can create. At the start, each memory location is unprotected. The language must provide instructions for creating a capability, and for protecting a location given a capability, this should only be possible if the location is unprotected. \\
+Reading and writing a memory location is always possible if the location is unprotected. However, if the location is protected with a capability, reading and writing that location is only possible if the same capability is provided at reading and writing time.
+
+\hline
+
+Capabilities are gonna be represented as negative numbers. To accomodate this the memory is no longer a mapping from $\N$ to $\N$ but one from $\N$ to $\I$. \\
+To make the capabilities unforgeable and unobservable, registers can still only hold positive values. Similarly the rest of the operations are only allowed to operate on positive numbers.
+
+\setstretch{1}\begin{align*}
+    t ::= &\ r:=n \\
+        &| sum\ r\ r \\
+        &| sub\ r\ r \\
+        &| cmp\ r\ r \\
+        &| jmp\ r \\
+        &| jiz\ r \\
+        &| jeq\ r \\
+        &| read\ r\ r \\
+        &| write\ r\ r \\
+        &| \textcolor{blue}{cap\ r} \\
+        &| \textcolor{blue}{prot\ r} \\
+        &| \textcolor{blue}{deadp\ r} \\
+        &| \textcolor{blue}{writep\ r} \\
+    r ::= & ar|br|cr|dr|er|fr|gr|hr \\
+        |&ir|jr|kr|lr|mr|nr|or \\
+    C ::=& \emptyset | C,\N\mapsto t \\
+    F ::=& \emptyset | F,\N\mapsto b \\
+    R ::=& \emptyset | R, r\mapsto \N \\
+    M ::=& \emptyset | M, \N\mapsto \textcolor{blue}{\mathbb{I}} \\
+    \textcolor{blue}{P ::=}& \textcolor{blue}{\emptyset | P, \mathbb I \mapsto \N} \\
+\end{align*}
+
+\paragraph{Judgement:}
+\begin{equation*}
+    n;C;R;F;M\textcolor{blue}{;P} \rightrightarrows n;C;R;F;M\textcolor{blue}{;P}
+\end{equation*}
+Codebase, registers, flags, memory, \textcolor{blue}{and protections}:
+\[\setstretch{3} \begin{array}{ccc}
+    \st[]{C(n)=t}{C=C',n\mapsto t} &
+    \st[]{R(r)=n}{R=R',r\mapsto n} &
+    \st[]{F(n)=B}{F=F',n\mapsto B} \\
+    \st[]{C(n)=t}{C=C',n'\mapsto \_\quad C'(n)=t} &
+    \st[]{R(r)=n}{R=R',r'\mapsto \_\quad R'(r)=n} &
+    \st[]{F(n)=B}{F=F',n'\mapsto \_\quad F'(n)=B} \\
+    \st[]{M(n)=n'}{M=M',n\mapsto n'} &
+    \st[]{M(n)=n'}{M=M',n"\mapsto \_\quad M'(n)=n'} \\
+    \st[]{\textcolor{blue}{P(i)=n}}{\textcolor{blue}{P=P',i\mapsto n}} &
+    \st[]{\textcolor{blue}{P(i)=n}}{\textcolor{blue}{P=P',i'\mapsto\_ \quad P'(i)=n}} &
+    \st[]{\textcolor{blue}{P(i)=n}}{\textcolor{blue}{P=P',i'\mapsto n' \quad P'(i)=n}} &
+\end{array}\]
+The rule for traversing the protection list is a bit different from the others because it has to allow the same capability to be mapped to multiple memory addresses.
+
+Capabilities will be generated in a sequential order starting from $-1$. The function FREE returns the first unused negative number
+\begin{gather*}
+    \te{FREE}(P) = MINP(P)-1 \\
+    \te{MINP}(\emptyset) = 0 \\
+    \te{MINP}(P,i\mapsto n) = min(i,\te{MINP}(P))
+\end{gather*}
+The UNPROT function checks if a memory address is unprotected
+\begin{gather*}
+    \te{UNPROT}(\emptyset,n) = true \\
+    \te{UNPROT}(P,i\to n, n) = false \\
+    \te{UNPROT}(P,i\to n', n) = UNPROT(P) \\
+\end{gather*}
+
+\paragraph{Rules:}
+\setstretch{3}\begin{gather*}
+    \st[load]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R';F;M\textcolor{blue}{;P}}{C(n)=r_1:=n_1 \quad R'=R,r_1\mapsto n_1 \quad n'=n+1} \\
+    \st[sum]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R';F;M\textcolor{blue}{;P}}{
+        C(n)=sum\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1+n_2 \ 
+        n'=n+1
+    } \\
+    \st[sub]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R';F';M\textcolor{blue}{;P}}{
+        C(n)=sub\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1-n_2 \ 
+        n'=n+1 \
+        F'=F,0\mapsto n_2>n_1
+    } \\
+    \st[cmp]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R;F';M\textcolor{blue}{;P}}{
+        C(n)=cmp\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        F'=F,1\mapsto n_1==n_2 \
+        n'=n+1
+    } \\
+    \st[jmp]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R;F;M\textcolor{blue}{;P}}{
+        C(n)=jmp\ r_1 \quad
+        R(r_1)=n_1 \quad
+        n'=n_1
+    } \\
+    \st[jiz]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R;F;M\textcolor{blue}{;P}}{
+        C(n)=jiz\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(1)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[jeq]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R;F;M\textcolor{blue}{;P}}{
+        C(n)=jeq\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(0)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[read]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R';F;M\textcolor{blue}{;P}}{
+        C(n)=read\ r_1\ r_2 \quad
+        R(r_2)=n_2 \quad
+        M(n_2) = n" \quad
+        \textcolor{blue}{n" \geq 0} \quad
+        \textcolor{blue}{\te{UNPROT}(P, n_2)} \quad
+        R' = R,r_1\mapsto n" \quad
+        n'=n+1
+    } \\
+    \st[write]{n;C;R;F;M\textcolor{blue}{;P} \execs n';C;R;F;M'\textcolor{blue}{;P}}{
+        C(n)=write\ r_1\ r_2 \quad
+        R(r_1)=n_1 \quad
+        R(r_2)=n_2 \quad
+        \textcolor{blue}{\te{UNPROT}(P, n_1)} \quad
+        M' = M,n_1\mapsto n_2 \quad
+        n'=n+1
+    } \\
+    \st[\textcolor{blue}{cap}]{n;C;R;F;M;P \execs n';C;R;F;M';P'}{
+        C(n)=cap\ r \quad
+        R(r)=n_1 \quad
+        \te{UNPROT}(P,n_1) \quad
+        i = \te{FREE}(P) \quad
+        M' = M,n_1\mapsto i \quad
+        n'=n+1
+    } \\
+    \st[\textcolor{blue}{prot}]{n;C;R;F;M;P \execs n';C;R;F;M;P'}{
+        C(n)=prot\ r_1\ r_2 \quad 
+        R(r_1) = n_1 \quad
+        R(r_2) = n_2 \quad
+        M(n_2) = i \quad
+        i<0 \quad
+        \te{UNPROT}(P, n_1) \quad
+        P' = P,i\mapsto n_1 \quad
+        n'=n+1
+    } \\
+    \st[\textcolor{blue}{readp}]{n;C;R;F;M;P \execs n';C;R';F;M;P}{
+        C(n)=readp\ r_1\ r_2\ r_3 \quad
+        \setstretch{1}\begin{array}{lll}R(r_2)=n_2 & M(n_2)=n" & n"\geq 0\\R(r_3)=n_3 & M(n_3)=i & P(i)=n_2\\\end{array}\setstretch{3} \quad
+        R'=R,r_1\mapsto n" \quad
+        n'=n+1
+    } \\
+    \st[\textcolor{blue}{writep}]{n;C;R;F;M;P \execs n';C;R;F;M',P}{
+        C(n)=writep\ r_1\ r_2\ r_3 \quad
+        \setstretch{1}\begin{array}{lll}R(r_1)=n_1 \\ R(r_2)=n_2 \\ R(r_3)=n_3 \end{array}\setstretch{3} \quad
+        M(n_3)=i \quad
+        P(i)=n_1 \quad
+        M' = M,n_1\mapsto n_2 \quad
+        n'=n+1
+    }
+\end{gather*}
+The new commands are:
+\setstretch{1}\begin{itemize}
+    \item $cap\ r$: generates a new capability and stores it in the memory address pointed by $r$
+    \item $prot\ r_1\ r_2$: protects the memory address stored in $r_1$ with a capability stored in memory and pointed at by $r_2$
+    \item $readp\ r_1\ r_2\ r_3$: reads the memory address stored in $r_2$ and stores the content in $r_1$. Requires the capability pointed at by $r_3$
+    \item $writep\ r_1\ r_2\ r_3$: writes the content of $r_2$ in the memory address stored in $r_1$. Requires the capability pointed at by $r_3$
+\end{itemize}
+
+\newpage
+\section{Typing CASM}
+Provide typing rules for all instructions of CASM (that is, all instructions from RML, ASM and CASM).
+\hline
+% We can expand $\tau$ to include registers and side effects
+% \begin{gather*}
+%     \tau ::= \cdots | \mathcal R | sf | j | mw | cc | pm \\
+% \end{gather*}
+% The side effects are represented by types with no associated value
+% \begin{align*}
+%     & rw && \te{Write to register} \\
+%     & sf && \te{Set flag} \\
+%     & j  && \te{Jump} \\
+%     & mw && \te{Write to memory} \\
+%     & cc && \te{Create capability} \\
+%     & pm && \te{Protect memory with a capability} \\
+% \end{align*}
+% 
+% We define $\mathcal S$ as a generic side effect
+% \begin{align*}
+%     \mathcal S \triangleq sf \uplus j \uplus mw \uplus cc \uplus pm
+% \end{align*}
+% 
+% We define arguments as either registers or natural numbers
+% \begin{align*}
+%     \mathcal A \triangleq \mathcal R \uplus \N
+% \end{align*}
+% and a list of arguments as we defined lists in class
+% \begin{align*}
+%     \mathcal Args \triangleq \mu \alpha. Bool \uplus (\mathcal A \times \alpha)
+% \end{align*}
+% Finally each instruction can be typed as a pair containing a list of arguments and a side effect
+% \begin{gather*}
+%     \mathcal{I} \triangleq \mathcal Args \times \mathcal S \\
+% \end{gather*}
+% The values for $\mathcal R$ are the registers $ar,br,\dots,or$ as defined for RML
+% 
+% The typing rules for the instructions are
+% \begin{gather*}
+%     \begin{array}{lcr}
+%         \st[load]{\Gamma\vdash r:=n : }{\Gamma\vdash r: \mathcal R \quad \Gamma\vdash n:\N}
+%     \end{array}
+% \end{gather*}
+
+We can type each instruction by the arguments it receives and the type of side effect it has.\\
+We $\tau$ to contain the side effects, which have no value
+\begin{align*}
+    \tau ::= \cdots |&\ rw && \te{Write to register} \\
+    &| sf && \te{Set flag} \\
+    &| j  && \te{Jump} \\
+    &| mw && \te{Write to memory} \\
+    &| cc && \te{Create capability} \\
+    &| pm && \te{Protect memory with a capability} \\
+\end{align*}
+We also expand $\tau$ with the register type, and $v$ with the registers defined for RML
+\begin{align*}
+    \tau ::=& \cdots | \mR \\
+    v ::=& \cdots | ar|br|\dots|or
+\end{align*}
+
+\begin{align*}
+    \setstretch{3}\begin{array}{lll}
+        \st[load]{\Gamma\vdash r:=n: \mR\to\N\to rw}{\Gamma\vdash r:\mR \quad \Gamma\vdash n:\N} &
+        \st[sum]{\Gamma\vdash sum\ r_1\ r_2: \mR\to\mR\to rw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[sub]{\Gamma\vdash sub\ r_1\ r_2: \mR\to\mR\to rw \times sf}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} \\
+        \st[cmp]{\Gamma\vdash cmp\ r_1\ r_2: \mR\to\mR\to sf}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[jmp]{\Gamma\vdash jmp\ r: \mR\to sf}{\Gamma\vdash r:\mR} &
+        \st[jiz]{\Gamma\vdash jiz\ r: \mR\to sf}{\Gamma\vdash r:\mR} \\
+        \st[jeq]{\Gamma\vdash jeq\ r: \mR\to sf}{\Gamma\vdash r:\mR} &
+        \st[read]{\Gamma\vdash read\ r_1\ r_2: \mR\to\mR\to rw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[write]{\Gamma\vdash write\ r_1\ r_2: \mR\to\mR\to mw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} \\
+        \st[cap]{\Gamma\vdash cap\ r: \mR\to cc}{\Gamma\vdash r:\mR} &
+        \st[prot]{\Gamma\vdash prot\ r_1\ r_2: \mR\to\mR\to pm}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR} &
+        \st[readp]{\Gamma\vdash prot\ r_1\ r_2\ r_3: \mR\to\mR\to\mR\to pm}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR \quad \Gamma\vdash r_3:\mR} \\
+                                                                                                                 &&\st[writep]{\Gamma\vdash prot\ r_1\ r_2\ r_3: \mR\to\mR\to\mR\to mw}{\Gamma\vdash r_1:\mR \quad \Gamma\vdash r_2:\mR \quad \Gamma\vdash r_3:\mR}
+    \end{array}\setstretch{1}
+\end{align*}
+The types for each instruction work to represent their "shape" and behaviour.
+
+\newpage
+\section{Subtyping}
+Subtyping lets you use a term of type $\tau$ at a super-type $\tau'$. Intuitively, it is the same principle by which you can use an object of a class as if it were of a super class. \\
+Concretely, subtyping is achieved by introducing the subsumption rule below, as well as an ordering on types, indicated with $<:$.
+
+\begin{gather*}
+    \st[Subsumption]{
+        \Gamma\vdash t:\tau'
+    }{
+        \Gamma\vdash t:\tau \quad
+        \tau <:\tau'
+    }
+\end{gather*}
+
+Consider the standard typing of the sequencing rule and its related reduction. Suppose we extend our types with $Unit$, so $\tau ::= \cdots | Unit$ and our terms with $unit$ (a new value), so $t ::= \cdots | unit$.
+
+$$
+\begin{array}{lr}
+    \st[Type-seq]{
+        \Gamma\vdash t;t':\tau
+    }{
+        \Gamma \vdash t: Unit \quad
+        \Gamma \vdash t':\tau
+    }
+    &
+    \st[Eval-seq]{
+        unit;t\leadsto^p t
+    }{}
+\end{array}
+$$
+
+Consider STLC with sums and pairs. Can we introduce an ordering on types to allow this kind of reduction: $v;t \leadsto^p t$ for any value $v$, effectively replacing Rule \textcolor{red}{Eval-seq} while keeping Rule \textcolor{red}{Type-seq} and Rule \textcolor{red}{Subsumption}? If yes, show such an ordering. If no, argue why not.
+
+\hline
+\begin{gather*}
+    \N <: Unit \\
+    \tau\to\tau <: Unit \\
+    \tau\uplus\tau <: Unit \\
+    \tau\times\tau <: Unit \\
+\end{gather*}
+This ordering allows everything to be treated as $Unit$, thus we can type sequencing for any value on the left side.
+
+\end{document}

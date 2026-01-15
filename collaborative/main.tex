@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=3.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\input{../common}
+\usepackage[parfill]{parskip}
+
+\usepackage{graphicx}
+\usepackage{algorithm2e}
+
+\title{Collaborative Robotics}
+\author{Diego Oniarti}
+\date{Anno 2025-2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{2025-09-10}
+What is a robot? A programmable machine that can carry out a complex series of
+actions automatically.
+
+A robot can sense the \textit{environment}, make \textit{autonomous decisions}, and \textit{operate on the environment}.
+
+\section{2025-09-11}
+Robots have \textit{links} and \textit{joints}. Each one has a position and an orientation.
+
+\begin{callout}{Orientation}
+    The orientation can be expressed with a rotation matrix. But they are inefficient because they use too many variables. The matrix has $9$ values but only $3$ should really be needed.
+
+    Another way of describing orientation is through \textit{roll, pitch, and yaw}. This is also an intuitive representation but has the \textit{gimble lock} problem.
+
+    Quaternions are straight up magic but they work.
+\end{callout}
+
+\paragraph{Direct Kinematics}
+To describe the motion of each manipulator link, it is possible to attach a moving frame to each link and describe it w.r.t a fixed reference frame.
+
+The most important frames are 
+\begin{itemize}
+    \item base frame. This is the one at the base of a manipulator, which never moves
+    \item end-effector frame. The "hand" at the end of the manipulator.
+\end{itemize}
+
+\paragraph{Workspace}
+The workspace of a manipulator is denied as the are in Cartesian space that the end effector can reach.\\
+There may also be positions the manipulator can reach with the effector in some orientations but not others
+
+\paragraph{Joints}
+A joint $q$ is a connection between two or more links, which allows some motion between the connected links.
+
+Each joint constrains one link to move only in certain directions with respect to the other link. Each possible direction is a \textit{degree of freedom} (DoF)
+
+\begin{callout}{Dof}
+    Most actuators have at least $6$ degrees of freedom. This allows them to move objects in any direction and rotation.
+
+    Additional degrees of freedom are said \textit{redundant}, and they increase the dexterity of the robot. This allows the manipulator to do smoother motions and have better kinematics.
+\end{callout}
+
+There are many joint types, differentiated by the way the two links can move with respect to one another. Joints may also have an \textit{actuator} (motor) or not.
+
+\paragraph{Effectors}
+All different manipulators have and end-effector or a tool of some sort attached to the "wrist" of the arm.\\
+It is good to build three revolute joints in the wrist, giving it good dexterity.
+
+\paragraph{Kinematics}
+\begin{itemize}
+    \item Forward kinematics: find the end-effector pose $x_e$ as a function of the joint configuration $q$
+    \item inverse kinematics: find the joint configuration $q$ as a function of the "desired" end-effector pose $x_e$
+    \item differential kinematics: Instead of configurations and poses, it links the joint velocity $\dot q$ and position $q$ with the velocity of the end effector.
+\end{itemize}
+
+Forward kinematics are not always linear. So the inverse kinematics might and often do have multiple possible solutions.
+
+\paragraph{Dynamics}
+is the general problem of describing the motion of a robotic structure as a function of the forces and moments acting on it.\\
+In the case of direct dynamics we determine the accelerations and forces acting on the joints and their effects.\\
+For inverse dynamics we determine the force the actuators need to apply to get the desired motion.
+
+\paragraph{ISO/TS 15066 Collaborative robot} is a technical specification that regulates
+\begin{itemize}
+    \item Design of collaborative workspace
+    \item Design of collaborative operations
+        \begin{itemize}
+            \item minimum separation distance 
+            \item maximum velocity
+            \item etc
+        \end{itemize}
+    \item methods of collaborative working
+        \begin{itemize}
+            \item safety-rated monitored sto
+            \item hand-guiding
+            \item speed and separation
+        \end{itemize}
+    \item changing between collaborative and non-collaborative actions and different methods of collaboration
+\end{itemize}
+
+\paragraph{Compliant Controllers}
+A \textit{compliant} (or \textit{admittance}) robot is one that can be manipulated by hand by an human operator/actor. They still try to do their task, but can be grabbed and moved out of the way whenever it is needed.\\
+A compliant controller needs sensors to measure forces and torques applied to the joints. Also impedance on the motors can be used.
+
+\section{2025-10-02}
+To define a node in \texttt{ros2} we inherit from \texttt{rclcpp::Node}.
+
+rclcpp functions
+\begin{enumerate}
+    \item shutdown: Wait for Ctrl-C from terminal
+    \item Node::create\_publisher<msg\_type>(topic\_name, queue\_size)
+    \item Node::create\_wall\_timer(delay, callback) is like setInterval in js.
+\end{enumerate}
+
+\section{2025-10-08}
+
+\end{document}

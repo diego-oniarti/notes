@@ -1,0 +1,65 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\title{Appunti Signals, Image, Video}
+\author{Diego Oniarti}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Definitions}
+\begin{itemize}
+    \item $R(t)$: Segnale rettangolare di area unitaria. Durata $\Delta T$ e ampiezza $\frac 1 {\Delta T}$. Centrato in $\frac{\Delta T}2$
+    \item $\delta(t)$: impulso unitario. $\displaystyle \lim_{\Delta T\to 0}R(t)$, ma centrato in $0$.
+    \item $h(t)$: risposta all'impulso di un segnale.
+\end{itemize}
+
+
+\section{LTI Systems}
+Given a linear time invariant system, its impulse response $h(t)$, and a signal $x(t)$: \\
+We can calculate the response $y(t)$ to the signal $x$ as the convolution between $x$ and $h$.
+$$
+y(t) = x(t) * h(t)
+$$
+
+\section{Loew level image processing}
+Possiaamo modificare un'immagine nel dominio dei pixel senza introdurre rappresentazioni di livello superiore.
+
+Lo scopo principale del low level processing è quello di migliorare l'immagine correggendo errori introdotti dal metodo di acquisizione.
+\begin{itemize}
+    \item \textbf{Pre-processing:} operatori che lavorano su singoli pixel
+    \item \textbf{Filtering:} operatori che lavorano su un'area spaziale attorno al pixel in considerazione.
+\end{itemize}
+
+\subsection{Pre processing}
+Introdurremo 3 operazioni comuni
+\begin{itemize}
+    \item correzione della distorsione geometrica
+    \item correzione della distorsione colore
+    \item monipulazione dell'istogramma
+\end{itemize}
+
+\subsubsection{Distorsione geometrica}
+Effetti come \textit{fisheye} o \textit{telephoto} sono casi di distorsione geometrica. 
+
+\paragraph{Calibration}
+Questo tipo di distorsione può essere affrontato tramite \textit{calibrazione}.
+Si pone un pattern noto (una scacchiera tipicamente) davanti al apparecchio di acquisizione. Possiamo poi misurare la distorsione sulla scacchiera, invertirla, e applicarla all'immagine da correggere.
+
+È bene fare una calibrazione ogni volta che si usa una camera.
+
+\subsubsection{Distorsione cromatica}
+Un sistema può introdurre alterazioni non lineari ai componenti dei colori, modificando la percezione dei colori.
+
+Questo piò accadere per via dell'acquisizione, del processing, o del rendering. Quindi nella catena di elaborazione potrebbero sommarsi deversi effetti di distorsione.
+
+\section{Progetto}
+È possibile fare un progetto in alternativa all'esame orale.\\
+L'esame sembra la scelta migliore
+
+\end{document}
+
+

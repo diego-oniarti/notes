@@ -1,0 +1,113 @@
+\documentclass{article}
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=3.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\input{../common}
+\usepackage[parfill]{parskip}
+
+\usepackage{graphicx}
+\usepackage{algorithm2e}
+
+\title{Advanced Programming for Cryptographic Methods}
+\author{Diego Oniarti}
+\date{Anno 2025-2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{introduction}
+\paragraph{Schedule}
+Iniziamo alle 14:00
+
+\paragraph{topics}
+\begin{itemize}
+    \item introduction to applied cryptography. Not the quantum stuff yet.
+    \item How the theoretical aspects of cryptography translate on physical machines
+    \item Software development and security
+    \item JAVA using JCA and JCR
+    \item C and OpenSSL
+\end{itemize}
+
+\paragraph{exam}
+\begin{itemize}
+    \item exercises assigned burring the semester (0 to 5 points)
+    \item software project and report (0 to 27 points)
+    \item oral exam with questions stating from the project and spanning the whole course (-5 to 5 points)
+\end{itemize}
+no fixed groups for exercises
+
+\paragraph{Cryptography overview}
+Two actors (Alice and Bob) have to communicate over an \textit{insecure} channel. The channel is not secure because a third actor (Eve) is trying to tamper with the communication.
+
+Eve could have different capabilities in terms of computation power, system knowledge, etc.\\
+Existing systems have to constantly be updated to keep up with Eve's potential evolutions.
+
+Three things that we want from our systems are
+\begin{itemize}
+    \item Confidentiality
+    \item Integrity
+    \item Availability
+\end{itemize}
+Cryptography can work on the first two. But availability is not our problem.
+
+\paragraph{Theoretical vs applied}
+In theory numbers, keys, and other models can be arbitrarily big. In the real world whey need to be stored into memory or storage and processed in binary.
+
+\paragraph{Hash Function}
+Function $f(x)=d$ that takes an element $x$ from a set and returns a sequence of bits $d$.
+\begin{itemize}
+    \item $d$ must be of fixed size
+    \item $f$ must not be reversible
+    \item $f(x)$ must be unique. Collisions violate \textit{integrity}.\\
+        In the real word collisions are inevitable. But we must strive to minimize them as much as possible
+\end{itemize}
+
+\paragraph{Cryptosystem}
+A cryptosystem is a 5-tuple $<E,D,M,K,C>$ where
+\begin{itemize}
+    \item $E$ is an encryption algorithm
+    \item $D$ is a decryption algorithm
+    \item $M$ is the set of plaintexts
+    \item $K$ is the set of keys
+    \item $X$ is the set of ciphertextx
+\end{itemize}
+
+$E$ and $D$ can be characterized as functions
+
+\begin{align*}
+    E:M\times K   & \to C \\
+    D: X \times K & \to M \\
+    D(E(m,k),k)   & = m
+\end{align*}
+
+\paragraph{Kerckhoff's principle}
+A cryptosystem should be secure even if everything about the system, except the key, is public knowledge
+
+This principle makes interoperability of cryptographic primitives possible.
+
+\paragraph{modularity}
+Cryptographic primitives are not \textit{modular}. This means that even a combination of secure primitives can create an insecure application.
+
+\section{Hash Functions}
+Hash functions should be strictly one-way and it should be unfeasible to generate a collision on demand.
+
+We will use the \textit{Merkle construction} for this.\\
+The input message is partitioned into $t$ number of bit blocks, each one being $n$ bits.\\
+If necessary the final block is padded so that it is of the same length as the others.
+
+The construction is parametric with respect to a compression function $f$ which takes $2$ arguments.
+
+We take an initialization vector with the size $m$ of the final message. Then $f$ is applied iteratively on the initialization vector, passing a different block of the message as the second parameter each time.
+
+The compression function in \texttt{SHA256} takes in some constant as well to further increase the difficulty in cracking it. It is a composition of linear and non-linear operations, like bit-shifts and xor operations.
+
+\begin{figure}
+    \center
+    \includegraphics[width=0.8\linewidth]{images/sha.png}
+    \caption{Compression function in SHA256}
+\end{figure}
+
+\subsection{Linear functions, diffusion and digression}
+
+\end{document}

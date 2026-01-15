@@ -1,0 +1,84 @@
+\contentsline {section}{\numberline {1}25-02-2025}{2}{section.1}%
+\contentsline {section}{\numberline {2}Normal forms}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Negative Normal Form - NNF}{4}{subsection.2.1}%
+\contentsline {paragraph}{Properties}{4}{section*.12}%
+\contentsline {subsection}{\numberline {2.2}Conjunctive Normal Form - CNF}{4}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Naive CNF conversion}{4}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Labeling CNF conversion}{4}{subsubsection.2.2.2}%
+\contentsline {section}{\numberline {3}Basic SAT-solving techniques}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Intro - Unit propagation}{5}{subsection.3.1}%
+\contentsline {paragraph}{Resolution rule}{5}{section*.13}%
+\contentsline {paragraph}{Removal of valid clauses}{5}{section*.14}%
+\contentsline {paragraph}{Clause subsumption}{5}{section*.15}%
+\contentsline {paragraph}{Unit resolution}{5}{section*.16}%
+\contentsline {paragraph}{Unit subsumption}{5}{section*.17}%
+\contentsline {paragraph}{Unit propagation}{5}{section*.18}%
+\contentsline {subsection}{\numberline {3.2}Resolution algorithm}{5}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Tableaux}{5}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}DPLL - Davis-Putnam-Longeman-Loveland procedure}{6}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Backtracking problem}{6}{subsubsection.3.4.1}%
+\contentsline {section}{\numberline {4}OBDD - Ordered Binary Decision Diagrams}{6}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Generating OBDD - naive}{6}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Incremental Building}{6}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Modern SAT-solving techniques - CDCL}{7}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Stack representation of truth assignments}{7}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}Implication graphs}{7}{subsubsection.5.1.1}%
+\contentsline {paragraph}{UIP - Unique implication point}{8}{section*.19}%
+\contentsline {subsection}{\numberline {5.2}CDCL algorithm}{8}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Learning}{8}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Conflict analysis}{8}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Backjumping}{9}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Problems with CDCL}{9}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}Random restarts}{9}{subsection.5.7}%
+\contentsline {subsection}{\numberline {5.8}SAT under assumptions}{9}{subsection.5.8}%
+\contentsline {subsection}{\numberline {5.9}Selection of sub-formulas}{9}{subsection.5.9}%
+\contentsline {subsection}{\numberline {5.10}Incremental SAT solving}{10}{subsection.5.10}%
+\contentsline {section}{\numberline {6}First-Order Logic}{10}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Theories}{10}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Satisfiability Modulo Theories - SMT}{10}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}SMT Solvers}{10}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Combination of theories}{11}{subsection.6.4}%
+\contentsline {section}{\numberline {7}Kripke Models}{11}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Formal Definition}{11}{subsection.7.1}%
+\contentsline {paragraph}{Path}{12}{section*.25}%
+\contentsline {paragraph}{Reachable}{12}{section*.26}%
+\contentsline {paragraph}{Asynchronous Composition/Product}{12}{section*.27}%
+\contentsline {paragraph}{Synchronous Composition/Product}{13}{section*.28}%
+\contentsline {subsection}{\numberline {7.2}Description languages}{13}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}The SMV Language}{13}{subsubsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.3}Standard Programming Languages}{13}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Properties}{13}{subsection.7.4}%
+\contentsline {paragraph}{Safety Properties}{13}{section*.29}%
+\contentsline {paragraph}{Liveness Properties}{14}{section*.30}%
+\contentsline {paragraph}{Fairness Properties}{14}{section*.31}%
+\contentsline {subsection}{\numberline {7.5}Computation trees vs paths}{14}{subsection.7.5}%
+\contentsline {section}{\numberline {8}Temporal Logics}{14}{section.8}%
+\contentsline {subsection}{\numberline {8.1}LTL - Linear Temporal Logic}{14}{subsection.8.1}%
+\contentsline {subsubsection}{\numberline {8.1.1}Negation Properties}{14}{subsubsection.8.1.1}%
+\contentsline {subsubsection}{\numberline {8.1.2}LTL Tableaux rules}{15}{subsubsection.8.1.2}%
+\contentsline {subsection}{\numberline {8.2}CTL - Computation Tree Logic}{15}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}CTL*}{16}{subsection.8.3}%
+\contentsline {paragraph}{State formulas}{16}{section*.33}%
+\contentsline {paragraph}{Path formulas}{16}{section*.34}%
+\contentsline {section}{\numberline {9}Automata-Theoretic LTL Reasoning}{17}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Infinite word languages}{17}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Omega-Automata}{17}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Buchi automata}{17}{subsection.9.3}%
+\contentsline {paragraph}{Runs and Languages}{17}{section*.35}%
+\contentsline {paragraph}{DBA vs NBA}{17}{section*.36}%
+\contentsline {subsection}{\numberline {9.4}Operations on Buchi Automata}{17}{subsection.9.4}%
+\contentsline {paragraph}{Union}{17}{section*.37}%
+\contentsline {paragraph}{Intersection}{17}{section*.38}%
+\contentsline {subsection}{\numberline {9.5}LTL and Buchi}{17}{subsection.9.5}%
+\contentsline {paragraph}{validity and satisfiability}{17}{section*.39}%
+\contentsline {paragraph}{Entailment}{17}{section*.40}%
+\contentsline {paragraph}{LTL model checking}{18}{section*.41}%
+\contentsline {subsection}{\numberline {9.6}Language emptiness checking}{18}{subsection.9.6}%
+\contentsline {subsubsection}{\numberline {9.6.1}Naive Double Nested DFS algorithm}{18}{subsubsection.9.6.1}%
+\contentsline {subsubsection}{\numberline {9.6.2}SCC-based algorithm}{18}{subsubsection.9.6.2}%
+\contentsline {subsubsection}{\numberline {9.6.3}Smart Double Nested DFS}{18}{subsubsection.9.6.3}%
+\contentsline {subsection}{\numberline {9.7}Kripke Models to Buchi Automata}{18}{subsection.9.7}%
+\contentsline {subsection}{\numberline {9.8}From LTL formulas to Buchi Automata}{18}{subsection.9.8}%
+\contentsline {paragraph}{LTL Negative Normal Form}{18}{section*.42}%
+\contentsline {paragraph}{On-the-fly construction of $A_\varphi $}{18}{section*.43}%
+\contentsline {section}{\numberline {10}CTL Model Checking}{19}{section.10}%

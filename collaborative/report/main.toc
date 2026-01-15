@@ -1,0 +1,12 @@
+\contentsline {section}{\numberline {1}Introduction and selected topic}{1}{section.1}%
+\contentsline {section}{\numberline {2}Main Features}{1}{section.2}%
+\contentsline {paragraph}{Activation}{1}{section*.2}%
+\contentsline {paragraph}{Recognizing the human's intent}{1}{section*.3}%
+\contentsline {paragraph}{Matching the human's movements}{1}{section*.4}%
+\contentsline {paragraph}{Releasing the bars}{1}{section*.5}%
+\contentsline {section}{\numberline {3}Software components}{1}{section.3}%
+\contentsline {paragraph}{Control}{1}{section*.6}%
+\contentsline {paragraph}{Interaction}{2}{section*.7}%
+\contentsline {paragraph}{Safety}{2}{section*.8}%
+\contentsline {paragraph}{Task Planning}{2}{section*.9}%
+\contentsline {paragraph}{Motion planning}{2}{section*.10}%

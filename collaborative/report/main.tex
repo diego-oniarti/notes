@@ -1,0 +1,107 @@
+\documentclass{article}
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=3.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[parfill]{parskip}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+\usepackage{hyperref}
+
+
+\title{Software Development for Collaborative Robotics}
+\author{Luca Dematté - Diego Oniarti}
+\date{18/12/2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction and selected topic}
+Our idea originates from a real world scenario that is close to us. \textbf{Fig.\ref{fig:lathe_picture}} shows the lathe present in one of our fathers' workshop. \\
+The lathe is equipped with an automatic bar feeder which pushes the material in to
+be processed and a tray to store the brass bars. The bars need to be periodically loaded
+into the bar feeder by hand. This task is usually performed by two operators since
+the bars are approximately \textit{3m} in length and any bend in the material could
+render them unusable.
+
+Our project proposal is a robot that would aid an human operator in the task of
+loading these rods into the machine. The human will lift the rods from one end while
+the robot arm holds the other.
+
+\section{Main Features}
+In this section we will describe in more detail the order of operations. The actions
+are illustrated visually in \textbf{Fig. \ref{fig:illustrations}}
+
+\paragraph{Activation} The robot should stand in an idle state whenever the
+human is not in the proximity of the bar tray. It should then activate when
+it detects the human approaching the tray and showing intent to load the feeder.
+
+\paragraph{Recognizing the human's intent} The robot should use its camera to
+recognize when the human is starting to lift one end of the bars (which will be taken
+an handful at a time) and grab the other.
+
+\paragraph{Matching the human's movements} The robot should use its torque and force
+sensors to respond to the human's movements, moving accordingly to keep the rods level.
+
+\paragraph{Releasing the bars} The robot should be able to recognize when the human
+is releasing the bars into the feeder and do the same before returning to an idle position.
+
+\section{Software components}
+\paragraph{Control} We will use an impedance/admittance controller from the FZI
+repository to control the movement of the robot.
+
+\paragraph{Interaction} To second the human movement we will simply monitor the force
+and the torque on the end effector and operate accordingly.
+
+\paragraph{Safety} As stated in the report the robot will have power and force limiting,
+Speed and separation monitoring, and an emergency stop.
+
+\paragraph{Task Planning} The task the robot should perform is easily divisible into
+discrete phases that should be performed in sequence, so we believe the best approach
+would be a finite state machine. Hence we consider the use of the yasmin library.
+
+\paragraph{Motion planning} The robot would use simple spline interpolation to reach
+the bars and then switch to compliance.
+
+\begin{figure}[ht!]
+    \center
+    \includegraphics[width=0.8\linewidth]{images/tornio.jpg}
+    \caption{The lathe and the brass bars}
+    \label{fig:lathe_picture}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/idle.jpg}
+        \caption{Robot idle}
+        \label{fig:idle}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/recognize.jpg}
+        \caption{Robot recognizing the human intent}
+        \label{fig:recognition}
+    \end{subfigure}
+    \medskip
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/follow.jpg}
+        \caption{Robot following the human}
+        \label{fig:follow}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/load.jpg}
+        \caption{Robot and human loading the feeder}
+        \label{fig:load}
+    \end{subfigure}
+
+    \caption{Main features}
+    \label{fig:illustrations}
+\end{figure}
+
+\end{document}

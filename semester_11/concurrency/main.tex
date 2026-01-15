@@ -1,0 +1,520 @@
+\documentclass{article}
+
+\usepackage{pdflscape}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\input{../common}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+    language=Java,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=none,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=3
+}
+
+\title{Appunti Concurrency}
+\author{Diego Oniarti}
+\date{Anno 2024-2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Goals of the course}
+\begin{itemize}
+    \item get a general understnding of the issues
+    \item develop the ability to reason about
+        \begin{itemize}
+            \item what can go wrong under interference
+            \item what can be safely made mode efficient by concurrent cooperation
+        \end{itemize}
+\end{itemize}
+Più nello specifico vedremo algoritmi di sincronizazione, tecniche per ragionare formalmente sulla concorrenza, e i fondamentali:
+cos'è fattibile, cosa non lo è, e perché.
+
+Il libro che segue la Quaglia è "\textit{The art of multiprocessor programming, revised print}".
+
+\subsection{Modalità d'esame}
+Orale obbligatorio e progetto opzionale. Il progetto rende l'orale più semplice.
+Il progetto andrebbe fatto prima di Natale.
+
+
+\section{Concurrent vs Sequential}
+Un programma sequenziale deve occiparsi solo della "\textbf{safety}". Quindi assicurarsi che l'output sia corretto per un dato input. 
+
+Un programma concorrente, invece, deve occuparsi sia della safety che della "\textbf{liveness}". Questo è un'aspetto che non ha eguali nella programmazione sequenziale. Con liveness definiamo la capacità di un programma di eseguire correttamente a tempo indeterminato senza supervisione dall'utente (credo). \\
+Pensare alla safety nella programmazione concorrente è molto più complesso che nella programmazione sequenziale, e deve essere garantita a prescindere dall'ordine di esecuzione dei thread.
+
+\section{Underlying Model}
+Assumiamo:
+\begin{itemize}
+    \item Thread Multipli (processi)
+    \item Singola memoria condivisa
+    \item Gli oggetti risiedono in memoria
+    \item Delay asincroni inprevedibili
+\end{itemize}
+
+\section{Road Map}
+Inizieremo parlando di principi e use-cases dopo.
+
+\section{Esempio numeri primi}
+Immaginiamo di voler usare 10 processi per calcolare i numeri primi da $0$ a $10^10$. \\
+L'intuizione naive sarebbe quella secondo cui questo è 10 volte più veloce rispetto a farlo con un processore singolo. Ma raramente abbiamo questo tipo di improvement.
+
+\paragraph{Primo approccio}
+Il promo approccio potrebbe essere quello di dividere il range in $10$ e associare ad ogni thread uno dei $10$ range in cui calcolare i numeri primi.
+
+Questa opzione non è buona per il fatto che il task dell'ultimo thread è molto più complesso del task del primo. Questo è un problema di "load balancing".
+
+\paragraph{Metodo più dinamico}
+Usare un contatore condiviso. Ogni processo prende il primo numero libero che trova e testa se è primo. 
+
+Il problema ora è la gestione del counter condiviso. Se più thread tentano di accedere al counter in modo non atomico potrebbero sovrascriverlo con valori sbagliati o leggere valori non aggiornati.
+
+\section{Semafori}
+Questo non è safe, in quanto la lettura e la scrittura della variabile \texttt{temp} non sono sincrone.
+\begin{lstlisting}
+public class Counter {
+    private long value;
+
+    public long getAndIncrement() {
+        temp = value;
+        value = temp+1;
+        return temp;
+    }
+}
+\end{lstlisting}
+
+Affrontare la safety è diverso in diversi linguaggi. In Java possiamo usare la keywork "synchronized"
+\begin{lstlisting}
+public class Counter {
+    private long value;
+
+    public long getAndIncrement() {
+        synchronized {
+            temp = value;
+            value = temp+1;
+        }
+        return temp;
+    }
+}
+\end{lstlisting}
+
+\begin{callout}{Safety and Liveness}
+    Safety: Niente di brutto deve succedere. \\
+    Liveness: Prima o poi deve succedere qualcosa di bello.
+\end{callout}
+
+\section{Amdahl's Law}
+Questa formula ci indica quanto più veloce un programma può essere reso utilizzando concorrenza:
+$$
+speedup = \frac{1}{1-p+\frac p n}
+$$
+dove $p$ è la percentuale di codice che può essere parallelizzata e $n$ è il numero di processi.
+
+\section{Mutual Exclusion}
+\subsection{Time And Events}
+Un evento $a_0$ di un thread $A$ è \textit{istantaneo} e \textit{non} esistono eventi simultanei.
+
+Possiamo vedere un thread come una \textit{macchina a stati}.
+\paragraph{State}
+Differenziamo lo stato di un thread dallo stato del sistema. \\
+State: \begin{itemize}
+    \item program counter
+    \item local variables
+\end{itemize}
+System state: \begin{itemize}
+    \item shared variables
+    \item thread states
+\end{itemize}
+
+\paragraph{Intervalli}
+Un intervallo $A_0=(a_0,a_1)$ è il tempo tra gli eventi $a_0$ e $a_1$.
+
+\subsubsection{Precedenza}
+Possiamo dire che un intervallo \textit{precede} un'altro intervallo ($a_1 < b_0$)
+\paragraph{Irreflexive} Never true that $I\to I$
+\paragraph{Antisymmetric} $I\to J \implies I\not\to J$
+\paragraph{Transitive} $I\to J \text{ and } J \to K \implies I\to K$
+\paragraph{Partial} 
+
+\subsubsection{Eventi Ripetuti}
+$a_0^k$ indica la $k$-esima occorrenza dell'evento $a_0$, qual'ora esso si ripeta. \\
+Lo stesso si può fare con l'intervallo $A_0^k$.
+
+\subsection{Locks}
+Definiamo due metodi \textit{lock} e \textit{unlock} che incapsulreanno la sezione critica.
+\begin{lstlisting}
+public class Counter {
+    private long value;
+    private Lock mylock;
+    public long getAndIncrement() {
+        // Acquisisci il lock
+        mylock.lock();
+        try {
+            // Sezione critica
+            int temp = value;
+            value = value+1;
+        } finally {
+            // Rilascia il lock a ogni costo, anche in caso di errore
+            mylock.unlock();
+        }
+        return temp;
+    }
+}
+\end{lstlisting}
+\begin{callout}{java}
+    Usiamo Java perché è il linguaggio usato nel libro di testo. Non per altri motivi.
+\end{callout}
+
+\subsection{Deadlock-Free}
+Se un qualche thread chiama \textit{lock()}, primo a poi un qualsiasi thread deve acquisire il lock.
+\subsection{Starvation-Free}
+Se un qualche thread chiama \textit{lock()}, prima o poi deve acquisire il lock.
+
+\subsection{Soluzioni per due/n thread}
+Inizieremo con soluzioni che risolvono il problema con due thread prima di muoverci a soluzioni più generali e complesse.\\
+Indicheremo con $i$ il thread corrente e $j$ l'altro.
+
+\subsubsection{LockOne}
+\begin{lstlisting}
+class LockOne implements Lock {
+    private boolean[] flag = new boolean[2];
+    public void lock() {
+        // Setta la flag e aspetta che l'altra chiuda
+        flag[i] = true;
+        while (flag[j]) {}
+    }
+    public void unlock() {
+        flag[i] = false;
+    }
+}
+\end{lstlisting}
+
+Questa prima implementazione primitiva garantisce mutual exclusion ma non è deadlock-free. \\
+Se i due thread settano la flag allo stesso momento entrano in deadlock.
+
+\subsubsection{LockTwo}
+\begin{lstlisting}
+class LockTwo implements Lock {
+    private int victim;
+    public void lock() {
+        victim = i;
+        while (victim==i) {}
+    }
+    public void unlock() {}
+}
+\end{lstlisting}
+
+\subsubsection{Peterson's Algorithm}
+\begin{lstlisting}
+public void lock() {
+    flag[i] = true;
+    victim = i;
+    while (flag[j] && victim==i) {};
+}
+public void unlock() {
+    flag[i] = false;
+}
+\end{lstlisting}
+Questo algoritmo risolve sia mutual exclusion che starvation.
+
+L'ordine delle operazioni è importante. Se cambiassimo l'ordine delle attribuzioni di \texttt{flag[i]} e \texttt{victim} rompiamo già la mutua esclusione.
+
+L'algoritmo può essere visto come un "filtro". Dove settare la flag indica il desiderio di un thread di entrare nella CS, e la variabile victim funge da discriminatore.
+
+\subsubsection{Filter Algorithm}
+L'algoritmo di Peterson può essere generalizzato a più thread con una soluzione a "livelli"
+\begin{lstlisting}
+int[] level;
+int[] victim;
+
+public Filter(int n) {
+    public void lock() {
+        for (int L=1, L<n; L++) {
+            level[i] = L;
+            victim[L] = i;
+            while (((exists k!= i) level[k]>=L) && victim[L]==i) {};
+        }
+    }
+    public void unlock() {
+
+    }
+}
+\end{lstlisting}
+Questo algoritmo è starbation free e garantisce mutua esclusione. Non è buono a livello di fairness però.
+
+\subsection{Bounded Waiting}
+Possiamo dividere un metodo \textit{lock} in due parti. Il "\textit{doorway interval}" e il "\textit{waiting intervall}". 
+Per garantire un qualche livello di fairnes dobbiamo imporre un upper bound alla durata dell'intervallo di waiting.
+
+Un thread non può "superare" un altro più di $r$ volte. $r$ è un superparametro imposto dallo sviluppatore.
+\begin{callout}{superare}
+    Diciamo che un thread $A$ ne "supera" uno $B$ quando $A$ entra ed esce dalla sezione critica mentre $B$ rimane bloccato nel waiting della lock.
+\end{callout}
+
+\subsubsection{Bakery Algorithm}
+L'algoritmo del fornaio assicura un ordine FIFO per i thread in attesa.
+\begin{lstlisting}
+boolean[] flage;
+Lavel[] lavel;
+public void lock() {
+    // doorway
+    flag[i] = true;
+    label[i] = max(label[0],...,label[n-1])+1;
+    // waiting
+    while (forall k != i:
+        (flag[k] 
+        && 
+        (label[k],k) << (label[i],i)
+        )
+    ) {};
+}
+\end{lstlisting}
+$(lavel[a],a) << (label[b],b)$ ordine lessicografico.
+
+L'algoritmo a livello teorico funziona perfettamente. L'implementazione è però difficile o impossibile.
+\begin{enumerate}
+    \item Le lable esplodono a numeri infiniti, causando overflow
+    \item Ci possono essere conflitti durante il calcolo di max
+    \item Ci possono essere conflitti durante il calcolo del while
+\end{enumerate}
+Gli ultimi due punti possono essere risolti dall'ordine lessicografico ma il primo no.
+
+\section{Precedence Graph}
+One can construct a 
+\begin{itemize}
+    \item wait-free (no mutual exclusion)
+    \item concurrent
+    \item timestamping system
+    \item that never overflows
+\end{itemize}
+Un grafo dove an edge from $x$ to $y$: \begin{itemize}
+    \item $x$ is later timestamp
+    \item missing
+    \item missing
+\end{itemize}
+Quando usiamo \textit{grafi di precedenza} non facciamo ricorso alla transitività per capire "chi viene prima", ma sono gli archi.
+
+\section{Numero minimo di variabili}
+Non esiste un algoritmo che assicuri mutua esclusione tra $n$ thread con meno di $n$ variabili.
+
+Assumiamo per assurdo che esista un algoritmo di questo tipo. Possiamo poi dimostrare che un algoritmo di questo tipo rompe la mutua esclusione (provando la tesi per assurdo).
+
+Definiamo dei termini.
+\begin{itemize}
+    \item $S$ è \textit{idle} se tutti i thread sono nella loro reminder region.
+    \item $S\sim_A S'$ due stati sono \textit{indistinguibili} se
+        \begin{itemize}
+            \item Le variabili locali sono uguali
+            \item Le variabili globali sono uguali
+        \end{itemize}
+\end{itemize}
+
+Ora dei fatti:
+\begin{enumerate}
+    \item Any thread $A$ tunning solo from S, with either $S$ idle or $S\sim I$ and $I$ idle, can reach CS
+    \item Any thread $A$ that from an idle state reaches CS running solo must write something in shared memory before getting in.
+\end{enumerate}
+
+\section{Tight bound: n bite for n threads}
+
+\section{Hoare Logic}
+La \textit{Hoare Logic} era inizialmente utilizzata per ragionare sulla correttezza di programmi sequenziali. È un tipo di analisi sintattica (quindi statica).
+
+\begin{itemize}
+    \item At the basis of all deductive verification techniques \\
+        Anche PVS usato dall'NSA si basa sulla Hoare Logic
+    \item Used to specify properties of squential imperative programs by means of triples
+        \begin{align*}
+            \{p\} S \{q\}
+        \end{align*}
+        where 
+        \begin {itemize}
+            \item $S$ is a statement of the language
+            \item $p$ is the \textit{pre-condition}, an assertion about a relevant property which the state holds before $S$ is exectuted
+            \item $q$ is a \textit{post-condition}, an assertion that holds after $S$
+        \end{itemize}
+        In altre parole
+        \begin{itemize}
+            \item if $S$ starts execution in a state satisfying $p$
+            \item and if the execution of $S$ terminates
+            \item Then the state reached after the execution of $S$ satisfyes $q$
+        \end{itemize}
+\end{itemize}
+
+\subsection{Language of assertions}
+Assertions are formulas in a propositional loguc
+\begin{align*}
+    A ::=& A\ and\ A \\
+         |& A\ or\ A \\
+         |& true \\
+         |& false \\
+         & ... \\
+    S ::= & skip\ |x:=E | S;S| if B then S else S | while (B) S
+\end{align*}
+
+Evert state sarisfies $true$ and no state sarisfies $false$. Henche fpr every $p$ and for every $S$
+\begin{align*}
+    \{p\} S \{true\}
+\end{align*}
+is a valid triple. and $\{false\} S \{p\}$ is a valid triple.
+
+\begin{esempio}{es}
+    \[\begin{array}{cl}
+        \{x=5\}x:=x+1\{x=6\} & \text{è valido} \\
+        \{x=5\ and\ y=2\}x:=x+1\{x=6\ and\ y=3\} & \text{non è valido} \\
+        \{x=5\ and\ y=2\}x:=x+1\{x=6\ or\ y=3\} & \text{è valido} \\
+    \end{array}\]
+\end{esempio}
+
+\subsection{Proof System}
+A proof system is defines so that: if the proof system accepts $\{p\}S\{q\}$, $\{p\}S\{q\}$ is valid.
+\subsubsection{Proof outline}
+Un modo più compatto di scrivere derivazioni nel proof system per non avere alberi enormi.
+
+\begin{esempio}{es}
+\[\begin{array}{c}
+    \{x+1\} \\
+    \{x+1=y+1\} \\
+    x:=x+1 \\
+    \{x=y+1\} \\
+    y:=y+1 \\
+    \{x=y\}
+\end{array}\] 
+\end{esempio}
+
+\begin{esempio}{es}
+    \begin{align*}
+        \{x=5\ &and\ y=2\} \\
+        \{x&=5\} \\
+        \{x+1&=6\} \\
+        x&:=x+1 \\
+        \{x&=6\} \\
+        \{x=6\ &or\ y=3\}
+    \end{align*}
+\end{esempio}
+
+\begin{esempio}{es}
+    \[\begin{array}{c}
+        \{x=3\} \\
+        \{x>2\} \\
+        \{x+1>3\} \\
+        x:=x+1; \\
+        \{x>3\} \\
+        \{x+2>5\} \\
+        x:=x+2; \\
+        \{x>5\}
+    \end{array}\] 
+\end{esempio}
+
+\section{2024-10-31}
+\begin{itemize}
+    \item test and set: Molti cache miss
+    \item test and test and set: Meno cache miss
+    \item exponential backoff: Meno chase miss ancora ma dipende molto da\\ parametri dati
+\end{itemize}
+
+\section{Linearizability}
+Each method should take effect instantaneously between invasion an response evenest.
+
+A linearisable object is one whose possible executions are linearisable.
+
+Split method Calls into two events:
+\begin{itemize}
+    \item invocation \\
+        q.enq(x)
+    \item response \\
+        q.enq(x) returns void / x / empty
+\end{itemize}
+
+\section{Metodi di sincronizzazione}
+Il modo più becero per parallelizzare un set è aggiungere un lock che blocca l'intera data structure e la sblocca.\\
+Questo approccio non è un granché, in quanto vorremmo che più thread possano svolgere operazioni in simultaneo.
+
+\subsection{Course grained sync}
+Un lock blocca l'intera struttura dati.
+
+\subsection{Fine Grained Synchronization}
+Una soluzione è quella di proteggere con dei lock porzioni più piccole della data structure. \\
+Idealmente la suddivisione deve essere la più alta possibile.
+
+\subsection{Optimistic Synchronization}
+Search without locking. If you find it, lock and check. (Ok: we are done, NOK: start over)
+
+Questo approccio è più veloce in quanto non richiede un lock, ma gli errori diventano molto costosi.
+
+\subsection{Lazy Synchronization}
+Postpone hard work.\\
+Prendiamo per esempio la rimozione di un nodo.
+Iniziamo facendo una rimozione "logica" del nodo (marcarlo come cancellato) e più avanti facciamo la rimozione fisica più costosa.
+
+\subsection{Lock-Free Synchronization}
+Non usare lock ma istruzioni come CAS.\\
+Questo approccio è molto più difficile da implementare e alcune volte aggiunge un grande overhead. Ma non fa alcuna assunzione sullo scheduler.
+
+\section{Implementazione Set}
+I set avranno 3 metodi. (add, remove, has)
+Possiamo implementare un set come una linked list. Ogni nodo ha \begin{enumerate}
+    \item una key (hash di solito)
+    \item un valore
+    \item un puntatore a un nodo
+\end{enumerate}
+Nella lista terremo le key ordinate e 2 nodi aggiunti all'inizio e la fine ($\infty$ e $-\infty$)
+
+\subsection{Invarianti}
+\begin{enumerate}
+    \item la tail è raggiungibile dalla head.
+    \item il set non ha duplicati
+    \item la lista rimane ordinata (in funzione delle chiavi)
+\end{enumerate}
+
+\subsection{remove(x) add(x) fine-grained}
+Possiamo implementare un fine-grained sync approach usando 2 lock per scorrere la lista fino al punto desiderato. Poi sostituiamo il puntatore da $x-1$ a $x$ con quello a $x+1$ \\
+In maniera analoga, per aggiungere un nodo alla lista dobbiamo prendere il lock sul predecessore di x e il successore. O posso fare con un solo lock? Non ho capito
+
+\subsection{Optimistic}
+Cerchiamo il punto nella lista e ci prendiamo il lock senza prenderlo sugli elementi prima durante lo scrolling.
+Dopo aver preso i lock facciamo dei controlli: \begin{itemize}
+    \item che la head raggiunga il primo nodo
+    \item che il secondo possa raggiungere la tail
+    \item che il primo e il secondo siano ancora adiacenti
+\end{itemize}
+Se uno di questi controlli fallisce dobbiamo lasciare i lock e iniziare di nuovo
+
+Questi controlli ci costringono a fare almeno un altro traversing completo della lista, che può diventare costoso su set molto grandi.
+
+\subsection{Lazy}
+Like optimistic, expect: \begin{itemize}
+    \item scan once
+    \item contains(x) never locks...
+\end{itemize}
+
+We add a flag to the cells, which tells us whether the value is inside the set or not.
+
+\section{Wrap Up}
+\begin{itemize}
+    \item Hoare logic
+    \item simulations between I/O automata
+ciao
+\end{itemize}
+
+\section{Presentazione}
+
+\end{document}
+

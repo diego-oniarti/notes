@@ -1,0 +1,38 @@
+@incollection{ZHUO2011709,
+    title = {Chapter 44 - Using GPUs to Accelerate Advanced MRI Reconstruction with Field Inhomogeneity Compensation},
+    editor = {Wen-mei W. Hwu},
+    booktitle = {GPU Computing Gems Emerald Edition},
+    publisher = {Morgan Kaufmann},
+    address = {Boston},
+    pages = {709-722},
+    year = {2011},
+    series = {Applications of GPU Computing Series},
+    isbn = {978-0-12-384988-5},
+    doi = {https://doi.org/10.1016/B978-0-12-384988-5.00044-9},
+    url = {https://www.sciencedirect.com/science/article/pii/B9780123849885000449},
+    author = {Yue Zhuo and Xiao-Long Wu and Justin P. Haldar and Thibault Marin and Wen-mei W. Hwu and Zhi-Pei Liang and Bradley P. Sutton},
+    abstract = {Publisher Summary
+    This chapter focuses on a GPU implementation for a fast advanced non-Cartesian MRI reconstruction algorithm with field inhomogeneity compensation. Magnetic resonance imaging (MRI) is a flexible diagnostic tool, providing image contrast relating to the structure, function, and biochemistry of virtually every system in the body. However, the technique is generally slow and has low sensitivity, which limits its application in the clinical environment. Several challenges exist that limit the application of MRI in the clinical environment. Traditionally, the main limitations in MRI have been due to the manner in which data are sampled in clinical scans. The techniques of tiling have been applied with constant memory, loop invariant code motion, storing variables in registers, and using single-precision floating-point computations on the GPU kernels. The parallel structure of the reconstruction algorithms makes it suitable for parallel programming on GPUs. Accelerating this kind of algorithm can allow for more accurate image reconstruction while keeping computation times short enough for clinical use. Thus, the use of GPUs will enable improved trade-offs between data acquisition time, signal-to-noise ratio, and the severity of artifacts owing to nonideal physical effects during the MRI imaging experiment.}
+}
+
+@online {sharedMem,
+    title = {Using Shared Memory in CUDA C/C++},
+    author = {Mark Harris},
+    url = {https://developer.nvidia.com/blog/using-shared-memory-cuda-cc},
+    date = {Jan 28, 2013}
+}
+
+@online {shuffleOps,
+    title = {Warp Shuffle Functions},
+    url = {https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html\#warp-shuffle-functions}
+}
+
+@online {cuda_ldg,
+    title = {Read-Only Data Cache Load Function},
+    url = {https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html\#read-only-data-cache-load-function}
+} 
+
+@online {cuda_restrict,
+    title = {Cuda Programming Guide: \_\_restrict\_\_},
+    url = {https://docs.nvidia.com/cuda/cuda-c-programming-guide/\#restrict}
+}

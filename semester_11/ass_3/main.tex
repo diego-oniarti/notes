@@ -1,0 +1,248 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{semantic}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{nicefrac, xfrac}
+\usepackage[a4paper, margin=0.5in]{geometry}
+\usepackage{setspace}
+
+\input{../common}
+\newcommand{\execs}[0]{\ensuremath{\rightrightarrows}}
+
+\usepackage{pdflscape}
+
+\title{Assignment \#3}
+\author{Diego Oniarti - 257835}
+\date{}
+\begin{document}
+
+\maketitle
+
+\section{Polymorphic behaviour}
+Prove that for any closed term $f$ of type $\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta)$ and for any closed types $\tau_1,\tau_2$ value $v:\tau_1$, we have $f\ \tau_1\ \tau_2\ v\leadsto^{*} \inl v$
+
+Assuming:
+\begin{align*}
+    & \Delta,\Gamma\vDash f:\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta) & HP1 \\
+    & \Delta \vdash \tau_1 & HP2 \\
+    & \Delta \vdash \tau_2 & HP3 \\
+    & \vdash v:\tau_1       & HP4 \\
+\end{align*}
+Prove:
+\begin{align*}
+    & f\ \tau_1\ \tau_2\ v \leadsto^{*} \inl v  & THS
+\end{align*}
+
+\begin{align*}
+    \text{by HP1 w.h.} &\ \forall\delta\in D[\Delta],\forall\gamma\in G[\Gamma]^\delta, f\gamma\delta\in\cE[\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta)]^\delta \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v_1.f\gamma\delta\leadsto^{*}v_1 \AND v_1\in\V[\forall\alpha.\forall\beta.\alpha\to(\alpha\uplus\beta)]^\delta \\
+    \text{by def. of $\V$ w.h.} &\ v_1\equiv \Lambda\alpha.t \AND \forall \tau'.\forall S\in\text{semty}(\tau').t[\sfrac{\tau'}\alpha]\in\cE[\forall\beta.\alpha\to(\alpha\uplus\beta)]^{\substack{\delta,\hfill\\\alpha\mapsto\tau',S}} \\
+    \text{by HP2 pick} &\ \tau'=\tau_1,S=\{v\} \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v_2.t[\sfrac{\tau'}{\alpha}]\leadsto^{*}v_2\AND v_2\in\V[\forall\beta.\alpha\to(\alpha\uplus\beta)]^{\substack{\delta,\hfill\\\alpha\mapsto\tau_1,\{v\}}} \\
+    \text{by def. of $\V$ w.h.} &\ v_2\equiv \Lambda\beta.t' \AND \forall\tau".\forall S'\in\text{semty}(\tau").t'[\sfrac{\tau"}\beta]\in\cE[\alpha\to(\alpha\uplus\beta)]^{\textcolor{purple}{\overbrace{\textcolor{black}{\substack{\delta,\hfill\\\alpha\mapsto\tau_1,\{v\},\\\beta\mapsto\tau",S'}}}^{\delta'}}} \\
+    \text{pick} &\ \tau"=\tau_2,S'=\emptyset \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v_3.t'[\sfrac{\tau"}\beta]\leadsto^{*}v_3\AND v_3\in\V[\alpha\to(\alpha\uplus\beta)]^{\delta'} \\
+    \text{by def. of $\V$ w.h.} &\ v_3\equiv \lam{x:\alpha}{t"}\AND \forall v_4.\IF v_4 \in\V[\alpha]^{\delta'}\THEN t"[\sfrac{v_4}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
+    \text{by def. of $\V$ w.h.} &\ v_3\equiv \lam{x:\alpha}{t"}\AND \forall v_4.\IF v_4 \in \{v\}\THEN t"[\sfrac{v_4}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
+    \text{by $v_4=v$ w.h.} &\ v_3\equiv \lam{x:\alpha}{t"}\AND t"[\sfrac{v}{x}]\in\cE[\alpha\uplus\beta]^{\delta'} \\
+    \text{by def. of $\cE$ w.h.} &\ \exists v_5. t"[\sfrac{v}{x}] \leadsto^{*} v_5 \AND v_5\in\V[\alpha\uplus\beta]^{\delta'} \\
+    \text{by def. of $\V$ w.h.} &\  \begin{array}{rl}\text{either}&v_5\equiv \inl v_6 \AND v_6\in\V[\alpha]^{\delta'} \\
+    \text{or} & v_5\equiv \inr v_6 \AND v_6\in\V[\beta]^{\delta'}\end{array} \\
+        \text{by def. of $\V$ w.h.}  &\ \begin{array}{rl}\text{either}&v_5\equiv \inl v_6 \AND v_6\in \{v\} \\
+        \text{or} & \textcolor{purple}{\cancel{\textcolor{black}{v_5\equiv \inr v_6 \AND v_6\in \emptyset}}}\end{array} \\
+            \text{by no val in $\emptyset$ w.h.} &\ v_5\equiv \inl v _\square\\
+        \end{align*}
+
+\newpage
+\section{Free Theorems}
+\begin{gather*}
+    \not\exists t. \emptyset;\emptyset\vdash t: \forall\alpha.\forall\beta.\beta\to\alpha (THM)
+\end{gather*}
+Proof by contradiction. We assume that $\emptyset;\emptyset\vdash t: \forall\alpha.\forall\beta.\beta\to\alpha$.
+\begin{align*}
+    \te{By semantic soundness w.h.} &\ \emptyset;\emptyset\vDash t: \forall\alpha.\forall\beta.\beta\to\alpha \\
+    \te{By semantic typing w.h.} &\ t\in\cE[\forall\alpha.\forall\beta.\beta\to\alpha] \\
+    \te{By definition of $\cE$ w.h.} &\ \exists v. t\ls v \AND v \in \V[\forall\alpha.\forall\beta.\beta\to\alpha] \\
+    \te{By definition of $\V_\forall$ w.h.} &\ v\equiv \Lambda \alpha.t_1\AND \forall\tau',\forall S\in\te{SemTy}(\tau'). t_1[\sfrac{\tau'}\alpha] \in \cE[\forall\beta.\beta\to\alpha]^{\alpha\mapsto \tau',S} \\
+    \te{pick} &\ S=\emptyset \\
+    \te{By definition of $\cE$ w.h.} &\ \exists v_1. t_1[\sfrac{\tau'}\alpha] \ls v_1 \AND v_1\in\V[\forall\beta.\beta\to\alpha]^{\alpha\mapsto \tau',\emptyset} \\
+    \te{By definition of $\V_\forall$ w.h.} &\ v_1\equiv \Lambda \beta.t_2\AND \forall\tau",\forall S'\in\te{SemTy}(\tau"). t_2[\sfrac{\tau"}\beta] \in \cE[\beta\to\alpha]^{\left.\substack{\alpha\mapsto \tau',\emptyset\\\beta\mapsto \tau",S'}\right\}\delta} \\
+    % \te{pick} &\ S'=\emptyset \\
+    \te{By definition of $\cE$ w.h.} &\ \exists v_2.t_2[\sfrac{\tau"}\beta]\ls v_2 \AND v_2\in\V[\beta\to\alpha]^{\delta} \\
+    \te{by definition of $\V_\to$ w.h.} &\ v_2 \equiv \lam{x:\beta}{t_3} \AND \forall v_3.\IF v_3 \in\V[\beta]^\delta \THEN t_3[\sfrac{v_3}x]\in\cE[\alpha]^\delta \\
+    \te{by definition of $\cE$ w.h.} &\ \exists v_4. t_3[\sfrac{v_3}x]\ls v_4\AND v_4\in\V[\alpha] \\
+    \te{by definition of $\V_\alpha$ w.h.} &\ v_4\in\emptyset\te{ . Contradiction}_\square
+\end{align*}
+
+\newpage
+\section{A Register Machine Language}
+\begin{align*}
+    t ::= & r:=n \\
+        |& sum\ r\ r \\
+        |& sub\ r\ r \\
+        |& cmp\ r\ r \\
+        |& jmp\ r \\
+        |& jiz\ r \\
+        |& jeq\ r \\
+    r ::= & ar|br|cr|dr|er|fr|gr|hr \\
+        |&ir|jr|kr|lr|mr|nr|or \\
+    C ::=& \emptyset | C,\N\mapsto t \\
+    F ::=& \emptyset | F,\N\mapsto b \\
+    R ::=& \emptyset | R, r\mapsto \N \\
+\end{align*}
+
+Judgement:
+\begin{equation*}
+    n;C;R;F \rightrightarrows n;C;R;F
+\end{equation*}
+Codebase, registers, and flags:
+\[\setstretch{3} \begin{array}{ccc}
+    \st[]{C(n)=t}{C=C',n\mapsto t} &
+    \st[]{R(r)=n}{R=R',r\mapsto n} &
+    \st[]{F(n)=B}{F=F',n\mapsto B} \\
+    \st[]{C(n)=t}{C=C',n'\mapsto \_\quad C'(n)=t} &
+    \st[]{R(r)=n}{R=R',r'\mapsto \_\quad R'(r)=n} &
+    \st[]{F(n)=B}{F=F',n'\mapsto \_\quad F'(n)=B} \\
+\end{array}\]
+Rules:
+\setstretch{3}\begin{gather*}
+    \st[load]{n;C;R;F \execs n';C;R';F}{C(n)=r_1:=n_1 \quad R'=R,r_1\mapsto n_1 \quad n'=n+1} \\
+    \st[sum]{n;C;R;F \execs n';C;R';F}{
+        C(n)=sum\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1+n_2 \ 
+        n'=n+1
+    } \\
+    \st[sub]{n;C;R;F \execs n';C;R';F'}{
+        C(n)=sub\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1-n_2 \ 
+        n'=n+1 \
+        F'=F,0\mapsto n_2>n_1
+    } \\
+    \st[cmp]{n;C;R;F \execs n';C;R;F'}{
+        C(n)=cmp\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        F'=F,1\mapsto n_1==n_2 \
+        n'=n+1
+    } \\
+    \st[jmp]{n;C;R;F \execs n';C;R;F}{
+        C(n)=jmp\ r_1 \quad
+        R(r_1)=n_1 \quad
+        n'=n_1
+    } \\
+    \st[jiz]{n;C;R;F \execs n';C;R;F}{
+        C(n)=jiz\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(1)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[jeq]{n;C;R;F \execs n';C;R;F}{
+        C(n)=jeq\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(0)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+\end{gather*}
+
+\newpage
+\section{From the Register Machine to an Assembly Language}
+\setstretch{1}\begin{align*}
+    t ::= & r:=n \\
+        |& sum\ r\ r \\
+        |& sub\ r\ r \\
+        |& cmp\ r\ r \\
+        |& jmp\ r \\
+        |& jiz\ r \\
+        |& jeq\ r \\
+        |& read\ r\ r \\
+        |& write\ r\ r \\
+    r ::= & ar|br|cr|dr|er|fr|gr|hr \\
+        |&ir|jr|kr|lr|mr|nr|or \\
+    C ::=& \emptyset | C,\N\mapsto t \\
+    F ::=& \emptyset | F,\N\mapsto b \\
+    R ::=& \emptyset | R, r\mapsto \N \\
+    M ::=& \emptyset | M, \N\mapsto \N \\
+\end{align*}
+
+Judgement:
+\begin{equation*}
+    n;C;R;F;M \rightrightarrows n;C;R;F;M
+\end{equation*}
+Codebase, registers, flags, and memory:
+\[\setstretch{3} \begin{array}{cccc}
+    \st[]{C(n)=t}{C=C',n\mapsto t} &
+    \st[]{R(r)=n}{R=R',r\mapsto n} &
+    \st[]{F(n)=B}{F=F',n\mapsto B} \\
+    \st[]{C(n)=t}{C=C',n'\mapsto \_\quad C'(n)=t} &
+    \st[]{R(r)=n}{R=R',r'\mapsto \_\quad R'(r)=n} &
+    \st[]{F(n)=B}{F=F',n'\mapsto \_\quad F'(n)=B} \\
+    \st[]{M(n)=n'}{M=M',n\mapsto n'} &
+    \st[]{M(n)=n'}{M=M',n"\mapsto \_\quad M'(n)=n'} \\
+\end{array}\]
+Rules:
+\setstretch{3}\begin{gather*}
+    \st[load]{n;C;R;F;M \execs n';C;R';F;M}{C(n)=r_1:=n_1 \quad R'=R,r_1\mapsto n_1 \quad n'=n+1} \\
+    \st[sum]{n;C;R;F;M \execs n';C;R';F;M}{
+        C(n)=sum\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1+n_2 \ 
+        n'=n+1
+    } \\
+    \st[sub]{n;C;R;F;M \execs n';C;R';F';M}{
+        C(n)=sub\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        R'=R,r_1\mapsto n_1-n_2 \ 
+        n'=n+1 \
+        F'=F,0\mapsto n_2>n_1
+    } \\
+    \st[cmp]{n;C;R;F;M \execs n';C;R;F';M}{
+        C(n)=cmp\ r_1\ r_2 \ 
+        R(r_1)=n_1 \ 
+        R(r_2)=n_2 \ 
+        F'=F,1\mapsto n_1==n_2 \
+        n'=n+1
+    } \\
+    \st[jmp]{n;C;R;F;M \execs n';C;R;F;M}{
+        C(n)=jmp\ r_1 \quad
+        R(r_1)=n_1 \quad
+        n'=n_1
+    } \\
+    \st[jiz]{n;C;R;F;M \execs n';C;R;F;M}{
+        C(n)=jiz\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(1)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[jeq]{n;C;R;F;M \execs n';C;R;F;M}{
+        C(n)=jeq\ r_1 \quad
+        R(r_1)=n_1 \quad
+        F(0)=b \quad
+        n'=\IF b \THEN n_1 \ELSE n+1
+    } \\
+    \st[read]{n;C;R;F;M \execs n';C;R';F;M}{
+        C(n)=read\ r_1\ r_2 \quad
+        R(r_2)=n_2 \quad
+        M(n_2) = n" \quad
+        R' = R,r_1\mapsto n" \quad
+        n'=n+1
+    } \\
+    \st[write]{n;C;R;F;M \execs n';C;R;F;M'}{
+        C(n)=write\ r_1\ r_2 \quad
+        R(r_1)=n_1 \quad
+        R(r_2)=n_2 \quad
+        M' = M,n_1\mapsto n_2 \quad
+        n'=n+1
+    }
+\end{gather*}
+
+\end{document}
